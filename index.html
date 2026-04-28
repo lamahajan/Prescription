@@ -166,7 +166,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* Diag / complaints */
 .rxdg{font-size:12.5px;color:#1a1040;font-weight:700;line-height:1.6;margin-bottom:4px;}
-.rxcp{font-size:11.5px;color:#3a3060;line-height:1.8;margin-bottom:5px;white-space:pre-line;}
+.rxcp{font-size:11.5px;color:#3a3060;line-height:1.8;margin-bottom:5px;}
+.rxcp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px 10px;}
 
 /* Medicines */
 .rxmt{width:100%;border-collapse:collapse;margin-bottom:7px;}
@@ -530,7 +531,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <div class="mf certf-days"><label>Rest Days</label><input id="cDays" type="number" value="3" min="1" oninput="renderCert()"></div>
     <div class="mf certf-from"><label>From Date</label><input id="cFrom" type="date" oninput="renderCert()"></div>
     <div class="mf certf-to"><label>To Date</label><input id="cTo" type="date" oninput="renderCert()"></div>
-    <div class="mf" style="grid-column:1/-1"><label>📅 Certificate Date (signature ke neeche)</label><div style="display:flex;gap:6px;align-items:center"><input id="cSigDate" type="date" oninput="renderCert()" style="flex:1"><input id="cSigTime" type="time" oninput="renderCert()" style="width:110px"><button onclick="setCertNow()" style="padding:5px 10px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:6px;font-size:11px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">⏱ Now</button></div></div>
+    <div class="mf" style="grid-column:1/-1"><label>📅 Certificate Date (below signature)</label><div style="display:flex;gap:6px;align-items:center"><input id="cSigDate" type="date" oninput="renderCert()" style="flex:1"><input id="cSigTime" type="time" oninput="renderCert()" style="width:110px"><button onclick="setCertNow()" style="padding:5px 10px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:6px;font-size:11px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">⏱ Now</button></div></div>
     <div class="mf certf-purpose" style="display:none"><label>Purpose / Destination</label><input id="cPurpose" type="text" oninput="renderCert()"></div>
     <div class="mf certf-caretaker" style="display:none"><label>Caretaker Name</label><input id="cCt" type="text" oninput="renderCert()"></div>
     <div class="mf certf-relation" style="display:none"><label>Relation to Patient</label><input id="cRel" type="text" placeholder="Spouse / Father" oninput="renderCert()"></div>
@@ -548,8 +549,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   <div id="certPreview" style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:18px 22px;font-size:14.5px;line-height:2;color:#1a1040;font-family:'DM Sans',sans-serif;max-height:48vh;overflow-y:auto"></div>
   <div class="mfoot" style="margin-top:10px">
     <button class="mcc" onclick="document.getElementById('certMo').style.display='none'">Cancel</button>
-    <button onclick="sendCertTelegram()" style="padding:9px 18px;background:#6a5acd;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✈️ Telegram</button>
-    <button onclick="printCert()" style="padding:9px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ Print</button>
+    <button onclick="printCert()" style="padding:9px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ Print / Send</button>
   </div>
 </div>
 </div>
@@ -608,10 +608,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <button class="mc" onclick="document.getElementById('syncMo').style.display='none'">✕</button>
   </div>
   <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px;margin-bottom:14px;font-size:11px;color:#2e7d32;line-height:1.7">
-    <strong>Kaise kaam karta hai:</strong><br>
-    📤 <strong>Push</strong> — Signature + Settings is device se Telegram pe save karta hai<br>
-    📥 <strong>Pull</strong> — Telegram se signature + settings is device pe load karta hai<br>
-    ⚠️ Telegram Bot Token pehle ⚙️ Settings mein set karein
+    <strong>How it works:</strong><br>
+    📤 <strong>Push</strong> — Saves your signature + settings from this device to Telegram<br>
+    📥 <strong>Pull</strong> — Loads signature + settings from Telegram onto this device<br>
+    ⚠️ Please configure your Telegram Bot Token first in ⚙️ Settings
   </div>
   <div id="syncStatus" style="font-size:11.5px;color:var(--mu);min-height:18px;margin-bottom:12px;text-align:center"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -741,8 +741,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
         </label>
       </div>
       <div style="font-size:10px;color:var(--mu);margin-top:8px;line-height:1.6;background:rgba(106,90,205,.05);border-radius:6px;padding:6px 8px">
-        📤 Push — settings Telegram pe bhejo<br>
-        📥 Pull — doosre device pe load karo
+        📤 Push — send settings to Telegram<br>
+        📥 Pull — load settings on another device
       </div>
     </div>
   </div>
@@ -1467,7 +1467,15 @@ function upd(){
   const db=document.getElementById('rxdgb');
   if(dg){document.getElementById('rxdg').textContent=dg;db.style.display='block';}else db.style.display='none';
   const cb=document.getElementById('rxcpb');
-  if(cp){document.getElementById('rxcp').textContent=cp;cb.style.display='block';}else cb.style.display='none';
+  if(cp){
+    const lines=cp.split('\n').map(l=>l.trim()).filter(l=>l);
+    if(lines.length>1){
+      document.getElementById('rxcp').innerHTML=`<div class="rxcp-grid">${lines.map(l=>`<div>${l}</div>`).join('')}</div>`;
+    }else{
+      document.getElementById('rxcp').textContent=cp;
+    }
+    cb.style.display='block';
+  }else cb.style.display='none';
 
   // Medicines
   const mb=document.getElementById('rxmb'),mr=document.getElementById('rxmrows');
@@ -1539,18 +1547,18 @@ function upd(){
       rxc.style.position='absolute';
       rxc.style.bottom='auto';
       rxc.style.overflow='visible';
-      const sigTop=280+contentH+10;
+      const sigTop=280+contentH+20;
       rxsig.style.position='absolute';
       rxsig.style.bottom='auto';
       rxsig.style.top=sigTop+'px';
-      const disclaimTop=sigTop+85;
+      const disclaimTop=sigTop+95;
       const disc=document.getElementById('rxdisclaim');
       if(disc){disc.style.position='absolute';disc.style.bottom='auto';disc.style.top=disclaimTop+'px';}
-      rxp.style.minHeight=(disclaimTop+30)+'px';
+      rxp.style.minHeight=(disclaimTop+50)+'px';
     } else {
       rxc.style.position='absolute';
       rxc.style.bottom='220px';
-      rxc.style.overflow='hidden';
+      rxc.style.overflow='visible';
       rxsig.style.position='absolute';
       rxsig.style.bottom='145px';
       rxsig.style.top='';
@@ -1657,7 +1665,7 @@ function setSyncStatus(msg,color='var(--mu)'){
 async function syncPush(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
-  if(!token||!chatId){setSyncStatus('❌ Pehle ⚙️ Settings mein Bot Token & Chat ID set karein','#c62828');return;}
+  if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
   setSyncStatus('📦 Data package kar raha hai...');
   const payload=JSON.stringify({
     _marker:SYNC_MARKER,_ts:Date.now(),
@@ -1676,18 +1684,18 @@ async function syncPush(){
   fd2.append('chat_id',chatId);
   fd2.append('document',blob,'rx_sync.json');
   fd2.append('caption',SYNC_MARKER+'\nRx Sync — '+new Date().toLocaleString('en-IN'));
-  setSyncStatus('📤 Telegram pe bhej raha hai...');
+  setSyncStatus('📤 Sending to Telegram...');
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
     const data=await res.json();
-    if(data.ok)setSyncStatus('✅ Push ho gaya! Doosre device pe Pull karein.','#2e7d32');
+    if(data.ok)setSyncStatus('✅ Push successful! Pull on your other device.','#2e7d32');
     else setSyncStatus('❌ Error: '+(data.description||'Failed'),'#c62828');
   }catch(e){setSyncStatus('❌ Network error: '+e.message,'#c62828');}
 }
 async function syncPull(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
-  if(!token||!chatId){setSyncStatus('❌ Pehle ⚙️ Settings mein Bot Token & Chat ID set karein','#c62828');return;}
+  if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
   setSyncStatus('🔍 Telegram mein sync dhundh raha hai...');
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=50&allowed_updates=["message"]`);
@@ -1702,7 +1710,7 @@ async function syncPull(){
         syncTs=msg.date;syncFileId=msg.document.file_id;
       }
     }
-    if(!syncFileId){setSyncStatus('⚠️ Koi sync nahi mila. Pehle kisi device se Push karein.','#e65100');return;}
+    if(!syncFileId){setSyncStatus('⚠️ No sync data found. Please Push from a device first.','#e65100');return;}
     setSyncStatus('📥 Sync file download ho rahi hai...');
     const fpRes=await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${syncFileId}`);
     const fpData=await fpRes.json();
@@ -1719,7 +1727,7 @@ async function syncPull(){
     });
     renderCustomTpls();
     setSyncStatus('✅ Sync complete! ('+new Date(syncTs*1000).toLocaleString('en-IN')+')','#2e7d32');
-    showToast('✅ Sync ho gaya!',3000);
+    showToast('✅ Sync complete!',3000);
   }catch(e){setSyncStatus('❌ Error: '+e.message,'#c62828');}
 }
 
@@ -1770,7 +1778,7 @@ async function sendTelegram(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){
-    showToast('⚙️ Bot Token & Chat ID pehle set karein',3000);
+    showToast('⚙️ Please configure Bot Token & Chat ID first',3000);
     openSettings();return;
   }
   showToast('📄 PDF bana raha hai...',4000);
@@ -1783,10 +1791,10 @@ async function sendTelegram(){
     fd2.append('chat_id',chatId);
     fd2.append('document',blob,`Rx_${nm.replace(/\s+/g,'_')}_${dt.replace(/\//g,'-')}.pdf`);
     fd2.append('caption',caption);
-    showToast('📤 Telegram pe bhej raha hai...',4000);
+    showToast('📤 Sending to Telegram...',4000);
     const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
     const data=await res.json();
-    if(data.ok){showToast('✅ PDF Telegram pe bhej diya!',3000);}
+    if(data.ok){showToast('✅ PDF sent to Telegram!',3000);}
     else{showToast('❌ Error: '+(data.description||'Failed'),4000);console.error(data);}
   }catch(e){showToast('❌ Error: '+e.message,4000);console.error(e);}
 }
@@ -1834,7 +1842,7 @@ async function printSaveAndSend(){
         fd2.append('chat_id',chatId);
         fd2.append('document',blob,`Rx_${nm.replace(/\s+/g,'_')}_${dt.replace(/\//g,'-')}.pdf`);
         fd2.append('caption',caption);
-        showToast('📤 Telegram pe bhej raha hai...',3000);
+        showToast('📤 Sending to Telegram...',3000);
         const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
         const data=await res.json();
         if(data.ok){toastMessages.push('✈️ Telegram sent');}
@@ -3142,6 +3150,9 @@ function openMedCert(){
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('cFrom').value=today;
   const now=new Date();const pad2=n=>String(n).padStart(2,'0');
+  // Auto-set To Date = today + 2 (3 days inclusive)
+  const toD=new Date();toD.setDate(toD.getDate()+2);
+  document.getElementById('cTo').value=`${toD.getFullYear()}-${pad2(toD.getMonth()+1)}-${pad2(toD.getDate())}`;
   document.getElementById('cSigDate').value=today;
   document.getElementById('cSigTime').value=`${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
   document.getElementById('cTo').value=today;
@@ -3206,7 +3217,7 @@ function renderCert(){
   const His=his[0].toUpperCase()+his.slice(1);
 
   // Age/Gender line
-  const agLine=age+(gender?` / ${gender}`:'')+' years';
+  const agLine=age+(gender?` / ${gender}`:'');
 
   const sig=sigUrl?`<img src="${sigUrl}" style="max-height:40px;max-width:110px;display:block;margin:0 0 0 auto">`:'';
   // Preserve manually edited timestamp if user has typed in it
@@ -3233,25 +3244,34 @@ function renderCert(){
   let body='';
   const titles={sick:'MEDICAL / SICK LEAVE CERTIFICATE',fitness_work:'FITNESS FOR WORK CERTIFICATE',fitness_travel:'FITNESS FOR TRAVEL CERTIFICATE',fitness_studies:'FITNESS FOR STUDIES CERTIFICATE',recovery:'RECOVERY CERTIFICATE',caretaker:'MEDICAL CARETAKER CERTIFICATE',custom:'MEDICAL CERTIFICATE'};
   const customTitle=certType==='custom'?(cv('cCustomTitle')||'MEDICAL CERTIFICATE').toUpperCase():null;
-  const title=`<p style="text-align:center;font-weight:800;font-size:13px;text-decoration:underline;letter-spacing:1px;margin-bottom:4px">${customTitle||titles[certType]||'MEDICAL CERTIFICATE'}</p>`;
+  const title=`<p style="text-align:center;font-weight:800;font-size:18px;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1.5px;letter-spacing:2.5px;margin-bottom:18px;font-family:'DM Sans',sans-serif;color:#1a1040;">${customTitle||titles[certType]||'MEDICAL CERTIFICATE'}</p>`;
   if(certType==='sick'){
+    // Auto-calculate To Date from From Date + Days
+    const fromVal=document.getElementById('cFrom').value;
+    const daysNum=parseInt(cv('cDays'))||1;
+    if(fromVal&&daysNum>0){
+      const fromD=new Date(fromVal);
+      fromD.setDate(fromD.getDate()+daysNum-1);
+      const pad=n=>String(n).padStart(2,'0');
+      document.getElementById('cTo').value=`${fromD.getFullYear()}-${pad(fromD.getMonth()+1)}-${pad(fromD.getDate())}`;
+    }
     const days=cv('cDays')||'___';const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, was examined by me today and found to be suffering from <strong>${dx}</strong>.</p><p>In my opinion, ${he} requires rest and is unfit for duties for <strong>${days} day(s)</strong>, from <strong>${from}</strong> to <strong>${to}</strong> (both days inclusive).</p><p>This certificate is issued on ${his} request for availing leave.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me and is found to be suffering from <strong>${dx}</strong>.</p><p>In my considered medical opinion, ${he} requires complete rest and is unfit to perform ${his} duties for <strong>${days} day(s)</strong>, with effect from <strong>${from}</strong> to <strong>${to}</strong> (both days inclusive).</p><p>This certificate is issued on ${his} request for the purpose of availing medical leave.</p>`;
   } else if(certType==='fitness_work'){
     const purpose=cv('cPurpose')||'regular duties';const restrict=cv('cRestrict');const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong>.</p><p>${He} has recovered from <strong>${dx}</strong> and is now <strong>medically fit to resume: ${purpose}</strong>.</p>${restrict?`<p><strong>Restrictions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong>.</p><p>${He} has recovered from <strong>${dx}</strong> and is now <strong>medically fit to resume: ${purpose}</strong>.</p>${restrict?`<p><strong>Restrictions / Special Instructions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request.</p>`;
   } else if(certType==='fitness_travel'){
     const dest=cv('cPurpose')||'travel';const restrict=cv('cRestrict');const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong> for <strong>${dx}</strong>.</p><p>In my opinion, ${he} is currently <strong>medically fit to travel to ${dest}</strong>.</p>${restrict?`<p><strong>Special Instructions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request for travel purpose.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong> for <strong>${dx}</strong>.</p><p>In my medical opinion, ${he} is currently <strong>medically fit to travel to ${dest}</strong>.</p>${restrict?`<p><strong>Special Instructions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request for travel purpose.</p>`;
   } else if(certType==='fitness_studies'){
     const inst=cv('cPurpose')||'resume academic studies';const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, was under medical care for <strong>${dx}</strong>.</p><p>${He} has recovered and is now <strong>medically fit to ${inst}</strong> with effect from <strong>${from}</strong>.</p><p>This certificate is issued on ${his} request for submission to educational institution.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under medical care for <strong>${dx}</strong>.</p><p>${He} has made satisfactory recovery and is now <strong>medically fit to ${inst}</strong> with effect from <strong>${from}</strong>.</p><p>This certificate is issued on ${his} request for submission to the educational institution.</p>`;
   } else if(certType==='recovery'){
     const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, was under my medical care from <strong>${from}</strong> to <strong>${to}</strong> for <strong>${dx}</strong>.</p><p>${He} has <strong>recovered satisfactorily</strong> and is now in a stable condition.</p><p>This certificate is issued on ${his} request to confirm recovery.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under my medical supervision from <strong>${from}</strong> to <strong>${to}</strong> for <strong>${dx}</strong>.</p><p>${He} has <strong>recovered satisfactorily</strong> and is now in a clinically stable condition.</p><p>This certificate is issued on ${his} request to confirm recovery.</p>`;
   } else if(certType==='caretaker'){
     const ct=cv('cCt')||'__________________';const rel=cv('cRel')||'relative';const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age/Gender: <strong>${agLine}</strong>${addrLine}, is under my medical care for <strong>${dx}</strong> and requires dedicated home care.</p><p><strong>${ct}</strong> (${rel} of patient) is required as a <strong>medical caretaker</strong> from <strong>${from}</strong> to <strong>${to}</strong>.</p><p>This certificate is issued on patient's request for caretaker's leave.</p>`;
+    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, is under my medical care for <strong>${dx}</strong> and requires dedicated home-based medical care.</p><p><strong>${ct}</strong> (${rel} of the patient) is required to be present as a <strong>medical caretaker</strong> from <strong>${from}</strong> to <strong>${to}</strong>.</p><p>This certificate is issued on the patient's request for the purpose of caretaker leave.</p>`;
   } else if(certType==='custom'){
     body=`<p>${(cv('cCustom')||'Enter certificate text above...').replace(/\n/g,'</p><p>')}</p>`;
   }
@@ -3265,64 +3285,100 @@ function renderCert(){
     _tsSpan.addEventListener('blur',function(){this.style.background='';});
   }
 }
+function _buildCertHtml(content,includeBg,activeBgUrl){
+  const topPad=(includeBg&&activeBgUrl)?'310px':'70px';
+  const bgCss=(includeBg&&activeBgUrl)
+    ?`html,body{background-image:url('${activeBgUrl}');background-size:100% 100%;background-repeat:no-repeat;background-position:center;}`
+    :'';
+  return{topPad,bgCss,html:`<!DOCTYPE html><html><head><title>Medical Certificate</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:210mm;min-height:297mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body{font-family:'DM Sans','Segoe UI',Arial,sans-serif;font-size:14px;color:#1a1040;line-height:1.9;}
+${bgCss}
+.cert-wrap{padding:${topPad} 56px 100px 56px;}
+p{margin:10px 0;line-height:1.9;}
+strong{font-weight:700;}
+img{max-width:100%;display:block;}
+@media print{
+  @page{size:A4;margin:0;}
+  html,body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  ${includeBg&&activeBgUrl?`html,body{background-image:url('${activeBgUrl}')!important;background-size:100% 100%!important;background-repeat:no-repeat!important;background-position:center!important;}`:''}
+}
+</style></head><body><div class="cert-wrap">${content}</div></body></html>`};
+}
 function printCert(){
   const content=document.getElementById('certPreview').innerHTML;
   const includeBg=document.getElementById('certBgToggle')?.checked;
   const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
-  const bgStyle=(includeBg&&activeBgUrl)?
-    `body{background-image:url('${activeBgUrl}');background-size:100% 100%;background-repeat:no-repeat;background-position:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`:'';
-  let ifrm=document.getElementById('_certPrintFrame');
-  if(!ifrm){
-    ifrm=document.createElement('iframe');
-    ifrm.id='_certPrintFrame';
-    ifrm.style.cssText='position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;';
-    document.body.appendChild(ifrm);
-  }
+  const {html}=_buildCertHtml(content,includeBg,activeBgUrl);
+  // Always rebuild iframe for fresh content
+  const oldIfrm=document.getElementById('_certPrintFrame');
+  if(oldIfrm)oldIfrm.remove();
+  const ifrm=document.createElement('iframe');
+  ifrm.id='_certPrintFrame';
+  ifrm.style.cssText='position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;';
+  document.body.appendChild(ifrm);
   const doc=ifrm.contentDocument||ifrm.contentWindow.document;
-  doc.open();
-  doc.write('<!DOCTYPE html><html><head><title>Medical Certificate</title>'
-    +'<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}'
-    +'html,body{width:210mm;min-height:297mm;}'
-    +'body{font-family:\'DM Sans\',\'Segoe UI\',sans-serif;font-size:15px;color:#1a1040;line-height:2;}'
-    +bgStyle
-    +'.cert-wrap{padding:310px 46px 100px 46px;}'
-    +'p{margin:8px 0}strong{font-weight:700}'
-    +'@media print{@page{size:A4;margin:0}}'
-    +'</style></head><body><div class="cert-wrap">'+content+'</div></body></html>');
-  doc.close();
-  setTimeout(()=>{ifrm.contentWindow.focus();ifrm.contentWindow.print();},800);
+  doc.open();doc.write(html);doc.close();
+  // Wait for fonts + images to load before printing
+  ifrm.onload=()=>{setTimeout(()=>{ifrm.contentWindow.focus();ifrm.contentWindow.print();},600);};
+  // Also send to Telegram using same high-quality render
+  const token=localStorage.getItem('tgToken'),chatId=localStorage.getItem('tgChatId');
+  if(token&&chatId){
+    setTimeout(()=>sendCertTelegram(),800);
+  }
 }
 async function sendCertTelegram(){
   const token=localStorage.getItem('tgToken'),chatId=localStorage.getItem('tgChatId');
-  if(!token||!chatId){showToast('⚙️ Pehle Settings mein Bot Token set karein',3000);return;}
-  showToast('📄 Certificate bana raha hai...',4000);
+  if(!token||!chatId){return;}
+  showToast('📄 Sending certificate to Telegram...',5000);
   try{
     const includeBg=document.getElementById('certBgToggle')?.checked;
-    // Always read fresh from localStorage
     const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
     const certContent=document.getElementById('certPreview').innerHTML;
+    const {html:certHtml}=_buildCertHtml(certContent,includeBg,activeBgUrl);
 
-    const wrap=document.createElement('div');
-    wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1040;line-height:2;`;
-    if(includeBg&&activeBgUrl){
-      wrap.style.backgroundImage=`url('${activeBgUrl}')`;
-      wrap.style.backgroundSize='100% 100%';
-      wrap.style.backgroundRepeat='no-repeat';
-      wrap.style.backgroundPosition='center';
-    }
-    const inner=document.createElement('div');
-    inner.style.cssText='padding:310px 46px 100px 46px;';
-    inner.innerHTML=certContent;
-    wrap.appendChild(inner);
-    document.body.appendChild(wrap);
+    // Render inside an off-screen iframe so the Google Font stylesheet
+    // is actually loaded and applied before html2canvas captures it —
+    // identical to the approach used by printCert() for consistent output.
+    const oldIfrm=document.getElementById('_certTgFrame');
+    if(oldIfrm)oldIfrm.remove();
+    const ifrm=document.createElement('iframe');
+    ifrm.id='_certTgFrame';
+    ifrm.style.cssText='position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;';
+    document.body.appendChild(ifrm);
 
+    // Write full styled HTML (including font link) into the iframe
+    await new Promise(resolve=>{
+      ifrm.onload=resolve;
+      const doc=ifrm.contentDocument||ifrm.contentWindow.document;
+      doc.open();doc.write(certHtml);doc.close();
+    });
+
+    // Wait for fonts inside the iframe to finish loading
+    await ifrm.contentDocument.fonts.ready;
+    // Extra buffer for background images and final paint
+    await new Promise(r=>setTimeout(r,700));
+
+    const captureTarget=ifrm.contentDocument.body;
     const toast=document.getElementById('toast');toast.style.display='none';
-    const canvas=await html2canvas(wrap,{scale:4,backgroundColor:'#ffffff',useCORS:true,allowTaint:true,logging:false,width:794,windowWidth:794});
+    const canvas=await html2canvas(captureTarget,{
+      scale:3,
+      backgroundColor:'#ffffff',
+      useCORS:true,
+      allowTaint:true,
+      logging:false,
+      width:794,
+      height:1123,
+      windowWidth:794,
+      windowHeight:1123,
+    });
     toast.style.display='';
-    document.body.removeChild(wrap);
+    document.body.removeChild(ifrm);
 
-    const imgData=canvas.toDataURL('image/jpeg',0.92);
+    const imgData=canvas.toDataURL('image/jpeg',0.95);
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
@@ -3335,10 +3391,11 @@ async function sendCertTelegram(){
     fd2.append('caption',`📋 Medical Certificate\n👤 ${pn}\n📅 ${cdate('cFrom')}\n🏥 Dr. Lakshaya Mahajan`);
     const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
     const data=await res.json();
-    if(data.ok)showToast('✅ Certificate Telegram pe bheja!',3000);
+    if(data.ok)showToast('✅ Certificate sent to Telegram!',3000);
     else showToast('❌ '+(data.description||'Failed'),4000);
   }catch(e){showToast('❌ '+e.message,4000);}
 }
+
 
 // Escape closes certMo too
 document.addEventListener('keydown',e=>{
