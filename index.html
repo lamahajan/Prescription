@@ -219,7 +219,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:40px 36px;text-align:center;max-width:340px;width:90%;backdrop-filter:blur(10px)">
     <div style="font-size:42px;margin-bottom:8px">🩺</div>
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:4px">Dr. Lakshaya Mahajan</div>
-    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:28px;letter-spacing:.5px">PRESCRIPTION WRITER · PRIVATE</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:28px;letter-spacing:.5px">· PRESCRIPTION WEB APPLICATION ·</div>
     <input id="lockInput" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPass()"
       style="width:100%;box-sizing:border-box;padding:11px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;text-align:center;letter-spacing:2px">
     <button onclick="checkPass()" style="width:100%;padding:12px;background:#6a5acd;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s" onmouseover="this.style.background='#4a3fa0'" onmouseout="this.style.background='#6a5acd'">🔓 Unlock</button>
@@ -1681,131 +1681,47 @@ async function syncPush(){
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
     const data=await res.json();
-    if(data.ok){
-      const fileId=data.result.document.file_id;
-      // Store file_id locally for instant pull on same device
-      localStorage.setItem('syncFileId',fileId);
-      localStorage.setItem('syncTs',Date.now().toString());
-      // Also send a pointer text message so other devices can find the file_id via getUpdates
-      const ptr=`${SYNC_MARKER}_PTR\n${fileId}\n${Date.now()}`;
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:ptr})}).catch(()=>{});
-      setSyncStatus('✅ Push ho gaya! Doosre device pe Pull karein.','#2e7d32');
-    }else setSyncStatus('❌ Error: '+(data.description||'Failed'),'#c62828');
+    if(data.ok)setSyncStatus('✅ Push ho gaya! Doosre device pe Pull karein.','#2e7d32');
+    else setSyncStatus('❌ Error: '+(data.description||'Failed'),'#c62828');
   }catch(e){setSyncStatus('❌ Network error: '+e.message,'#c62828');}
 }
-
-async function _downloadSyncFile(token,fileId){
-  // Get download path
-  const fpRes=await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${fileId}`);
-  const fpData=await fpRes.json();
-  if(!fpData.ok)throw new Error('getFile failed: '+(fpData.description||'unknown'));
-  const dlUrl=`https://api.telegram.org/file/bot${token}/${fpData.result.file_path}`;
-  // Try direct fetch first (works in most browsers incl GitHub Pages)
-  try{
-    const r=await fetch(dlUrl);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    return await r.json();
-  }catch(e){
-    // Fallback: fetch as text then parse (handles edge-case encoding)
-    const r2=await fetch(dlUrl);
-    const txt=await r2.text();
-    return JSON.parse(txt);
-  }
-}
-
 async function syncPull(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){setSyncStatus('❌ Pehle ⚙️ Settings mein Bot Token & Chat ID set karein','#c62828');return;}
-  setSyncStatus('🔍 Sync dhundh raha hai...');
+  setSyncStatus('🔍 Telegram mein sync dhundh raha hai...');
   try{
-    let fileId=null,syncTs=0;
-
-    // ── Step 1: Try locally stored file_id (same device, fastest) ──
-    const localFileId=localStorage.getItem('syncFileId');
-    const localTs=parseInt(localStorage.getItem('syncTs')||'0');
-    if(localFileId){fileId=localFileId;syncTs=localTs;}
-
-    // ── Step 2: Check Telegram getUpdates for pointer message or document ──
-    setSyncStatus('🔍 Telegram updates check kar raha hai...');
-    const res=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100`);
+    const res=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=50&allowed_updates=["message"]`);
     const data=await res.json();
-    if(data.ok){
-      for(const u of(data.result||[])){
-        const msg=u.message;if(!msg)continue;
-        const ts=msg.date*1000;
-        // Check text pointer messages (SYNC_MARKER_PTR)
-        const txt=msg.text||'';
-        if(txt.startsWith(SYNC_MARKER+'_PTR')&&ts>syncTs){
-          const parts=txt.split('\n');
-          if(parts[1]){fileId=parts[1].trim();syncTs=ts;}
-        }
-        // Check document messages (legacy + current)
-        const cap=msg.caption||'';
-        if(cap.includes(SYNC_MARKER)&&msg.document&&ts>syncTs){
-          syncTs=ts;fileId=msg.document.file_id;
-        }
+    if(!data.ok){setSyncStatus('❌ Telegram error: '+(data.description||'Failed'),'#c62828');return;}
+    const msgs=data.result||[];
+    let syncFileId=null,syncTs=0;
+    for(const u of msgs){
+      const msg=u.message;if(!msg)continue;
+      const cap=msg.caption||'';
+      if(cap.includes(SYNC_MARKER)&&msg.document&&msg.date>syncTs){
+        syncTs=msg.date;syncFileId=msg.document.file_id;
       }
     }
-
-    if(!fileId){setSyncStatus('⚠️ Koi sync nahi mila. Pehle Push karein ya Export/Import use karein.','#e65100');return;}
-
+    if(!syncFileId){setSyncStatus('⚠️ Koi sync nahi mila. Pehle kisi device se Push karein.','#e65100');return;}
     setSyncStatus('📥 Sync file download ho rahi hai...');
-    const pl=await _downloadSyncFile(token,fileId);
+    const fpRes=await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${syncFileId}`);
+    const fpData=await fpRes.json();
+    if(!fpData.ok){setSyncStatus('❌ File fetch failed','#c62828');return;}
+    const fileRes=await fetch(`https://api.telegram.org/file/bot${token}/${fpData.result.file_path}`);
+    const pl=await fileRes.json();
     if(pl._marker!==SYNC_MARKER){setSyncStatus('❌ Invalid sync file','#c62828');return;}
-
-    // Restore all settings
     if(pl.sigUrl){localStorage.setItem('sigUrl',pl.sigUrl);sigUrl=pl.sigUrl;restoreSig();}
     if(pl.bgUrl){localStorage.setItem('bgUrl',pl.bgUrl);bgUrl=pl.bgUrl;restoreBgImage();}
-    if(pl.tgToken){localStorage.setItem('tgToken',pl.tgToken);document.getElementById('tgToken').value=pl.tgToken;}
-    if(pl.tgChatId){localStorage.setItem('tgChatId',pl.tgChatId);document.getElementById('tgChatId').value=pl.tgChatId;}
+    if(pl.tgToken)localStorage.setItem('tgToken',pl.tgToken);
+    if(pl.tgChatId)localStorage.setItem('tgChatId',pl.tgChatId);
     ['customTpls','cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy'].forEach(k=>{
       if(pl[k])localStorage.setItem(k,pl[k]);
     });
-    // Save the file_id so future pulls on this device are instant
-    localStorage.setItem('syncFileId',fileId);
-    localStorage.setItem('syncTs',syncTs.toString());
     renderCustomTpls();
-    setSyncStatus('✅ Sync complete! ('+new Date(syncTs).toLocaleString('en-IN')+')','#2e7d32');
+    setSyncStatus('✅ Sync complete! ('+new Date(syncTs*1000).toLocaleString('en-IN')+')','#2e7d32');
     showToast('✅ Sync ho gaya!',3000);
-  }catch(e){setSyncStatus('❌ Error: '+e.message+' — Agar repeated fail ho, Export/Import use karein','#c62828');}
-}
-
-// ─── EXPORT / IMPORT ───
-function exportData(){
-  const keys=['sigUrl','bgUrl','tgToken','tgChatId','customTpls','rxSaved','rxPrefs',
-    'cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy','syncFileId','syncTs'];
-  const out={_v:1,_ts:new Date().toISOString(),_app:'RxWriter'};
-  keys.forEach(k=>{const v=localStorage.getItem(k);if(v)out[k]=v;});
-  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='RxWriter_Backup_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();URL.revokeObjectURL(a.href);
-  showToast('✅ Backup downloaded!');
-}
-function importData(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const d=JSON.parse(e.target.result);
-      if(d._app!=='RxWriter'&&!confirm('Yeh file RxWriter backup nahi lagti. Phir bhi import karein?'))return;
-      const keys=['sigUrl','bgUrl','tgToken','tgChatId','customTpls','rxSaved','rxPrefs',
-        'cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy','syncFileId','syncTs'];
-      let count=0;
-      keys.forEach(k=>{if(d[k]){localStorage.setItem(k,d[k]);count++;}});
-      // Apply immediately
-      if(d.sigUrl){sigUrl=d.sigUrl;restoreSig();}
-      if(d.bgUrl){bgUrl=d.bgUrl;restoreBgImage();}
-      if(d.tgToken)document.getElementById('tgToken').value=d.tgToken;
-      if(d.tgChatId)document.getElementById('tgChatId').value=d.tgChatId;
-      renderCustomTpls();
-      showToast('✅ Import complete! '+count+' items restored.');
-      inp.value='';
-    }catch(err){alert('❌ Invalid file: '+err.message);}
-  };
-  r.readAsText(f);
+  }catch(e){setSyncStatus('❌ Error: '+e.message,'#c62828');}
 }
 
 function showToast(msg,dur=2500){
