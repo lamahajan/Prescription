@@ -13,6 +13,14 @@
 .set-tog{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ede9f8;cursor:pointer;font-size:12px;color:var(--tx);font-weight:500;}
 .set-tog input[type=checkbox]{width:15px;height:15px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
 .set-tog span{line-height:1.4;}
+/* Patient Register btn */
+.pt-reg-btn{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--p);background:#f0ecff;color:var(--p);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .13s;font-family:inherit;}
+.pt-reg-btn:hover{background:var(--p);color:#fff;}
+/* Patient registry list item */
+.pr-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--br);border-radius:8px;margin-bottom:5px;background:var(--ca);cursor:pointer;transition:background .12s;}
+.pr-item:hover{background:#f0ecff;}
+/* Custom adv chip row */
+.adv-custom-chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border:1px solid #4caf50;background:#e8f5e9;color:#1b5e20;border-radius:12px;font-size:10px;font-weight:700;}
 </style>
 <style>
 :root{--p:#6a5acd;--pd:#4a3fa0;--pl:#9b8ee0;--bg:#e8e4f4;--tx:#1e1840;--mu:#7a6e9a;--br:#d0c8ec;--wh:#fff;--ca:#faf9ff;}
@@ -253,7 +261,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
   <div class="sc">
     <div class="st">Patient Details</div>
-    <div class="rw r1"><div class="fl"><label>Patient Name</label><input id="pN" type="text" placeholder="Full name" oninput="upd()"></div></div>
+    <div class="rw r1"><div class="fl"><label>Patient Name</label>
+      <div style="display:flex;gap:5px;align-items:center">
+        <input id="pN" type="text" placeholder="Full name" oninput="upd()" style="flex:1">
+        <button class="pt-reg-btn" onclick="openPatientRegister()" title="Load Registered Patient">👤</button>
+        <button class="pt-reg-btn" onclick="saveCurrentPatient()" title="Save to Patient Registry">＋</button>
+      </div>
+    </div></div>
     <div class="rw r2">
       <div class="fl" style="min-width:0"><label>Age</label><input id="pA" type="text" placeholder="34 Yrs" oninput="upd()" style="width:100%"></div>
       <div class="fl" style="min-width:0"><label>Gender</label><select id="pG" onchange="upd()" style="width:100%"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
@@ -429,7 +443,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   <div class="sc">
     <div class="st">General Advice</div>
     <div class="ag" id="advCh"></div>
-    <div class="fl"><label>Custom Advice</label><textarea id="advX" rows="2" placeholder="Additional instructions..." oninput="upd()"></textarea></div>
+    <div class="fl"><label>Custom Advice</label>
+      <div style="display:flex;gap:5px">
+        <input id="advCustomInput" type="text" placeholder="Type custom advice & press Add..." style="flex:1" onkeydown="if(event.key==='Enter'){addCustomAdvChip();event.preventDefault();}">
+        <button onclick="addCustomAdvChip()" style="padding:5px 10px;background:#e8f5e9;border:1.5px solid #4caf50;border-radius:6px;color:#1b5e20;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">+ Add</button>
+      </div>
+    </div>
+    <div class="ig" id="advCustomCh" style="margin-top:4px"></div>
   </div>
 
   <div class="sc">
@@ -550,6 +570,87 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <button class="mcc" onclick="document.getElementById('certMo').style.display='none'">Cancel</button>
     <button onclick="printCert()" style="padding:9px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ Print / Send</button>
   </div>
+</div>
+</div>
+
+<!-- ─── PATIENT REGISTER MODAL ─── -->
+<div class="mo" id="patientRegMo" style="display:none">
+<div class="mb" style="max-width:720px;width:96vw;max-height:94vh;overflow:hidden;padding:0;border-radius:18px;display:flex;flex-direction:column;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#2e2480,#6a5acd 60%,#9b8ee0);padding:14px 20px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div>
+      <div style="font-size:15px;font-weight:700;color:#fff">👥 Patient Registry</div>
+      <div id="prStats" style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px;letter-spacing:.4px">Loading...</div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button onclick="prSetView('list')" id="prTabList" style="padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.2);color:#fff;transition:all .15s">📋 List</button>
+      <button onclick="prSetView('add')" id="prTabAdd" style="padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.8);transition:all .15s">➕ Register</button>
+      <button onclick="document.getElementById('patientRegMo').style.display='none'" style="width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="overflow-y:auto;flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+
+    <!-- LIST VIEW -->
+    <div id="prViewList">
+      <!-- Search + Sort bar -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input id="prSearch" type="text" placeholder="🔍 Name, phone, blood group, diagnosis..." oninput="renderPatientList()" style="flex:1;border:1px solid var(--br);border-radius:8px;padding:8px 12px;font-size:12px;font-family:inherit;outline:none;color:var(--tx)">
+        <select id="prSort" onchange="renderPatientList()" style="border:1px solid var(--br);border-radius:8px;padding:7px 10px;font-size:11px;font-family:inherit;color:var(--tx);outline:none;background:var(--wh)">
+          <option value="recent">Recent First</option>
+          <option value="name">A–Z Name</option>
+          <option value="visits">Most Visits</option>
+        </select>
+      </div>
+      <!-- Patient list -->
+      <div id="prList"></div>
+    </div>
+
+    <!-- ADD / EDIT VIEW -->
+    <div id="prViewAdd" style="display:none">
+      <div id="prEditBanner" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#2e7d32;font-weight:600;margin-bottom:10px">✏️ Editing existing patient record</div>
+      <input type="hidden" id="prEditId">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="mf" style="grid-column:1/-1"><label>Full Name *</label><input id="prName" type="text" placeholder="Patient full name" style="font-size:13px;font-weight:600"></div>
+        <div class="mf"><label>Age</label><input id="prAge" type="text" placeholder="34 Yrs / DOB"></div>
+        <div class="mf"><label>Gender</label>
+          <select id="prGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+        </div>
+        <div class="mf"><label>Blood Group</label>
+          <select id="prBlood"><option value="">Unknown</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select>
+        </div>
+        <div class="mf"><label>Mobile</label><input id="prPhone" type="text" placeholder="98XXXXXXXX"></div>
+        <div class="mf"><label>WhatsApp</label><input id="prWa" type="text" placeholder="Same / different no."></div>
+        <div class="mf"><label>Occupation</label><input id="prOcc" type="text" placeholder="Farmer, Teacher..."></div>
+        <div class="mf" style="grid-column:1/-1"><label>Address</label><input id="prAddr" type="text" placeholder="Village / City, District"></div>
+        <div class="mf" style="grid-column:1/-1"><label>🚨 Known Allergies</label><input id="prAllergy" type="text" placeholder="Penicillin, Sulfa, NSAIDs... (leave blank if none)"></div>
+        <div class="mf" style="grid-column:1/-1"><label>🩺 Chronic Conditions / PMH</label><input id="prPmh" type="text" placeholder="HTN, DM, Asthma, CKD, CAD..."></div>
+        <div class="mf" style="grid-column:1/-1"><label>💊 Current Regular Medicines</label><input id="prMeds" type="text" placeholder="Metformin, Amlodipine..."></div>
+      </div>
+      <div style="background:#f8f7ff;border:1px solid var(--br);border-radius:8px;padding:10px;margin-bottom:10px">
+        <div style="font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">🆘 Emergency Contact</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+          <div class="mf"><label>Name</label><input id="prEmName" type="text" placeholder="Relative name"></div>
+          <div class="mf"><label>Relation</label><input id="prEmRel" type="text" placeholder="Son, Wife..."></div>
+          <div class="mf"><label>Phone</label><input id="prEmPhone" type="text" placeholder="98XXXXXXXX"></div>
+        </div>
+      </div>
+      <div class="mf" style="margin-bottom:10px"><label>📝 Notes / Remarks</label><textarea id="prNotes" rows="2" placeholder="Any special notes about this patient..." style="resize:vertical"></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="prSetView('list')" style="padding:9px 16px;border:1px solid var(--br);border-radius:8px;background:var(--wh);color:var(--mu);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">← Back</button>
+        <button onclick="addPatientToRegistry()" style="flex:1;padding:9px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👤 Save Patient Record</button>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div id="prViewProfile" style="display:none">
+      <button onclick="prSetView('list')" style="padding:6px 14px;border:1px solid var(--br);border-radius:7px;background:var(--wh);color:var(--mu);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">← Back to List</button>
+      <div id="prProfileCard"></div>
+    </div>
+
+  </div><!-- /body -->
 </div>
 </div>
 
@@ -1142,7 +1243,7 @@ function deleteDrugFromDB(){
 
 // ─── STATE ───
 let meds=[],mc=0,editId=null,sigUrl='',ctype='OPD';
-let selInv=new Set(),selAdv=new Set(),selNot=new Set(),selInvCustom=new Set();
+let selInv=new Set(),selAdv=new Set(),selNot=new Set(),selInvCustom=new Set(),selAdvCustom=new Set();
 
 // ─── CHIPS ───
 const INVS=['CBC','ESR','CRP','Blood Sugar (F/PP)','HbA1c','Lipid Profile','KFT','LFT',
@@ -1167,9 +1268,318 @@ const NOTS=['Review after investigations report','If no relief in 48 hrs, revisi
   'Home isolation advised for 5-7 days','Avoid contact with children/elderly',
   'Referred to specialist — follow-up report needed','Admission advised if no improvement'];
 
+
+
 function buildChips(id,list,set,cls){
   const c=document.getElementById(id);
   c.innerHTML=list.map(v=>`<span class="ck" data-v="${v}" onclick="tc(this,'${cls}')">${v}</span>`).join('');
+}
+
+// ─── CUSTOM ADVICE CHIPS ───
+function makeCustomAdvChip(val){
+  const el=document.createElement('span');
+  el.className='ck sa adv-custom-chip';
+  el.dataset.v=val;
+  el.style.cssText='display:inline-flex;align-items:center;gap:3px;';
+  const txt=document.createElement('span');
+  txt.textContent=val;
+  const del=document.createElement('span');
+  del.textContent='✕';
+  del.title='Remove';
+  del.style.cssText='display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(76,175,80,.3);border-radius:50%;font-size:9px;font-weight:900;cursor:pointer;flex-shrink:0;margin-left:2px;';
+  del.onclick=function(e){
+    e.stopPropagation();
+    selAdvCustom.delete(val);
+    el.remove();
+    upd();
+  };
+  el.appendChild(txt);
+  el.appendChild(del);
+  return el;
+}
+function addCustomAdvChip(){
+  const inp=document.getElementById('advCustomInput');
+  const val=inp.value.trim();
+  if(!val)return;
+  if(selAdvCustom.has(val)){inp.value='';return;}
+  selAdvCustom.add(val);
+  document.getElementById('advCustomCh').appendChild(makeCustomAdvChip(val));
+  inp.value='';
+  upd();
+}
+
+// ─── PATIENT REGISTRY ───
+function getPatientRegistry(){return JSON.parse(localStorage.getItem('patientRegistry')||'[]');}
+function savePatientRegistry(list){localStorage.setItem('patientRegistry',JSON.stringify(list));}
+
+let prCurrentView='list';
+function prSetView(v){
+  prCurrentView=v;
+  document.getElementById('prViewList').style.display=v==='list'?'':'none';
+  document.getElementById('prViewAdd').style.display=v==='add'?'':'none';
+  document.getElementById('prViewProfile').style.display=v==='profile'?'':'none';
+  const tl=document.getElementById('prTabList'),ta=document.getElementById('prTabAdd');
+  tl.style.background=v==='list'?'rgba(255,255,255,.25)':'transparent';
+  tl.style.borderColor=v==='list'?'rgba(255,255,255,.5)':'rgba(255,255,255,.25)';
+  ta.style.background=v==='add'?'rgba(255,255,255,.25)':'transparent';
+  ta.style.borderColor=v==='add'?'rgba(255,255,255,.5)':'rgba(255,255,255,.25)';
+  if(v==='add'){
+    const isEdit=!!document.getElementById('prEditId').value;
+    if(!isEdit){
+      ['prName','prAge','prPhone','prWa','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+      document.getElementById('prGender').value='';
+      document.getElementById('prBlood').value='';
+      document.getElementById('prEditId').value='';
+      document.getElementById('prEditBanner').style.display='none';
+    }
+    setTimeout(()=>document.getElementById('prName').focus(),100);
+  }
+  if(v==='list'){renderPatientList();}
+}
+
+function openPatientRegister(){
+  document.getElementById('prEditId').value='';
+  document.getElementById('prEditBanner').style.display='none';
+  prUpdateStats();
+  prSetView('list');
+  document.getElementById('patientRegMo').style.display='flex';
+}
+
+function prUpdateStats(){
+  const list=getPatientRegistry();
+  const today=new Date().toISOString().split('T')[0];
+  const todayVisits=list.filter(p=>(p.visits||[]).some(v=>v.date===today)).length;
+  const total=list.length;
+  document.getElementById('prStats').textContent=`${total} patients registered · ${todayVisits} visited today`;
+}
+
+function saveCurrentPatient(){
+  const nm=g('pN');
+  if(!nm){showToast('⚠️ Patient name required',2000);return;}
+  const list=getPatientRegistry();
+  const today=new Date().toISOString().split('T')[0];
+  const existing=list.findIndex(p=>p.name.toLowerCase()===nm.toLowerCase());
+  if(existing>=0){
+    list[existing].age=g('pA')||list[existing].age;
+    list[existing].gender=document.getElementById('pG').value||list[existing].gender;
+    list[existing].lastVisit=today;
+    // Add today's visit if not already logged
+    if(!list[existing].visits)list[existing].visits=[];
+    const diag=g('diag');
+    if(!list[existing].visits.find(v=>v.date===today)){
+      list[existing].visits.unshift({date:today,diag:diag||''});
+    }
+    showToast('✅ Visit logged for '+nm,2500);
+  }else{
+    const id='PT'+Date.now();
+    list.unshift({id,name:nm,age:g('pA'),gender:document.getElementById('pG').value,phone:'',wa:'',blood:'',occ:'',addr:'',allergy:'',pmh:'',meds:'',emName:'',emRel:'',emPhone:'',notes:'',lastVisit:today,visits:[{date:today,diag:g('diag')||''}],regDate:today});
+    showToast('✅ Patient registered: '+nm,2500);
+  }
+  savePatientRegistry(list);
+}
+
+function addPatientToRegistry(){
+  const nm=document.getElementById('prName').value.trim();
+  if(!nm){showToast('⚠️ Name required',1800);return;}
+  const list=getPatientRegistry();
+  const today=new Date().toISOString().split('T')[0];
+  const editId=document.getElementById('prEditId').value;
+  const rec={
+    name:nm,
+    age:document.getElementById('prAge').value.trim(),
+    gender:document.getElementById('prGender').value,
+    blood:document.getElementById('prBlood').value,
+    phone:document.getElementById('prPhone').value.trim(),
+    wa:document.getElementById('prWa').value.trim(),
+    occ:document.getElementById('prOcc').value.trim(),
+    addr:document.getElementById('prAddr').value.trim(),
+    allergy:document.getElementById('prAllergy').value.trim(),
+    pmh:document.getElementById('prPmh').value.trim(),
+    meds:document.getElementById('prMeds').value.trim(),
+    emName:document.getElementById('prEmName').value.trim(),
+    emRel:document.getElementById('prEmRel').value.trim(),
+    emPhone:document.getElementById('prEmPhone').value.trim(),
+    notes:document.getElementById('prNotes').value.trim(),
+    lastVisit:today,
+  };
+  if(editId){
+    const idx=list.findIndex(p=>p.id===editId);
+    if(idx>=0){list[idx]={...list[idx],...rec};showToast('✅ Patient updated: '+nm,2500);}
+  }else{
+    const existing=list.findIndex(p=>p.name.toLowerCase()===nm.toLowerCase());
+    if(existing>=0){
+      list[existing]={...list[existing],...rec};showToast('✅ Patient record updated: '+nm,2500);
+    }else{
+      const id='PT'+Date.now();
+      list.unshift({id,...rec,regDate:today,visits:[]});
+      showToast('✅ Registered: '+nm,2500);
+    }
+  }
+  savePatientRegistry(list);
+  document.getElementById('prEditId').value='';
+  document.getElementById('prEditBanner').style.display='none';
+  prUpdateStats();
+  prSetView('list');
+}
+
+function loadPatientToForm(idx){
+  const list=getPatientRegistry();
+  const p=list[idx];if(!p)return;
+  document.getElementById('pN').value=p.name;
+  document.getElementById('pA').value=p.age||'';
+  document.getElementById('pG').value=p.gender||'';
+  // Log visit
+  const today=new Date().toISOString().split('T')[0];
+  if(!p.visits)p.visits=[];
+  p.lastVisit=today;
+  if(!p.visits.find(v=>v.date===today)){p.visits.unshift({date:today,diag:''});}
+  savePatientRegistry(list);
+  document.getElementById('patientRegMo').style.display='none';
+  upd();
+  showToast('✅ Patient loaded: '+p.name+(p.allergy?'  ⚠️ Allergy: '+p.allergy:''),3500);
+  // Flash allergy warning if present
+  if(p.allergy){
+    setTimeout(()=>showToast('⚠️ ALLERGY: '+p.allergy,4000),200);
+  }
+}
+
+function editPatient(idx,e){
+  e.stopPropagation();
+  const list=getPatientRegistry();
+  const p=list[idx];if(!p)return;
+  ['prName','prAge','prPhone','prWa','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes'].forEach(id=>{
+    const field={prName:'name',prAge:'age',prPhone:'phone',prWa:'wa',prOcc:'occ',prAddr:'addr',prAllergy:'allergy',prPmh:'pmh',prMeds:'meds',prEmName:'emName',prEmRel:'emRel',prEmPhone:'emPhone',prNotes:'notes'}[id];
+    const el=document.getElementById(id);if(el&&field)el.value=p[field]||'';
+  });
+  document.getElementById('prGender').value=p.gender||'';
+  document.getElementById('prBlood').value=p.blood||'';
+  document.getElementById('prEditId').value=p.id||'';
+  document.getElementById('prEditBanner').style.display='block';
+  prSetView('add');
+}
+
+function deletePatient(idx,e){
+  e.stopPropagation();
+  if(!confirm('Delete patient record?'))return;
+  const list=getPatientRegistry();
+  list.splice(idx,1);
+  savePatientRegistry(list);
+  prUpdateStats();
+  renderPatientList();
+}
+
+function viewPatientProfile(idx){
+  const list=getPatientRegistry();
+  const p=list[idx];if(!p)return;
+  const bloodColors={'A+':'#e53935','A−':'#c62828','B+':'#1e88e5','B−':'#1565c0','AB+':'#8e24aa','AB−':'#6a1b9a','O+':'#43a047','O−':'#2e7d32'};
+  const bc=bloodColors[p.blood]||'#6a5acd';
+  const visits=p.visits||[];
+  const visitHtml=visits.length?visits.slice(0,10).map(v=>`
+    <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid #ede9f8">
+      <span style="font-size:10px;color:var(--mu);white-space:nowrap;min-width:75px">${v.date}</span>
+      <span style="font-size:11px;color:var(--tx)">${v.diag||'<em style="color:#b0a8cc">No diagnosis recorded</em>'}</span>
+    </div>`).join(''):'<div style="font-size:11px;color:#b0a8cc;padding:8px 0">No visits logged yet.</div>';
+
+  const card=document.getElementById('prProfileCard');
+  card.innerHTML=`
+  <!-- Header card -->
+  <div style="background:linear-gradient(135deg,#f0ecff,#faf9ff);border:1px solid rgba(106,90,205,.2);border-radius:12px;padding:14px 16px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:48px;height:48px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:16px;font-weight:700;color:var(--tx)">${p.name}</div>
+        <div style="font-size:11px;color:var(--mu)">${[p.age,p.gender,p.occ].filter(Boolean).join(' · ')}</div>
+        ${p.regDate?`<div style="font-size:10px;color:#9b8ee0">Registered: ${p.regDate}</div>`:''}
+      </div>
+      ${p.blood?`<div style="width:40px;height:40px;border-radius:50%;background:${bc};color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid ${bc}aa">${p.blood}</div>`:''}
+    </div>
+    <!-- Info grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;font-size:11px">
+      ${p.phone?`<div><span style="color:var(--mu);font-weight:600">📞 Mobile: </span><a href="tel:${p.phone}" style="color:var(--p);font-weight:700;text-decoration:none">${p.phone}</a></div>`:''}
+      ${p.wa?`<div><span style="color:var(--mu);font-weight:600">💬 WhatsApp: </span><a href="https://wa.me/91${p.wa.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none">${p.wa}</a></div>`:''}
+      ${p.addr?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">📍 </span>${p.addr}</div>`:''}
+      ${p.emName?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">🆘 Emergency: </span>${p.emName}${p.emRel?' ('+p.emRel+')':''}${p.emPhone?' — '+p.emPhone:''}</div>`:''}
+    </div>
+  </div>
+  <!-- Medical info -->
+  ${(p.allergy||p.pmh||p.meds)?`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    ${p.allergy?`<div style="background:#fff3e0;border:1.5px solid #ff9800;border-radius:9px;padding:9px 12px">
+      <div style="font-size:10px;font-weight:800;color:#e65100;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">⚠️ Allergies</div>
+      <div style="font-size:12px;font-weight:700;color:#bf360c">${p.allergy}</div>
+    </div>`:''}
+    ${p.pmh?`<div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:9px;padding:9px 12px">
+      <div style="font-size:10px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">🩺 PMH / Chronic</div>
+      <div style="font-size:11.5px;color:#1a237e">${p.pmh}</div>
+    </div>`:''}
+    ${p.meds?`<div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:9px;padding:9px 12px;grid-column:1/-1">
+      <div style="font-size:10px;font-weight:800;color:#6a1b9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">💊 Current Medicines</div>
+      <div style="font-size:11.5px;color:#4a148c">${p.meds}</div>
+    </div>`:''}
+  </div>`:''}
+  ${p.notes?`<div style="background:#fffde7;border:1px solid #fff176;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11.5px;color:#5a4500"><strong>📝 Notes:</strong> ${p.notes}</div>`:''}
+  <!-- Visit history -->
+  <div style="background:#f8f7ff;border:1px solid var(--br);border-radius:10px;padding:10px 14px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">📅 Visit History <span style="background:var(--p);color:#fff;border-radius:8px;padding:1px 6px;font-size:9px">${visits.length}</span></div>
+    ${visitHtml}
+  </div>
+  <!-- Actions -->
+  <div style="display:flex;gap:8px">
+    <button onclick="loadPatientToForm(${idx})" style="flex:1;padding:9px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📋 Load to Prescription</button>
+    <button onclick="editPatient(${idx},event)" style="padding:9px 16px;background:#f0ecff;color:var(--p);border:1.5px solid var(--pl);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✎ Edit</button>
+    <button onclick="deletePatient(${idx},event)" style="padding:9px 14px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit">🗑</button>
+  </div>
+  `;
+  prSetView('profile');
+}
+
+function renderPatientList(){
+  const search=(document.getElementById('prSearch')?.value||'').toLowerCase();
+  const sort=document.getElementById('prSort')?.value||'recent';
+  let list=getPatientRegistry();
+  if(search) list=list.filter(p=>
+    p.name.toLowerCase().includes(search)||
+    (p.phone&&p.phone.includes(search))||
+    (p.blood&&p.blood.toLowerCase().includes(search))||
+    (p.pmh&&p.pmh.toLowerCase().includes(search))||
+    (p.allergy&&p.allergy.toLowerCase().includes(search))||
+    (p.addr&&p.addr.toLowerCase().includes(search))
+  );
+  if(sort==='name') list=[...list].sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='visits') list=[...list].sort((a,b)=>(b.visits||[]).length-(a.visits||[]).length);
+  // else recent = default registry order
+
+  const el=document.getElementById('prList');
+  const fullList=getPatientRegistry();
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;color:#b0a8cc;font-size:12px;padding:24px">${search?'No match found':'No patients registered yet.<br>Click ➕ Register to add your first patient.'}</div>`;
+    return;
+  }
+  el.innerHTML=list.map(p=>{
+    const realIdx=fullList.indexOf(p);
+    const visits=p.visits||[];
+    const bloodColors={'A+':'#e53935','A−':'#c62828','B+':'#1e88e5','B−':'#1565c0','AB+':'#8e24aa','AB−':'#6a1b9a','O+':'#43a047','O−':'#2e7d32'};
+    const bc=bloodColors[p.blood];
+    return`<div class="pr-item" onclick="viewPatientProfile(${realIdx})" style="cursor:pointer">
+      <div style="width:38px;height:38px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;flex-shrink:0;position:relative">
+        ${p.name.charAt(0).toUpperCase()}
+        ${visits.length?`<span style="position:absolute;bottom:-3px;right:-3px;background:#4caf50;color:#fff;border-radius:8px;font-size:8px;font-weight:900;padding:1px 4px;border:1.5px solid #fff">${visits.length}</span>`:''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12.5px;font-weight:700;color:var(--tx)">${p.name}</span>
+          ${p.blood&&bc?`<span style="font-size:9px;font-weight:800;color:#fff;background:${bc};border-radius:5px;padding:1px 5px">${p.blood}</span>`:''}
+          ${p.allergy?`<span style="font-size:9px;font-weight:700;color:#bf360c;background:#fff3e0;border:1px solid #ffcc80;border-radius:5px;padding:1px 5px">⚠️ Allergy</span>`:''}
+        </div>
+        <div style="font-size:10.5px;color:var(--mu)">${[p.age,p.gender,p.phone].filter(Boolean).join(' · ')}</div>
+        <div style="font-size:10px;color:#9b8ee0">${p.lastVisit?'Last: '+p.lastVisit:''} ${p.pmh?'· '+p.pmh:''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        <button onclick="loadPatientToForm(${realIdx});event.stopPropagation()" style="padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Load ↗</button>
+        <button onclick="editPatient(${realIdx},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 function makeCustomInvChip(val){
   const el=document.createElement('span');
@@ -1507,7 +1917,7 @@ function upd(){
   }else ib.style.display='none';
 
   // Advice
-  const allA=[...selAdv];const ca=g('advX');if(ca)allA.push(ca);
+  const allA=[...selAdv,...selAdvCustom];const ca=g('advX');if(ca)allA.push(ca);
   const ab=document.getElementById('rxab'),ae=document.getElementById('rxadv');
   if(allA.length){
     ae.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px 10px">${allA.map(a=>`<div style="line-height:1.8"><span style="font-size:18px;line-height:0;vertical-align:middle;margin-right:4px;color:#1e1840">•</span>${a}</div>`).join('')}</div>`;
@@ -1575,8 +1985,9 @@ function clearAll(){
   });
   document.getElementById('pD').value=new Date().toISOString().split('T')[0];
   document.getElementById('afChk').checked=false;document.getElementById('vT').disabled=false;
-  meds=[];selInv.clear();selAdv.clear();selNot.clear();selInvCustom.clear();
+  meds=[];selInv.clear();selAdv.clear();selNot.clear();selInvCustom.clear();selAdvCustom.clear();
   document.getElementById('invCustomCh').innerHTML='';
+  document.getElementById('advCustomCh').innerHTML='';
   document.querySelectorAll('.ck').forEach(c=>c.classList.remove('si','sa','sn'));
   renderMeds();upd();
 }
@@ -1588,6 +1999,7 @@ document.addEventListener('keydown',e=>{
     document.getElementById('savedMo').style.display='none';
     document.getElementById('settingsMo').style.display='none';
     document.getElementById('syncMo').style.display='none';
+    document.getElementById('patientRegMo').style.display='none';
   }
 });
 
@@ -1876,13 +2288,13 @@ function getRxState(){
     diag:g('diag'),comp:g('comp'),
     meds:JSON.parse(JSON.stringify(meds)),mc:mc,
     selInv:[...selInv],selAdv:[...selAdv],selNot:[...selNot],
-    selInvCustom:[...selInvCustom],
+    selInvCustom:[...selInvCustom],selAdvCustom:[...selAdvCustom],
     advX:g('advX'),notX:g('notX'),
     fuD:g('fuD'),fuN:g('fuN'),ctype:ctype
   };
 }
 function applyRxState(s){
-  ['pN','pA','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','advX','notX','fuD','fuN'].forEach(id=>{
+  ['pN','pA','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','notX','fuD','fuN'].forEach(id=>{
     const e=document.getElementById(id);if(e&&s[id]!==undefined)e.value=s[id];
   });
   document.getElementById('pG').value=s.pG||'';
@@ -1891,8 +2303,9 @@ function applyRxState(s){
   tempUnitF=s.tempUnitF!==undefined?s.tempUnitF:true;
   document.getElementById('tempUnitBtn').textContent=tempUnitF?'°F':'°C';
   meds=s.meds||[];mc=s.mc||0;
-  selInv.clear();selAdv.clear();selNot.clear();selInvCustom.clear();
+  selInv.clear();selAdv.clear();selNot.clear();selInvCustom.clear();selAdvCustom.clear();
   document.getElementById('invCustomCh').innerHTML='';
+  document.getElementById('advCustomCh').innerHTML='';
   document.querySelectorAll('.ck').forEach(c=>c.classList.remove('si','sa','sn'));
 
   // Helper: add chip dynamically if value not in existing chips
@@ -1917,6 +2330,11 @@ function applyRxState(s){
   (s.selInvCustom||[]).forEach(v=>{
     selInvCustom.add(v);
     document.getElementById('invCustomCh').appendChild(makeCustomInvChip(v));
+  });
+  // Restore custom adv chips
+  (s.selAdvCustom||[]).forEach(v=>{
+    selAdvCustom.add(v);
+    document.getElementById('advCustomCh').appendChild(makeCustomAdvChip(v));
   });
 
   if(s.ctype){ctype=s.ctype;document.querySelectorAll('.co').forEach(o=>{o.classList.toggle('act',o.dataset.val===ctype);});}
@@ -3414,6 +3832,7 @@ function exportData(){
     tgToken:localStorage.getItem('tgToken'),
     tgChatId:localStorage.getItem('tgChatId'),
     rxPrefs:localStorage.getItem('rxPrefs'),
+    patientRegistry:localStorage.getItem('patientRegistry'),
     cbMem_mFq:localStorage.getItem('cbMem_mFq'),
     cbMem_mTm:localStorage.getItem('cbMem_mTm'),
     cbMem_mRt:localStorage.getItem('cbMem_mRt'),
@@ -3433,7 +3852,7 @@ function importData(inp){
   r.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      const keys=['rxSaved','customTpls','customDrugs','sigUrl','bgUrl','tgToken','tgChatId','rxPrefs','cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy'];
+      const keys=['rxSaved','customTpls','customDrugs','sigUrl','bgUrl','tgToken','tgChatId','rxPrefs','patientRegistry','cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy'];
       keys.forEach(k=>{if(data[k])localStorage.setItem(k,data[k]);});
       if(data.sigUrl){sigUrl=data.sigUrl;restoreSig();}
       if(data.bgUrl){bgUrl=data.bgUrl;restoreBgImage();}
