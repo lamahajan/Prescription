@@ -195,7 +195,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
-.rxdisclaim{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:8.5px;color:#b0a8cc;letter-spacing:.3px;font-style:italic;}
+.rxdisclaim{position:absolute;bottom:72px;left:46px;font-size:8.5px;color:#b0a8cc;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
 /* When content is long, push sig below content instead of overlapping */
 .rxc{position:absolute;top:280px;left:0;right:0;bottom:150px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 .rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
@@ -1652,8 +1652,7 @@ function openSync(){
   document.getElementById('syncMo').style.display='flex';
 }
 function setSyncStatus(msg,color='var(--mu)'){
-  const el=document.getElementById('syncStatus');
-  el.style.color=color;el.textContent=msg;
+  document.querySelectorAll('#syncStatus').forEach(el=>{el.style.color=color;el.textContent=msg;});
 }
 async function syncPush(){
   const token=localStorage.getItem('tgToken');
@@ -3228,8 +3227,8 @@ function renderCert(){
     }
   } else { certTimestamp=cdate('cFrom'); }
   if(_userEditedTs) certTimestamp=_userEditedTs.replace(/^Date:\s*/,'');
-  const sigBlock=`<div style="text-align:right;margin-top:24px">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:0 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
-  const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:14px;font-style:italic">Not valid for medico-legal purposes</p>`;
+  const sigBlock=`<div style="text-align:right;margin-top:20px;line-height:1.4">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:0 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
+  const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:10px;font-style:italic;line-height:1.4">Not valid for medico-legal purposes</p>`;
   const addrLine=addr?`<br><span style="font-size:11px;color:#5a4e90">R/o: ${addr}</span>`:'';
   let body='';
   const titles={sick:'MEDICAL / SICK LEAVE CERTIFICATE',fitness_work:'FITNESS FOR WORK CERTIFICATE',fitness_travel:'FITNESS FOR TRAVEL CERTIFICATE',fitness_studies:'FITNESS FOR STUDIES CERTIFICATE',recovery:'RECOVERY CERTIFICATE',caretaker:'MEDICAL CARETAKER CERTIFICATE',custom:'MEDICAL CERTIFICATE'};
@@ -3269,8 +3268,9 @@ function renderCert(){
 function printCert(){
   const content=document.getElementById('certPreview').innerHTML;
   const includeBg=document.getElementById('certBgToggle')?.checked;
-  const bgStyle=(includeBg&&bgUrl)?
-    `body{background-image:url('${bgUrl}');background-size:100% 100%;background-repeat:no-repeat;background-position:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`:'';
+  const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
+  const bgStyle=(includeBg&&activeBgUrl)?
+    `body{background-image:url('${activeBgUrl}');background-size:100% 100%;background-repeat:no-repeat;background-position:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`:'';
   let ifrm=document.getElementById('_certPrintFrame');
   if(!ifrm){
     ifrm=document.createElement('iframe');
@@ -3299,13 +3299,14 @@ async function sendCertTelegram(){
   showToast('📄 Certificate bana raha hai...',4000);
   try{
     const includeBg=document.getElementById('certBgToggle')?.checked;
+    // Always read fresh from localStorage
+    const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
     const certContent=document.getElementById('certPreview').innerHTML;
 
-    // Build a full A4-sized off-screen div for capture
     const wrap=document.createElement('div');
     wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1040;line-height:2;`;
-    if(includeBg&&bgUrl){
-      wrap.style.backgroundImage=`url('${bgUrl}')`;
+    if(includeBg&&activeBgUrl){
+      wrap.style.backgroundImage=`url('${activeBgUrl}')`;
       wrap.style.backgroundSize='100% 100%';
       wrap.style.backgroundRepeat='no-repeat';
       wrap.style.backgroundPosition='center';
@@ -3316,8 +3317,7 @@ async function sendCertTelegram(){
     wrap.appendChild(inner);
     document.body.appendChild(wrap);
 
-    const toast=document.getElementById('toast');
-    toast.style.display='none';
+    const toast=document.getElementById('toast');toast.style.display='none';
     const canvas=await html2canvas(wrap,{scale:4,backgroundColor:'#ffffff',useCORS:true,allowTaint:true,logging:false,width:794,windowWidth:794});
     toast.style.display='';
     document.body.removeChild(wrap);
@@ -3345,6 +3345,50 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&document.getElementById('certMo'))
     document.getElementById('certMo').style.display='none';
 });
+
+// ─── EXPORT / IMPORT ALL DATA ───
+function exportData(){
+  const data={
+    _version:2,_date:new Date().toISOString(),
+    rxSaved:localStorage.getItem('rxSaved'),
+    customTpls:localStorage.getItem('customTpls'),
+    customDrugs:localStorage.getItem('customDrugs'),
+    sigUrl:localStorage.getItem('sigUrl'),
+    bgUrl:localStorage.getItem('bgUrl'),
+    tgToken:localStorage.getItem('tgToken'),
+    tgChatId:localStorage.getItem('tgChatId'),
+    rxPrefs:localStorage.getItem('rxPrefs'),
+    cbMem_mFq:localStorage.getItem('cbMem_mFq'),
+    cbMem_mTm:localStorage.getItem('cbMem_mTm'),
+    cbMem_mRt:localStorage.getItem('cbMem_mRt'),
+    cbMem_mDs:localStorage.getItem('cbMem_mDs'),
+    cbMem_mDy:localStorage.getItem('cbMem_mDy'),
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`rx_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+  showToast('📦 Backup exported!');
+}
+function importData(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const keys=['rxSaved','customTpls','customDrugs','sigUrl','bgUrl','tgToken','tgChatId','rxPrefs','cbMem_mFq','cbMem_mTm','cbMem_mRt','cbMem_mDs','cbMem_mDy'];
+      keys.forEach(k=>{if(data[k])localStorage.setItem(k,data[k]);});
+      if(data.sigUrl){sigUrl=data.sigUrl;restoreSig();}
+      if(data.bgUrl){bgUrl=data.bgUrl;restoreBgImage();}
+      if(data.tgToken)document.getElementById('tgToken').value=data.tgToken;
+      if(data.tgChatId)document.getElementById('tgChatId').value=data.tgChatId;
+      renderCustomTpls();loadPrefs();
+      showToast('✅ Data imported!',3000);
+    }catch(ex){showToast('❌ Invalid backup file',3000);}
+  };r.readAsText(f);
+  inp.value='';
+}
 </script>
 </body>
 </html>
