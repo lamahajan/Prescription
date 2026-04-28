@@ -3150,12 +3150,11 @@ function openMedCert(){
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('cFrom').value=today;
   const now=new Date();const pad2=n=>String(n).padStart(2,'0');
-  // Auto-set To Date = today + 2 (3 days inclusive)
+  // Set initial To Date = today + 2 (3 days inclusive, matching default cDays=3)
   const toD=new Date();toD.setDate(toD.getDate()+2);
   document.getElementById('cTo').value=`${toD.getFullYear()}-${pad2(toD.getMonth()+1)}-${pad2(toD.getDate())}`;
   document.getElementById('cSigDate').value=today;
   document.getElementById('cSigTime').value=`${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-  document.getElementById('cTo').value=today;
   setCertType('sick',document.querySelector('.cert-tab-btn'));
   document.getElementById('certMo').style.display='flex';
   renderCert();
@@ -3240,7 +3239,7 @@ function renderCert(){
   if(_userEditedTs) certTimestamp=_userEditedTs.replace(/^Date:\s*/,'');
   const sigBlock=`<div style="text-align:right;margin-top:20px;line-height:1.4">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:0 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
   const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:10px;font-style:italic;line-height:1.4">Not valid for medico-legal purposes</p>`;
-  const addrLine=addr?`<br><span style="font-size:11px;color:#5a4e90">R/o: ${addr}</span>`:'';
+  const addrLine=addr?`<br><span style="font-size:13px;color:#3a3060;font-family:'DM Sans',sans-serif;">R/o: ${addr}</span>`:'';
   let body='';
   const titles={sick:'MEDICAL / SICK LEAVE CERTIFICATE',fitness_work:'FITNESS FOR WORK CERTIFICATE',fitness_travel:'FITNESS FOR TRAVEL CERTIFICATE',fitness_studies:'FITNESS FOR STUDIES CERTIFICATE',recovery:'RECOVERY CERTIFICATE',caretaker:'MEDICAL CARETAKER CERTIFICATE',custom:'MEDICAL CERTIFICATE'};
   const customTitle=certType==='custom'?(cv('cCustomTitle')||'MEDICAL CERTIFICATE').toUpperCase():null;
@@ -3296,6 +3295,7 @@ function _buildCertHtml(content,includeBg,activeBgUrl){
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:210mm;min-height:297mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'DM Sans','Segoe UI',Arial,sans-serif;font-size:14px;color:#1a1040;line-height:1.9;}
+span{font-family:inherit;}
 ${bgCss}
 .cert-wrap{padding:${topPad} 56px 100px 56px;}
 p{margin:10px 0;line-height:1.9;}
