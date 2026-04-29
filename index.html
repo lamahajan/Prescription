@@ -826,46 +826,47 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
   <!-- ROW 2 COL 1+2: Print Preferences -->
   <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden;grid-column:1/3">
-    <div style="padding:9px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:15px">🖨️</span>
+    <div style="padding:7px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
+      <span style="font-size:14px">🖨️</span>
       <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Print / Save Preferences</span>
     </div>
-    <div style="padding:8px 13px;display:grid;grid-template-columns:1fr 1fr;gap:0">
-      <label class="set-tog"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
-      <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
-      <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
-      <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
-      <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
+    <!-- Checkboxes: 1 column, tight -->
+    <div style="padding:6px 13px 4px;display:flex;flex-direction:column;gap:0">
+      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
+      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
+      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
+      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
+      <label class="set-tog" style="padding:5px 0;border-bottom:none"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
       <input type="hidden" id="setPrefConfirm">
     </div>
-    <!-- Auto Token Format -->
-    <div id="autoTokenRow" style="display:none;padding:10px 13px 13px;border-top:1px dashed #e0d8f8">
-      <div style="font-size:10.5px;color:var(--mu);margin-bottom:8px;font-weight:600">Format: <code style="background:#f0ecff;padding:2px 6px;border-radius:4px;color:var(--p);font-size:11px">PREFIX-DDMMYYYY-001</code></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+    <!-- Auto Token Format — compact inline grid -->
+    <div id="autoTokenRow" style="display:none;padding:8px 13px 10px;border-top:1px dashed #e0d8f8">
+      <div style="font-size:10px;color:var(--mu);margin-bottom:6px;font-weight:600">Format: <code style="background:#f0ecff;padding:1px 5px;border-radius:4px;color:var(--p);font-size:10.5px">PREFIX-DDMMYYYY-001</code></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.2fr 1.4fr;gap:6px;align-items:end;margin-bottom:7px">
         <div>
-          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">OPD Prefix</label>
-          <input id="tokenPrefix" type="text" value="OPD" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:6px 8px;font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
+          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">OPD Prefix</label>
+          <input id="tokenPrefix" type="text" value="OPD" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box">
         </div>
         <div>
-          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Teleconsult Prefix</label>
-          <input id="tokenPrefixTel" type="text" value="TEL" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:6px 8px;font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
+          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Tele Prefix</label>
+          <input id="tokenPrefixTel" type="text" value="TEL" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box">
         </div>
         <div>
-          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Next Token Number</label>
-          <div style="display:flex;gap:4px;align-items:center">
-            <button onclick="adjToken(-1)" style="width:26px;height:26px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:14px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">−</button>
-            <input id="tokenCounter" type="number" min="1" value="1" oninput="savePrefs();previewToken()" style="flex:1;border:1px solid var(--p);border-radius:6px;padding:4px 6px;font-size:13px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
-            <button onclick="adjToken(1)" style="width:26px;height:26px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:14px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">＋</button>
+          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Next Token #</label>
+          <div style="display:flex;gap:3px;align-items:center">
+            <button onclick="adjToken(-1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">−</button>
+            <input id="tokenCounter" type="number" min="1" value="1" oninput="savePrefs();previewToken()" style="flex:1;min-width:0;border:1px solid var(--p);border-radius:6px;padding:3px 4px;font-size:12px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
+            <button onclick="adjToken(1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">＋</button>
           </div>
         </div>
         <div>
-          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Preview</label>
-          <div id="tokenPreview" style="font-size:11.5px;font-weight:700;color:var(--p);background:#f0ecff;border-radius:6px;padding:6px 8px;border:1px solid var(--pl);line-height:1.4"></div>
+          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Preview</label>
+          <div id="tokenPreview" style="font-size:10.5px;font-weight:700;color:var(--p);background:#f0ecff;border-radius:6px;padding:5px 7px;border:1px solid var(--pl);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
         </div>
       </div>
-      <div style="display:flex;gap:7px">
-        <button onclick="applyAutoToken()" style="flex:1;padding:7px 10px;background:var(--p);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">Apply to Token Field ↗</button>
-        <button onclick="document.getElementById('tokenCounter').value=1;savePrefs();previewToken()" style="padding:7px 12px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Reset to 1</button>
+      <div style="display:flex;gap:6px">
+        <button onclick="applyAutoToken()" style="flex:1;padding:6px 8px;background:var(--p);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Apply to Token Field ↗</button>
+        <button onclick="document.getElementById('tokenCounter').value=1;savePrefs();previewToken()" style="padding:6px 10px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Reset to 1</button>
       </div>
     </div>
   </div>
@@ -885,6 +886,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
         <label style="padding:8px 6px;background:#fff8e1;color:#e65100;border:1.5px solid #ffcc80;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;display:block">
           📂 Import<input type="file" accept=".json" onchange="importData(this)" style="display:none">
         </label>
+      </div>
+      <div style="margin-top:8px;border-top:1px dashed #e0d8f8;padding-top:8px">
+        <div style="font-size:10px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">🔥 Firebase Cloud</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button onclick="window.fbPushAll&&window.fbPushAll()" style="padding:8px 6px;background:#ff6f00;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔥 FB Push</button>
+          <button onclick="window.fbPullAll&&window.fbPullAll()" style="padding:8px 6px;background:#fff;color:#ff6f00;border:2px solid #ff6f00;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔥 FB Pull</button>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-top:6px;line-height:1.5">FB Push = sab kuch Firebase pe save karo<br>FB Pull = doosre device pe restore karo</div>
       </div>
       <div style="font-size:10px;color:var(--mu);margin-top:8px;line-height:1.6;background:rgba(106,90,205,.05);border-radius:6px;padding:6px 8px">
         📤 Push — send settings to Telegram<br>
@@ -4066,6 +4075,225 @@ function importData(inp){
   };r.readAsText(f);
   inp.value='';
 }
+</script>
+
+<!-- ═══════════════════════════════════════════════
+     FIREBASE INTEGRATION
+     Firestore  → prescriptions, patients, prefs, templates
+     Storage    → signature image, letterhead background
+═══════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }                        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc,
+         collection, getDocs, deleteDoc }       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadString,
+         getDownloadURL, deleteObject }         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyAOrgzRXsam1rWU-2jEvszyxnxo-Mok1QM",
+  authDomain:        "dr-lakshaya-rx.firebaseapp.com",
+  databaseURL:       "https://dr-lakshaya-rx-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "dr-lakshaya-rx",
+  storageBucket:     "dr-lakshaya-rx.firebasestorage.app",
+  messagingSenderId: "358605253581",
+  appId:             "1:358605253581:web:9d443b9dd50107592df284"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const stor = getStorage(app);
+
+// ─── Utility ───────────────────────────────────────────────────────────────
+const DEVICE_ID = 'dr_lakshaya_main'; // single-user app — one fixed doc per collection
+
+function fbToast(msg, dur=2500){ window.showToast && window.showToast(msg, dur); }
+
+// ─── FIRESTORE HELPERS ─────────────────────────────────────────────────────
+async function fbSet(colName, data){
+  try{
+    await setDoc(doc(db, colName, DEVICE_ID), data);
+    return true;
+  }catch(e){ console.error('fbSet',colName,e); return false; }
+}
+async function fbGet(colName){
+  try{
+    const snap = await getDoc(doc(db, colName, DEVICE_ID));
+    return snap.exists() ? snap.data() : null;
+  }catch(e){ console.error('fbGet',colName,e); return null; }
+}
+
+// ─── STORAGE HELPERS ───────────────────────────────────────────────────────
+async function storUpload(path, dataUrl){
+  try{
+    const r = ref(stor, path);
+    await uploadString(r, dataUrl, 'data_url');
+    return await getDownloadURL(r);
+  }catch(e){ console.error('storUpload',path,e); return null; }
+}
+async function storDelete(path){
+  try{ await deleteObject(ref(stor, path)); }catch(_){}
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  PUSH  — Local → Firebase
+// ══════════════════════════════════════════════════════════════════════════
+async function fbPushAll(){
+  fbToast('☁️ Firebase pe upload ho raha hai...', 6000);
+
+  // 1. Prescriptions
+  const rxSaved = JSON.parse(localStorage.getItem('rxSaved')||'[]');
+  await fbSet('prescriptions', { list: JSON.stringify(rxSaved), updatedAt: Date.now() });
+
+  // 2. Patient Registry
+  const patients = localStorage.getItem('patientRegistry')||'[]';
+  await fbSet('patients', { list: patients, updatedAt: Date.now() });
+
+  // 3. Preferences + Telegram config
+  const prefs = localStorage.getItem('rxPrefs')||'{}';
+  const tgToken  = localStorage.getItem('tgToken')||'';
+  const tgChatId = localStorage.getItem('tgChatId')||'';
+  await fbSet('settings', {
+    prefs, tgToken, tgChatId,
+    customTpls:  localStorage.getItem('customTpls')||'[]',
+    customDrugs: localStorage.getItem('customDrugs')||'[]',
+    cbMem_mFq:   localStorage.getItem('cbMem_mFq')||'[]',
+    cbMem_mTm:   localStorage.getItem('cbMem_mTm')||'[]',
+    cbMem_mRt:   localStorage.getItem('cbMem_mRt')||'[]',
+    cbMem_mDs:   localStorage.getItem('cbMem_mDs')||'[]',
+    cbMem_mDy:   localStorage.getItem('cbMem_mDy')||'[]',
+    updatedAt: Date.now()
+  });
+
+  // 4. Signature image → Firebase Storage
+  const sigUrlLocal = localStorage.getItem('sigUrl');
+  if(sigUrlLocal && sigUrlLocal.startsWith('data:')){
+    fbToast('📷 Signature upload ho rahi hai...', 4000);
+    const sigDownload = await storUpload('images/signature.png', sigUrlLocal);
+    if(sigDownload){
+      await fbSet('images', { sigUrl: sigDownload, updatedAt: Date.now() });
+    }
+  }
+
+  // 5. Background image → Firebase Storage
+  const bgUrlLocal = localStorage.getItem('bgUrl');
+  if(bgUrlLocal && bgUrlLocal.startsWith('data:')){
+    fbToast('🖼️ Letterhead upload ho raha hai...', 4000);
+    const bgDownload = await storUpload('images/letterhead.jpg', bgUrlLocal);
+    if(bgDownload){
+      const imgDoc = await fbGet('images') || {};
+      await fbSet('images', { ...imgDoc, bgUrl: bgDownload, updatedAt: Date.now() });
+    }
+  }
+
+  fbToast('✅ Firebase push complete!', 3000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  PULL  — Firebase → Local
+// ══════════════════════════════════════════════════════════════════════════
+async function fbPullAll(){
+  fbToast('📥 Firebase se data aa raha hai...', 6000);
+
+  // 1. Prescriptions
+  const rx = await fbGet('prescriptions');
+  if(rx?.list){ localStorage.setItem('rxSaved', rx.list); }
+
+  // 2. Patients
+  const pt = await fbGet('patients');
+  if(pt?.list){ localStorage.setItem('patientRegistry', pt.list); }
+
+  // 3. Settings
+  const st = await fbGet('settings');
+  if(st){
+    if(st.prefs)       localStorage.setItem('rxPrefs',      st.prefs);
+    if(st.tgToken)     localStorage.setItem('tgToken',      st.tgToken);
+    if(st.tgChatId)    localStorage.setItem('tgChatId',     st.tgChatId);
+    if(st.customTpls)  localStorage.setItem('customTpls',   st.customTpls);
+    if(st.customDrugs) localStorage.setItem('customDrugs',  st.customDrugs);
+    if(st.cbMem_mFq)   localStorage.setItem('cbMem_mFq',    st.cbMem_mFq);
+    if(st.cbMem_mTm)   localStorage.setItem('cbMem_mTm',    st.cbMem_mTm);
+    if(st.cbMem_mRt)   localStorage.setItem('cbMem_mRt',    st.cbMem_mRt);
+    if(st.cbMem_mDs)   localStorage.setItem('cbMem_mDs',    st.cbMem_mDs);
+    if(st.cbMem_mDy)   localStorage.setItem('cbMem_mDy',    st.cbMem_mDy);
+    // Apply telegram fields to UI
+    const tgT = document.getElementById('tgToken');
+    const tgC = document.getElementById('tgChatId');
+    if(tgT && st.tgToken)  tgT.value = st.tgToken;
+    if(tgC && st.tgChatId) tgC.value = st.tgChatId;
+    window.renderCustomTpls && window.renderCustomTpls();
+    window.loadPrefs        && window.loadPrefs();
+  }
+
+  // 4. Images (signature + background) — download URLs from Storage
+  const imgs = await fbGet('images');
+  if(imgs?.sigUrl){
+    localStorage.setItem('sigUrl', imgs.sigUrl);
+    window.sigUrl = imgs.sigUrl;
+    window.restoreSig && window.restoreSig();
+  }
+  if(imgs?.bgUrl){
+    localStorage.setItem('bgUrl', imgs.bgUrl);
+    window.bgUrl = imgs.bgUrl;
+    window.restoreBgImage && window.restoreBgImage();
+  }
+
+  fbToast('✅ Firebase pull complete! Sab kuch restore ho gaya.', 3000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  AUTO-SYNC — Push silently after every print/save
+// ══════════════════════════════════════════════════════════════════════════
+async function fbAutoSync(){
+  // Silent background push — no toast
+  try{
+    const rxSaved = JSON.parse(localStorage.getItem('rxSaved')||'[]');
+    await fbSet('prescriptions', { list: JSON.stringify(rxSaved), updatedAt: Date.now() });
+    const patients = localStorage.getItem('patientRegistry')||'[]';
+    await fbSet('patients', { list: patients, updatedAt: Date.now() });
+  }catch(_){}
+}
+
+// ─── Expose to global scope ────────────────────────────────────────────────
+window.fbPushAll  = fbPushAll;
+window.fbPullAll  = fbPullAll;
+window.fbAutoSync = fbAutoSync;
+
+// ─── Hook into existing saveRxSilent ──────────────────────────────────────
+// Auto-push to Firebase every time a prescription is saved
+const _origSaveRxSilent = window.saveRxSilent;
+if(_origSaveRxSilent){
+  window.saveRxSilent = function(){
+    _origSaveRxSilent();
+    fbAutoSync();
+  };
+}
+
+// ─── On load: auto-pull if Firebase has newer data ────────────────────────
+window.addEventListener('DOMContentLoaded', async ()=>{
+  // Wait for auth
+  const waitAuth = (ms=5000) => new Promise(res=>{
+    const start=Date.now();
+    const t=setInterval(()=>{
+      if(window.isAuth && window.isAuth()){clearInterval(t);res(true);}
+      if(Date.now()-start>ms){clearInterval(t);res(false);}
+    },200);
+  });
+  const authed = await waitAuth();
+  if(!authed) return;
+
+  // Check if Firebase has data newer than local
+  try{
+    const rx = await fbGet('prescriptions');
+    const localRx = JSON.parse(localStorage.getItem('rxSaved')||'[]');
+    // If Firebase has data and local is empty → auto pull
+    if(rx?.list && localRx.length===0){
+      await fbPullAll();
+      fbToast('☁️ Firebase se data restore hua!', 3000);
+    }
+  }catch(_){}
+});
+
+console.log('🔥 Firebase ready — Dr. Lakshaya Rx connected to Firestore + Storage');
 </script>
 </body>
 </html>
