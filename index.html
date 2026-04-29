@@ -744,171 +744,184 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 </div>
 
 <!-- ─── SETTINGS MODAL ─── -->
+<style>
+/* ── shared scard kept for other modals that may use it ── */
+.scard{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;margin-bottom:0;}
+.scard-hd{padding:7px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8;}
+.scard-hd span:first-child{font-size:14px;}
+.scard-title{font-size:10px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px;}
+.scard-body{padding:10px 12px;}
+.s2col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sup-btn{padding:7px 10px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:7px;font-size:11px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;text-align:center;display:block;width:100%;transition:background .13s;}
+.sup-btn:hover{background:#e4d8ff;}
+.sdel-btn{padding:6px 10px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit;width:100%;transition:background .13s;}
+.sdel-btn:hover{background:#ffd7d7;}
+.sig-prev-box{margin-top:7px;min-height:40px;display:flex;align-items:center;justify-content:center;background:rgba(106,90,205,.04);border-radius:7px;border:1.5px dashed var(--br);}
+.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.sync-btn{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;border:none;}
+/* ── new compact settings panel ── */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;}
+.set-col{display:flex;flex-direction:column;gap:9px;}
+.set-block{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;}
+.set-bh{padding:6px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);border-bottom:1px solid #e0d8f8;display:flex;align-items:center;gap:6px;}
+.set-bh-icon{font-size:13px;}
+.set-bh-lbl{font-size:9.5px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px;}
+.set-bb{padding:9px 11px;}
+.set-tog{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:var(--tx);font-weight:500;cursor:pointer;border-bottom:1px solid #f0edf8;}
+.set-tog:last-child{border-bottom:none;}
+.set-tog input[type=checkbox]{width:13px;height:13px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
+</style>
 <div class="mo" id="settingsMo" style="display:none">
-<div class="mb" style="max-width:1100px;width:96vw;max-height:96vh;overflow:hidden;padding:0;border-radius:18px;display:flex;flex-direction:column;">
+<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:700px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;overflow:hidden;">
 
-  <!-- Settings Header -->
-  <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:14px 22px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
     <div>
-      <div style="font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">⚙️ Settings</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;letter-spacing:.5px">TELEGRAM · LETTERHEAD · SIGNATURE · PRINT · SYNC</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px">⚙️ Settings</div>
+      <div style="font-size:9.5px;color:rgba(255,255,255,.6);margin-top:1px;letter-spacing:.5px">TELEGRAM · LETTERHEAD · SIGNATURE · PRINT · CLOUD SYNC</div>
     </div>
-    <button onclick="document.getElementById('settingsMo').style.display='none'" style="width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    <button onclick="document.getElementById('settingsMo').style.display='none'" style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
   </div>
 
-  <!-- 3-col grid body — no scroll -->
-  <div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:start;overflow-y:auto;flex:1;">
+  <!-- 2-column grid body — no scroll -->
+  <div class="set-grid">
 
-  <!-- COL 1: Telegram -->
-  <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:15px">✈️</span>
-      <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Telegram Bot</span>
-    </div>
-    <div style="padding:11px 13px;display:flex;flex-direction:column;gap:9px">
-      <div class="mf">
-        <label>Bot Token</label>
-        <input id="tgToken" type="password" placeholder="123456:ABCdef..." style="font-family:monospace;font-size:11px">
-      </div>
-      <div class="mf">
-        <label>Chat ID</label>
-        <input id="tgChatId" type="text" placeholder="-100xxxxxxxxx or your user ID">
-      </div>
-      <div style="font-size:10px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.05);border-radius:6px;padding:6px 8px">
-        💡 Create a bot using BotFather → Get your Chat ID from @userinfobot
-      </div>
-    </div>
-  </div>
+    <!-- ── LEFT COLUMN ── -->
+    <div class="set-col">
 
-  <!-- COL 2: Letterhead -->
-  <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:15px">🖼️</span>
-      <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Letterhead Background</span>
-    </div>
-    <div style="padding:11px 13px">
-      <div style="font-size:10.5px;color:var(--mu);margin-bottom:9px;line-height:1.6">Upload a JPG/PNG image for the A4 page background — it will appear in full quality in PDF and print.</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <label style="padding:8px 13px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:8px;font-size:12px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;text-align:center;display:block">
-          📂 Upload Letterhead
-          <input type="file" id="bgFi" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="loadBgImage(this)" style="display:none">
-        </label>
-        <button onclick="clearBgImage()" style="padding:7px 12px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;width:100%">✕ Remove</button>
-      </div>
-      <div id="bgPrevWrap" style="display:none;margin-top:9px">
-        <img id="bgPrev" style="max-height:60px;max-width:100%;border:1px solid var(--br);border-radius:6px;display:block">
-        <div id="bgPrevLabel" style="font-size:10px;color:#2e7d32;font-weight:600;margin-top:4px">✅ Letterhead loaded</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COL 3: Signature -->
-  <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:15px">✍️</span>
-      <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Signature</span>
-    </div>
-    <div style="padding:11px 13px">
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <label style="padding:8px 13px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:8px;font-size:12px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;text-align:center;display:block">
-          📁 Upload Signature
-          <input type="file" id="sigFi" accept="image/*" onchange="loadSig(this)" style="display:none">
-        </label>
-        <button onclick="clrSig()" style="padding:7px 12px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;width:100%">✕ Remove</button>
-      </div>
-      <div style="margin-top:9px;min-height:44px;display:flex;align-items:center;justify-content:center;background:rgba(106,90,205,.04);border-radius:6px;border:1px dashed var(--br)">
-        <img id="sprev" style="display:none;max-height:40px;max-width:120px;object-fit:contain">
-        <span id="sprevPlaceholder" style="font-size:10px;color:var(--mu)">Preview here</span>
-      </div>
-      <div style="font-size:10px;color:var(--mu);margin-top:6px">PNG transparent background recommended</div>
-    </div>
-  </div>
-
-  <!-- ROW 2 COL 1+2: Print Preferences -->
-  <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden;grid-column:1/3">
-    <div style="padding:7px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:14px">🖨️</span>
-      <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Print / Save Preferences</span>
-    </div>
-    <!-- Checkboxes: 1 column, tight -->
-    <div style="padding:6px 13px 4px;display:flex;flex-direction:column;gap:0">
-      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
-      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
-      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
-      <label class="set-tog" style="padding:5px 0"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
-      <label class="set-tog" style="padding:5px 0;border-bottom:none"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
-      <input type="hidden" id="setPrefConfirm">
-    </div>
-    <!-- Auto Token Format — compact inline grid -->
-    <div id="autoTokenRow" style="display:none;padding:8px 13px 10px;border-top:1px dashed #e0d8f8">
-      <div style="font-size:10px;color:var(--mu);margin-bottom:6px;font-weight:600">Format: <code style="background:#f0ecff;padding:1px 5px;border-radius:4px;color:var(--p);font-size:10.5px">PREFIX-DDMMYYYY-001</code></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1.2fr 1.4fr;gap:6px;align-items:end;margin-bottom:7px">
-        <div>
-          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">OPD Prefix</label>
-          <input id="tokenPrefix" type="text" value="OPD" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Tele Prefix</label>
-          <input id="tokenPrefixTel" type="text" value="TEL" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Next Token #</label>
-          <div style="display:flex;gap:3px;align-items:center">
-            <button onclick="adjToken(-1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">−</button>
-            <input id="tokenCounter" type="number" min="1" value="1" oninput="savePrefs();previewToken()" style="flex:1;min-width:0;border:1px solid var(--p);border-radius:6px;padding:3px 4px;font-size:12px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
-            <button onclick="adjToken(1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">＋</button>
+      <!-- Telegram -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">✈️</span><span class="set-bh-lbl">Telegram Bot</span></div>
+        <div class="set-bb" style="display:flex;flex-direction:column;gap:7px;">
+          <div class="mf">
+            <label>Bot Token</label>
+            <input id="tgToken" type="password" placeholder="123456:ABCdef..." style="font-family:monospace;font-size:10.5px">
+          </div>
+          <div class="mf">
+            <label>Chat ID</label>
+            <input id="tgChatId" type="text" placeholder="-100xxxxxxxxx or your user ID">
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.06);border-radius:7px;padding:6px 9px">
+            💡 <strong>@BotFather</strong> → create bot → copy token · Chat ID from <strong>@userinfobot</strong>
           </div>
         </div>
-        <div>
-          <label style="font-size:9.5px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Preview</label>
-          <div id="tokenPreview" style="font-size:10.5px;font-weight:700;color:var(--p);background:#f0ecff;border-radius:6px;padding:5px 7px;border:1px solid var(--pl);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      </div>
+
+      <!-- Letterhead -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">🖼️</span><span class="set-bh-lbl">Letterhead Background</span></div>
+        <div class="set-bb">
+          <div class="s2col" style="margin-bottom:7px">
+            <label class="sup-btn">
+              📂 Upload
+              <input type="file" id="bgFi" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="loadBgImage(this)" style="display:none">
+            </label>
+            <button class="sdel-btn" onclick="clearBgImage()">✕ Remove</button>
+          </div>
+          <div id="bgPrevWrap" style="display:none">
+            <img id="bgPrev" style="max-height:52px;max-width:100%;border:1px solid var(--br);border-radius:7px;display:block">
+            <div id="bgPrevLabel" style="font-size:9.5px;color:#2e7d32;font-weight:600;margin-top:4px">✅ Letterhead loaded</div>
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.4;margin-top:5px">Recommended: <strong>794×1123 px</strong> JPG/PNG</div>
         </div>
       </div>
-      <div style="display:flex;gap:6px">
-        <button onclick="applyAutoToken()" style="flex:1;padding:6px 8px;background:var(--p);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Apply to Token Field ↗</button>
-        <button onclick="document.getElementById('tokenCounter').value=1;savePrefs();previewToken()" style="padding:6px 10px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Reset to 1</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ROW 2 COL 3: Sync -->
-  <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden">
-    <div style="padding:9px 13px;background:linear-gradient(90deg,rgba(106,90,205,.12),transparent);display:flex;align-items:center;gap:7px;border-bottom:1px solid #e0d8f8">
-      <span style="font-size:15px">☁️</span>
-      <span style="font-size:11px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.7px">Sync</span>
-    </div>
-    <div style="padding:11px 13px">
-      <div id="syncStatus" style="font-size:11px;min-height:14px;margin-bottom:8px;text-align:center;color:var(--mu)"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <button onclick="syncPush()" style="padding:8px 6px;background:#6a5acd;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📤 Push</button>
-        <button onclick="syncPull()" style="padding:8px 6px;background:#fff;color:#6a5acd;border:2px solid #6a5acd;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📥 Pull</button>
-        <button onclick="exportData()" style="padding:8px 6px;background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📦 Export</button>
-        <label style="padding:8px 6px;background:#fff8e1;color:#e65100;border:1.5px solid #ffcc80;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;display:block">
-          📂 Import<input type="file" accept=".json" onchange="importData(this)" style="display:none">
-        </label>
-      </div>
-      <div style="margin-top:8px;border-top:1px dashed #e0d8f8;padding-top:8px">
-        <div style="font-size:10px;font-weight:700;color:#4a3fa0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">🔥 Firebase Cloud</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <button onclick="window.fbPushAll&&window.fbPushAll()" style="padding:8px 6px;background:#ff6f00;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔥 FB Push</button>
-          <button onclick="window.fbPullAll&&window.fbPullAll()" style="padding:8px 6px;background:#fff;color:#ff6f00;border:2px solid #ff6f00;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔥 FB Pull</button>
+      <!-- Signature -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">✍️</span><span class="set-bh-lbl">Doctor Signature</span></div>
+        <div class="set-bb">
+          <div class="s2col">
+            <label class="sup-btn">
+              📁 Upload
+              <input type="file" id="sigFi" accept="image/*" onchange="loadSig(this)" style="display:none">
+            </label>
+            <button class="sdel-btn" onclick="clrSig()">✕ Remove</button>
+          </div>
+          <div class="sig-prev-box" style="min-height:36px;margin-top:7px">
+            <img id="sprev" style="display:none;max-height:36px;max-width:130px;object-fit:contain">
+            <span id="sprevPlaceholder" style="font-size:9.5px;color:var(--mu)">Preview here</span>
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);margin-top:5px">💡 PNG with transparent background for clean print</div>
         </div>
-        <div style="font-size:10px;color:var(--mu);margin-top:6px;line-height:1.5">FB Push = sab kuch Firebase pe save karo<br>FB Pull = doosre device pe restore karo</div>
       </div>
-      <div style="font-size:10px;color:var(--mu);margin-top:8px;line-height:1.6;background:rgba(106,90,205,.05);border-radius:6px;padding:6px 8px">
-        📤 Push — send settings to Telegram<br>
-        📥 Pull — load settings on another device
-      </div>
-    </div>
-  </div>
 
-  <!-- Footer — full width -->
-  <div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--br);background:#faf9ff;border-radius:0 0 18px 18px;grid-column:1/-1;flex-shrink:0">
+    </div><!-- /left col -->
+
+    <!-- ── RIGHT COLUMN ── -->
+    <div class="set-col">
+
+      <!-- Print Preferences -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">🖨️</span><span class="set-bh-lbl">Print / Save Preferences</span></div>
+        <div class="set-bb">
+          <label class="set-tog"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
+          <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
+          <input type="hidden" id="setPrefConfirm">
+          <!-- Auto Token inline section -->
+          <div id="autoTokenRow" style="display:none;margin-top:8px;padding:8px;background:#f0ecff;border-radius:8px;border:1px solid var(--pl)">
+            <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:5px">FORMAT: <code style="background:#fff;padding:1px 5px;border-radius:3px;color:var(--p)">PREFIX-DDMMYYYY-001</code></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+              <div>
+                <label style="font-size:9px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">OPD Prefix</label>
+                <input id="tokenPrefix" type="text" value="OPD" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:4px 7px;font-size:11px;font-family:inherit;outline:none;box-sizing:border-box">
+              </div>
+              <div>
+                <label style="font-size:9px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">Tele Prefix</label>
+                <input id="tokenPrefixTel" type="text" value="TEL" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:4px 7px;font-size:11px;font-family:inherit;outline:none;box-sizing:border-box">
+              </div>
+            </div>
+            <div style="display:flex;gap:5px;align-items:center;margin-bottom:5px">
+              <button onclick="adjToken(-1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">−</button>
+              <input id="tokenCounter" type="number" min="1" value="1" oninput="savePrefs();previewToken()" style="flex:1;min-width:0;border:1px solid var(--p);border-radius:6px;padding:3px 5px;font-size:12px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
+              <button onclick="adjToken(1)" style="width:24px;height:24px;border:1px solid var(--br);border-radius:5px;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">＋</button>
+              <button onclick="applyAutoToken()" style="padding:4px 8px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Apply ↗</button>
+              <button onclick="document.getElementById('tokenCounter').value=1;savePrefs();previewToken()" style="padding:4px 7px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0">Reset</button>
+            </div>
+            <div id="tokenPreview" style="font-size:10px;font-weight:700;color:var(--p);background:#fff;border-radius:6px;padding:4px 8px;border:1px solid var(--pl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Firebase + Import/Export -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">🔥</span><span class="set-bh-lbl">Cloud Sync &amp; Backup</span></div>
+        <div class="set-bb">
+          <!-- Firebase row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+            <button onclick="window.fbPushAll&&window.fbPushAll()" style="padding:9px 6px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#ff6f00;color:#fff;border:none;transition:opacity .13s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">🔥 Firebase Push</button>
+            <button onclick="window.fbPullAll&&window.fbPullAll()" style="padding:9px 6px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#ff6f00;border:2px solid #ff6f00;transition:background .13s" onmouseover="this.style.background='#fff3e0'" onmouseout="this.style.background='#fff'">🔥 Firebase Pull</button>
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(255,111,0,.05);border-radius:7px;padding:6px 9px;border:1px solid rgba(255,111,0,.15);margin-bottom:8px">
+            🔥 <strong>Push</strong> — prescriptions, patients, settings &amp; images → Firebase<br>
+            🔥 <strong>Pull</strong> — restore everything on any device
+          </div>
+          <!-- Import/Export row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+            <button onclick="exportData()" style="padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7;transition:background .13s" onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#e8f5e9'">📦 Export JSON</button>
+            <label style="padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff8e1;color:#e65100;border:1.5px solid #ffcc80;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .13s" onmouseover="this.style.background='#ffe0b2'" onmouseout="this.style.background='#fff8e1'">
+              📂 Import JSON<input type="file" accept=".json" onchange="importData(this)" style="display:none">
+            </label>
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.04);border-radius:7px;padding:6px 9px">
+            📦 Export — saara data JSON file mein backup karo<br>
+            📂 Import — JSON file se data restore karo
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right col -->
+
+  </div><!-- /set-grid -->
+
+  <!-- Footer -->
+  <div style="display:flex;gap:8px;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--br);background:#faf9ff;flex-shrink:0">
     <button class="mcc" onclick="document.getElementById('settingsMo').style.display='none'">Cancel</button>
     <button class="mcs" onclick="saveSettings()">💾 Save Settings</button>
   </div>
 
-  </div>
 </div>
 </div>
 
@@ -4089,14 +4102,21 @@ import { getFirestore, doc, setDoc, getDoc,
 import { getStorage, ref, uploadString,
          getDownloadURL, deleteObject }         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+// ── config (obfuscated – XOR + base64) ────────────────────────────────────
+const _ok='rxMahajan2024';
+function _d(e){
+  const b=atob(e);let r='';
+  for(let i=0;i<b.length;i++)r+=String.fromCharCode(b.charCodeAt(i)^_ok.charCodeAt(i%_ok.length));
+  return r;
+}
 const firebaseConfig = {
-  apiKey:            "AIzaSyAOrgzRXsam1rWU-2jEvszyxnxo-Mok1QM",
-  authDomain:        "dr-lakshaya-rx.firebaseapp.com",
-  databaseURL:       "https://dr-lakshaya-rx-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "dr-lakshaya-rx",
-  storageBucket:     "dr-lakshaya-rx.firebasestorage.app",
-  messagingSenderId: "358605253581",
-  appId:             "1:358605253581:web:9d443b9dd50107592df284"
+  apiKey:            _d('MzE3ADsYKy4cVUpgbAEZIFAaNj9MXFh1REcIATUPEA5HLAFZAWN5'),
+  authDomain:        _d('FgpgDQkKGQkPS1EfRgpWKwgaBAgAHVdRQkRcGyIM'),
+  databaseURL:       _d('Ggw5ERtbRU4KQB1eVRkLJQARAEcTFh9UV1ITDSEVRRMeBQwcUUFdE1U+Dh0VAgQPQUQDGhQRPwQKABkEClNEU1YTCyhPCREa'),
+  projectId:         _d('FgpgDQkKGQkPS1EfRgo='),
+  storageBucket:     _d('FgpgDQkKGQkPS1EfRgpWKwgaBAgAHVdDRlsAGSoERgAaEQ=='),
+  messagingSenderId: _d('QU11V1hUWFRdBwgD'),
+  appId:             _d('Q0J+VFBXWlRcBwMHDENCOgQKW1MFWgYDUA0WHHhRWVFdVFcAVFQGSkw=')
 };
 
 const app  = initializeApp(firebaseConfig);
