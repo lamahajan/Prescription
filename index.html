@@ -263,10 +263,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <div class="st">Patient Details</div>
     <div class="rw r1"><div class="fl"><label>Patient Name</label>
       <div style="display:flex;gap:5px;align-items:center">
-        <input id="pN" type="text" placeholder="Full name" oninput="upd()" style="flex:1">
-        <button class="pt-reg-btn" onclick="openPatientRegister()" title="Load Registered Patient">👤</button>
-        <button class="pt-reg-btn" onclick="saveCurrentPatient()" title="Save to Patient Registry">＋</button>
+        <input id="pN" type="text" placeholder="Type name to search registry..." oninput="upd();prNameInput(this.value)" list="pNList" style="flex:1" autocomplete="off">
+        <datalist id="pNList"></datalist>
+        <button class="pt-reg-btn" onclick="openPatientRegister()" title="Open Patient Registry">👥</button>
+        <button class="pt-reg-btn" onclick="saveCurrentPatient()" title="Save current patient to registry" style="font-size:12px">💾</button>
       </div>
+      <div id="pNSuggest" style="display:none;position:absolute;z-index:200;background:#fff;border:1px solid var(--br);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);width:280px;max-height:180px;overflow-y:auto;margin-top:2px"></div>
     </div></div>
     <div class="rw r2">
       <div class="fl" style="min-width:0"><label>Age</label><input id="pA" type="text" placeholder="34 Yrs" oninput="upd()" style="width:100%"></div>
@@ -277,7 +279,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <div class="fl" style="min-width:0"><label>Token / ID</label><input id="pI" type="text" placeholder="OPD-001" oninput="upd()" style="width:100%"></div>
     </div>
     <div class="rw r1">
-      <div class="fl"><label>Weight</label><div class="ww"><input id="pW" type="number" placeholder="65" oninput="upd()"><span class="wu">kg</span></div></div>
+      <div class="fl"><label>Weight</label><div class="ww"><input id="pW" type="number" min="0" placeholder="65" oninput="upd()"><span class="wu">kg</span></div></div>
     </div>
   </div>
 
@@ -285,20 +287,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <div class="st">Vitals</div>
     <div class="rw r2">
       <div class="fl"><label>BP (mmHg)</label>
-        <div class="bpw"><input id="bS" type="number" placeholder="120" style="width:55px" oninput="upd()"><span class="bps">/</span><input id="bD" type="number" placeholder="80" style="width:55px" oninput="upd()"></div>
+        <div class="bpw"><input id="bS" type="number" min="0" placeholder="120" style="width:55px" oninput="upd()"><span class="bps">/</span><input id="bD" type="number" min="0" placeholder="80" style="width:55px" oninput="upd()"></div>
       </div>
-      <div class="fl"><label>Pulse (bpm)</label><input id="vP" type="number" placeholder="72" oninput="upd()"></div>
+      <div class="fl"><label>Pulse (bpm)</label><input id="vP" type="number" min="0" placeholder="72" oninput="upd()"></div>
     </div>
     <div class="rw r3">
       <div class="fl" style="min-width:0">
         <label>Temp</label>
         <div style="display:flex;align-items:center;gap:2px">
-          <input id="vT" type="number" placeholder="98.6" oninput="autoTempUnit()" style="flex:1;min-width:0;width:0">
+          <input id="vT" type="number" min="0" placeholder="98.6" oninput="autoTempUnit()" style="flex:1;min-width:0;width:0">
           <button id="tempUnitBtn" onclick="toggleTempUnit()" style="padding:4px 5px;border:1px solid var(--br);border-radius:5px;background:#f0ecff;font-size:10px;font-weight:700;color:var(--p);cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0">°F</button>
         </div>
       </div>
-      <div class="fl" style="min-width:0"><label>SpO₂(%)</label><input id="vS" type="number" placeholder="98" oninput="upd()" style="width:100%"></div>
-      <div class="fl" style="min-width:0"><label>RR/min</label><input id="vR" type="number" placeholder="18" oninput="upd()" style="width:100%"></div>
+      <div class="fl" style="min-width:0"><label>SpO₂(%)</label><input id="vS" type="number" min="0" max="100" placeholder="98" oninput="upd()" style="width:100%"></div>
+      <div class="fl" style="min-width:0"><label>RR/min</label><input id="vR" type="number" min="0" placeholder="18" oninput="upd()" style="width:100%"></div>
     </div>
     <div style="margin-top:5px">
       <label class="af-chk" style="display:inline-flex"><input type="checkbox" id="afChk" onchange="toggleAF()"> &nbsp;Afebrile (no fever)</label>
@@ -614,15 +616,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <input type="hidden" id="prEditId">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
         <div class="mf" style="grid-column:1/-1"><label>Full Name *</label><input id="prName" type="text" placeholder="Patient full name" style="font-size:13px;font-weight:600"></div>
-        <div class="mf"><label>Age</label><input id="prAge" type="text" placeholder="34 Yrs / DOB"></div>
+        <!-- DOB + Age smart row -->
+        <div class="mf">
+          <label>Date of Birth</label>
+          <input id="prDob" type="date" oninput="prDobToAge()" style="width:100%">
+        </div>
+        <div class="mf">
+          <label>Age <span style="font-size:9px;color:var(--mu);font-weight:400">(auto from DOB)</span></label>
+          <input id="prAge" type="text" placeholder="34 Yrs" oninput="prAgeToDob()">
+        </div>
         <div class="mf"><label>Gender</label>
           <select id="prGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
         </div>
         <div class="mf"><label>Blood Group</label>
           <select id="prBlood"><option value="">Unknown</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select>
         </div>
-        <div class="mf"><label>Mobile</label><input id="prPhone" type="text" placeholder="98XXXXXXXX"></div>
-        <div class="mf"><label>WhatsApp</label><input id="prWa" type="text" placeholder="Same / different no."></div>
+        <div class="mf"><label>Weight (kg)</label><input id="prWeight" type="number" min="0" placeholder="65"></div>
+        <div class="mf"><label>Mobile / WhatsApp</label>
+          <div style="display:flex;gap:4px;align-items:center">
+            <input id="prPhone" type="text" placeholder="98XXXXXXXX" style="flex:1">
+            <a id="prWaLink" href="#" target="_blank" title="Open WhatsApp" style="display:none;color:#25d366;font-size:18px;text-decoration:none;flex-shrink:0">💬</a>
+          </div>
+        </div>
         <div class="mf"><label>Occupation</label><input id="prOcc" type="text" placeholder="Farmer, Teacher..."></div>
         <div class="mf" style="grid-column:1/-1"><label>Address</label><input id="prAddr" type="text" placeholder="Village / City, District"></div>
         <div class="mf" style="grid-column:1/-1"><label>🚨 Known Allergies</label><input id="prAllergy" type="text" placeholder="Penicillin, Sulfa, NSAIDs... (leave blank if none)"></div>
@@ -1308,7 +1323,74 @@ function addCustomAdvChip(){
   upd();
 }
 
-// ─── PATIENT REGISTRY ───
+// ─── DOB ↔ AGE SYNC ───
+function prDobToAge(){
+  const dob=document.getElementById('prDob').value;
+  if(!dob)return;
+  const today=new Date(),d=new Date(dob);
+  let yrs=today.getFullYear()-d.getFullYear();
+  const m=today.getMonth()-d.getMonth();
+  if(m<0||(m===0&&today.getDate()<d.getDate()))yrs--;
+  document.getElementById('prAge').value=yrs>0?yrs+' Yrs':'< 1 Yr';
+}
+function prAgeToDob(){
+  // If user types age manually, clear DOB (no reverse calc)
+  document.getElementById('prDob').value='';
+}
+
+// ─── PATIENT NAME AUTOCOMPLETE ───
+function prNameInput(val){
+  const box=document.getElementById('pNSuggest');
+  const list=getPatientRegistry();
+  if(!val||val.length<2){box.style.display='none';return;}
+  const matches=list.filter(p=>p.name.toLowerCase().includes(val.toLowerCase())).slice(0,6);
+  if(!matches.length){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=matches.map((p,i)=>{
+    const bloodColors={'A+':'#e53935','A−':'#c62828','B+':'#1e88e5','B−':'#1565c0','AB+':'#8e24aa','AB−':'#6a1b9a','O+':'#43a047','O−':'#2e7d32'};
+    const bc=p.blood?bloodColors[p.blood]:'';
+    return`<div onclick="prLoadFromSuggest(${list.indexOf(p)})" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid #f0ecff;transition:background .1s" onmouseover="this.style.background='#f0ecff'" onmouseout="this.style.background=''">
+      <div style="width:28px;height:28px;background:var(--p);border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.name}</div>
+        <div style="font-size:10px;color:var(--mu)">${[p.age,p.gender,p.phone].filter(Boolean).join(' · ')}</div>
+      </div>
+      ${p.blood&&bc?`<span style="font-size:9px;font-weight:800;color:#fff;background:${bc};border-radius:4px;padding:1px 5px;flex-shrink:0">${p.blood}</span>`:''}
+      ${p.allergy?`<span title="${p.allergy}" style="font-size:10px;color:#bf360c;flex-shrink:0">⚠️</span>`:''}
+    </div>`;
+  }).join('');
+  // Update datalist too
+  const dl=document.getElementById('pNList');
+  dl.innerHTML=matches.map(p=>`<option value="${p.name}">`).join('');
+}
+function prLoadFromSuggest(idx){
+  document.getElementById('pNSuggest').style.display='none';
+  loadPatientToForm(idx);
+}
+// Close suggest on outside click
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#pNSuggest')&&e.target.id!=='pN'){
+    const b=document.getElementById('pNSuggest');
+    if(b)b.style.display='none';
+  }
+});
+// Rebuild datalist from registry
+function rebuildPnDatalist(){
+  const list=getPatientRegistry();
+  const dl=document.getElementById('pNList');
+  if(dl)dl.innerHTML=list.map(p=>`<option value="${p.name}">`).join('');
+}
+
+// ─── AUTO-REGISTER unregistered patient on save ───
+function autoRegisterIfNew(){
+  const nm=g('pN');if(!nm)return;
+  const list=getPatientRegistry();
+  if(list.find(p=>p.name.toLowerCase()===nm.toLowerCase()))return;
+  const today=new Date().toISOString().split('T')[0];
+  list.unshift({id:'PT'+Date.now(),name:nm,age:g('pA'),gender:document.getElementById('pG').value,weight:g('pW'),phone:'',dob:'',blood:'',occ:'',addr:'',allergy:'',pmh:'',meds:'',emName:'',emRel:'',emPhone:'',notes:'',regDate:today,lastVisit:today,visits:[{date:today,diag:g('diag')||''}]});
+  savePatientRegistry(list);
+  rebuildPnDatalist();
+}
 function getPatientRegistry(){return JSON.parse(localStorage.getItem('patientRegistry')||'[]');}
 function savePatientRegistry(list){localStorage.setItem('patientRegistry',JSON.stringify(list));}
 
@@ -1326,7 +1408,7 @@ function prSetView(v){
   if(v==='add'){
     const isEdit=!!document.getElementById('prEditId').value;
     if(!isEdit){
-      ['prName','prAge','prPhone','prWa','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+      ['prName','prAge','prDob','prPhone','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
       document.getElementById('prGender').value='';
       document.getElementById('prBlood').value='';
       document.getElementById('prEditId').value='';
@@ -1340,6 +1422,7 @@ function prSetView(v){
 function openPatientRegister(){
   document.getElementById('prEditId').value='';
   document.getElementById('prEditBanner').style.display='none';
+  rebuildPnDatalist();
   prUpdateStats();
   prSetView('list');
   document.getElementById('patientRegMo').style.display='flex';
@@ -1372,7 +1455,7 @@ function saveCurrentPatient(){
     showToast('✅ Visit logged for '+nm,2500);
   }else{
     const id='PT'+Date.now();
-    list.unshift({id,name:nm,age:g('pA'),gender:document.getElementById('pG').value,phone:'',wa:'',blood:'',occ:'',addr:'',allergy:'',pmh:'',meds:'',emName:'',emRel:'',emPhone:'',notes:'',lastVisit:today,visits:[{date:today,diag:g('diag')||''}],regDate:today});
+    list.unshift({id,name:nm,age:g('pA'),gender:document.getElementById('pG').value,weight:g('pW'),phone:'',dob:'',blood:'',occ:'',addr:'',allergy:'',pmh:'',meds:'',emName:'',emRel:'',emPhone:'',notes:'',lastVisit:today,visits:[{date:today,diag:g('diag')||''}],regDate:today});
     showToast('✅ Patient registered: '+nm,2500);
   }
   savePatientRegistry(list);
@@ -1386,11 +1469,12 @@ function addPatientToRegistry(){
   const editId=document.getElementById('prEditId').value;
   const rec={
     name:nm,
+    dob:document.getElementById('prDob').value,
     age:document.getElementById('prAge').value.trim(),
     gender:document.getElementById('prGender').value,
     blood:document.getElementById('prBlood').value,
+    weight:document.getElementById('prWeight').value.trim(),
     phone:document.getElementById('prPhone').value.trim(),
-    wa:document.getElementById('prWa').value.trim(),
     occ:document.getElementById('prOcc').value.trim(),
     addr:document.getElementById('prAddr').value.trim(),
     allergy:document.getElementById('prAllergy').value.trim(),
@@ -1428,6 +1512,7 @@ function loadPatientToForm(idx){
   document.getElementById('pN').value=p.name;
   document.getElementById('pA').value=p.age||'';
   document.getElementById('pG').value=p.gender||'';
+  if(p.weight)document.getElementById('pW').value=p.weight;
   // Log visit
   const today=new Date().toISOString().split('T')[0];
   if(!p.visits)p.visits=[];
@@ -1447,12 +1532,14 @@ function editPatient(idx,e){
   e.stopPropagation();
   const list=getPatientRegistry();
   const p=list[idx];if(!p)return;
-  ['prName','prAge','prPhone','prWa','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes'].forEach(id=>{
-    const field={prName:'name',prAge:'age',prPhone:'phone',prWa:'wa',prOcc:'occ',prAddr:'addr',prAllergy:'allergy',prPmh:'pmh',prMeds:'meds',prEmName:'emName',prEmRel:'emRel',prEmPhone:'emPhone',prNotes:'notes'}[id];
+  ['prName','prAge','prPhone','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{
+    const field={prName:'name',prAge:'age',prPhone:'phone',prOcc:'occ',prAddr:'addr',prAllergy:'allergy',prPmh:'pmh',prMeds:'meds',prEmName:'emName',prEmRel:'emRel',prEmPhone:'emPhone',prNotes:'notes',prWeight:'weight'}[id];
     const el=document.getElementById(id);if(el&&field)el.value=p[field]||'';
   });
+  document.getElementById('prDob').value=p.dob||'';
   document.getElementById('prGender').value=p.gender||'';
   document.getElementById('prBlood').value=p.blood||'';
+  document.getElementById('prWeight').value=p.weight||'';
   document.getElementById('prEditId').value=p.id||'';
   document.getElementById('prEditBanner').style.display='block';
   prSetView('add');
@@ -1488,15 +1575,15 @@ function viewPatientProfile(idx){
       <div style="width:48px;height:48px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:16px;font-weight:700;color:var(--tx)">${p.name}</div>
-        <div style="font-size:11px;color:var(--mu)">${[p.age,p.gender,p.occ].filter(Boolean).join(' · ')}</div>
+        <div style="font-size:11px;color:var(--mu)">${[p.age,p.gender,p.weight?p.weight+' kg':null,p.occ].filter(Boolean).join(' · ')}</div>
         ${p.regDate?`<div style="font-size:10px;color:#9b8ee0">Registered: ${p.regDate}</div>`:''}
       </div>
       ${p.blood?`<div style="width:40px;height:40px;border-radius:50%;background:${bc};color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid ${bc}aa">${p.blood}</div>`:''}
     </div>
     <!-- Info grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;font-size:11px">
-      ${p.phone?`<div><span style="color:var(--mu);font-weight:600">📞 Mobile: </span><a href="tel:${p.phone}" style="color:var(--p);font-weight:700;text-decoration:none">${p.phone}</a></div>`:''}
-      ${p.wa?`<div><span style="color:var(--mu);font-weight:600">💬 WhatsApp: </span><a href="https://wa.me/91${p.wa.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none">${p.wa}</a></div>`:''}
+      ${p.phone?`<div><span style="color:var(--mu);font-weight:600">📞 Mobile: </span><a href="tel:${p.phone}" style="color:var(--p);font-weight:700;text-decoration:none">${p.phone}</a> <a href="https://wa.me/91${p.phone.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-size:11px;text-decoration:none;margin-left:4px">💬 WhatsApp</a></div>`:''}
+      ${p.dob?`<div><span style="color:var(--mu);font-weight:600">🎂 DOB: </span>${p.dob}</div>`:''}
       ${p.addr?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">📍 </span>${p.addr}</div>`:''}
       ${p.emName?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">🆘 Emergency: </span>${p.emName}${p.emRel?' ('+p.emRel+')':''}${p.emPhone?' — '+p.emPhone:''}</div>`:''}
     </div>
@@ -1571,7 +1658,7 @@ function renderPatientList(){
           ${p.blood&&bc?`<span style="font-size:9px;font-weight:800;color:#fff;background:${bc};border-radius:5px;padding:1px 5px">${p.blood}</span>`:''}
           ${p.allergy?`<span style="font-size:9px;font-weight:700;color:#bf360c;background:#fff3e0;border:1px solid #ffcc80;border-radius:5px;padding:1px 5px">⚠️ Allergy</span>`:''}
         </div>
-        <div style="font-size:10.5px;color:var(--mu)">${[p.age,p.gender,p.phone].filter(Boolean).join(' · ')}</div>
+        <div style="font-size:10.5px;color:var(--mu)">${[p.age,p.gender,p.weight?p.weight+' kg':null,p.phone].filter(Boolean).join(' · ')}</div>
         <div style="font-size:10px;color:#9b8ee0">${p.lastVisit?'Last: '+p.lastVisit:''} ${p.pmh?'· '+p.pmh:''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
@@ -1928,7 +2015,7 @@ function upd(){
   const allN=[...selNot];const cn=g('notX');if(cn)allN.push(cn);
   const ne=document.getElementById('rxnote');
   if(allN.length){
-    ne.innerHTML=`<span style="font-size:15px;font-weight:900;margin-right:4px">⚠</span>`+allN.map(n=>`<span style="font-size:16px;line-height:0;vertical-align:middle;margin-right:3px;margin-left:6px">•</span>${n}`).join('');
+    ne.innerHTML=`<div style="display:flex;align-items:flex-start;gap:6px"><div style="background:#e65100;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px;letter-spacing:.5px">INSTRUCTIONS</div><div style="flex:1">${allN.map(n=>`<div style="line-height:1.75"><span style="color:#c0392b;font-weight:700;margin-right:4px">›</span>${n}</div>`).join('')}</div></div>`;
     ne.style.display='block';
   }
   else ne.style.display='none';
@@ -2211,6 +2298,8 @@ async function sendTelegram(){
 }
 
 async function printSaveAndSend(){
+  // Auto-register patient if new
+  autoRegisterIfNew();
   const prefSave=document.getElementById('setPrefSave').checked;
   const prefTg=document.getElementById('setPrefTg').checked;
   const prefPrint=document.getElementById('setPrefPrint').checked;
@@ -3546,6 +3635,7 @@ function applyDisease(key) {
 buildChips('invCh',INVS,selInv,'si');
 buildChips('advCh',ADVS,selAdv,'sa');
 buildChips('notCh',NOTS,selNot,'sn');
+rebuildPnDatalist();
 document.getElementById('pD').value=new Date().toISOString().split('T')[0];
 renderCustomTpls();
 loadPrefs();
