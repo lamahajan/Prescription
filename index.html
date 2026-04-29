@@ -275,7 +275,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <div class="fl" style="min-width:0"><label>Gender</label><select id="pG" onchange="upd()" style="width:100%"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
     </div>
     <div class="rw r2">
-      <div class="fl" style="min-width:0"><label>Date</label><input id="pD" type="date" oninput="upd()" style="width:100%"></div>
+      <div class="fl" style="min-width:0"><label>Date</label><input id="pD" type="date" oninput="onDateChange()" style="width:100%"></div>
       <div class="fl" style="min-width:0"><label>Token / ID</label><input id="pI" type="text" placeholder="OPD-001" oninput="upd()" style="width:100%"></div>
     </div>
     <div class="rw r1">
@@ -835,7 +835,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
       <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
       <label class="set-tog"><input type="checkbox" id="setPrefConfirm" onchange="savePrefs()"> <span>✅ Show confirmation before printing</span></label>
-      <label class="set-tog" style="border-bottom:none;grid-column:1/-1"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
+      <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
+      <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
+    </div>
+    <!-- Auto Token Format -->
+    <div id="autoTokenRow" style="display:none;padding:10px 13px 13px;border-top:1px dashed #e0d8f8">
+      <div style="font-size:10.5px;color:var(--mu);margin-bottom:8px;font-weight:600">Format: <code style="background:#f0ecff;padding:2px 6px;border-radius:4px;color:var(--p);font-size:11px">PREFIX-DDMMYYYY-001</code></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+        <div>
+          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">OPD Prefix</label>
+          <input id="tokenPrefix" type="text" value="OPD" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:6px 8px;font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Teleconsult Prefix</label>
+          <input id="tokenPrefixTel" type="text" value="TEL" maxlength="10" oninput="savePrefs();previewToken()" style="width:100%;border:1px solid var(--br);border-radius:6px;padding:6px 8px;font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Next Token Number</label>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button onclick="adjToken(-1)" style="width:26px;height:26px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:14px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">−</button>
+            <input id="tokenCounter" type="number" min="1" value="1" oninput="savePrefs();previewToken()" style="flex:1;border:1px solid var(--p);border-radius:6px;padding:4px 6px;font-size:13px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
+            <button onclick="adjToken(1)" style="width:26px;height:26px;border:1px solid var(--br);border-radius:5px;background:#f8f7ff;font-size:14px;font-weight:700;cursor:pointer;color:var(--p);flex-shrink:0">＋</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--mu);font-weight:700;display:block;margin-bottom:3px">Preview</label>
+          <div id="tokenPreview" style="font-size:11.5px;font-weight:700;color:var(--p);background:#f0ecff;border-radius:6px;padding:6px 8px;border:1px solid var(--pl);line-height:1.4"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button onclick="applyAutoToken()" style="flex:1;padding:7px 10px;background:var(--p);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">Apply to Token Field ↗</button>
+        <button onclick="document.getElementById('tokenCounter').value=1;savePrefs();previewToken()" style="padding:7px 12px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Reset to 1</button>
+      </div>
     </div>
   </div>
 
@@ -1341,19 +1372,20 @@ function prAgeToDob(){
 // ─── PATIENT NAME AUTOCOMPLETE ───
 function prNameInput(val){
   const box=document.getElementById('pNSuggest');
-  const list=getPatientRegistry();
+  const fullList=getPatientRegistry();
   if(!val||val.length<2){box.style.display='none';return;}
-  const matches=list.filter(p=>p.name.toLowerCase().includes(val.toLowerCase())).slice(0,6);
+  // Keep real indices
+  const matches=fullList.map((p,i)=>({p,i})).filter(({p})=>p.name.toLowerCase().includes(val.toLowerCase())).slice(0,6);
   if(!matches.length){box.style.display='none';return;}
   box.style.display='block';
-  box.innerHTML=matches.map((p,i)=>{
+  box.innerHTML=matches.map(({p,i})=>{
     const bloodColors={'A+':'#e53935','A−':'#c62828','B+':'#1e88e5','B−':'#1565c0','AB+':'#8e24aa','AB−':'#6a1b9a','O+':'#43a047','O−':'#2e7d32'};
     const bc=p.blood?bloodColors[p.blood]:'';
-    return`<div onclick="prLoadFromSuggest(${list.indexOf(p)})" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid #f0ecff;transition:background .1s" onmouseover="this.style.background='#f0ecff'" onmouseout="this.style.background=''">
+    return`<div onclick="prLoadFromSuggest(${i})" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid #f0ecff;transition:background .1s" onmouseover="this.style.background='#f0ecff'" onmouseout="this.style.background=''">
       <div style="width:28px;height:28px;background:var(--p);border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.name}</div>
-        <div style="font-size:10px;color:var(--mu)">${[p.age,p.gender,p.phone].filter(Boolean).join(' · ')}</div>
+        <div style="font-size:10px;color:var(--mu)">${[p.age,p.gender,p.weight?p.weight+' kg':null,p.phone].filter(Boolean).join(' · ')}</div>
       </div>
       ${p.blood&&bc?`<span style="font-size:9px;font-weight:800;color:#fff;background:${bc};border-radius:4px;padding:1px 5px;flex-shrink:0">${p.blood}</span>`:''}
       ${p.allergy?`<span title="${p.allergy}" style="font-size:10px;color:#bf360c;flex-shrink:0">⚠️</span>`:''}
@@ -1361,7 +1393,7 @@ function prNameInput(val){
   }).join('');
   // Update datalist too
   const dl=document.getElementById('pNList');
-  dl.innerHTML=matches.map(p=>`<option value="${p.name}">`).join('');
+  dl.innerHTML=matches.map(({p})=>`<option value="${p.name}">`).join('');
 }
 function prLoadFromSuggest(idx){
   document.getElementById('pNSuggest').style.display='none';
@@ -1623,8 +1655,11 @@ function viewPatientProfile(idx){
 function renderPatientList(){
   const search=(document.getElementById('prSearch')?.value||'').toLowerCase();
   const sort=document.getElementById('prSort')?.value||'recent';
-  let list=getPatientRegistry();
-  if(search) list=list.filter(p=>
+  const fullList=getPatientRegistry();
+
+  // Track real indices before filter/sort
+  let indexed=fullList.map((p,i)=>({p,i}));
+  if(search) indexed=indexed.filter(({p})=>
     p.name.toLowerCase().includes(search)||
     (p.phone&&p.phone.includes(search))||
     (p.blood&&p.blood.toLowerCase().includes(search))||
@@ -1632,28 +1667,25 @@ function renderPatientList(){
     (p.allergy&&p.allergy.toLowerCase().includes(search))||
     (p.addr&&p.addr.toLowerCase().includes(search))
   );
-  if(sort==='name') list=[...list].sort((a,b)=>a.name.localeCompare(b.name));
-  else if(sort==='visits') list=[...list].sort((a,b)=>(b.visits||[]).length-(a.visits||[]).length);
-  // else recent = default registry order
+  if(sort==='name') indexed=[...indexed].sort((a,b)=>a.p.name.localeCompare(b.p.name));
+  else if(sort==='visits') indexed=[...indexed].sort((a,b)=>(b.p.visits||[]).length-(a.p.visits||[]).length);
 
   const el=document.getElementById('prList');
-  const fullList=getPatientRegistry();
-  if(!list.length){
+  if(!indexed.length){
     el.innerHTML=`<div style="text-align:center;color:#b0a8cc;font-size:12px;padding:24px">${search?'No match found':'No patients registered yet.<br>Click ➕ Register to add your first patient.'}</div>`;
     return;
   }
-  el.innerHTML=list.map(p=>{
-    const realIdx=fullList.indexOf(p);
+  el.innerHTML=indexed.map(({p,i})=>{
     const visits=p.visits||[];
     const bloodColors={'A+':'#e53935','A−':'#c62828','B+':'#1e88e5','B−':'#1565c0','AB+':'#8e24aa','AB−':'#6a1b9a','O+':'#43a047','O−':'#2e7d32'};
     const bc=bloodColors[p.blood];
-    return`<div class="pr-item" onclick="viewPatientProfile(${realIdx})" style="cursor:pointer">
+    return`<div class="pr-item" onclick="viewPatientProfile(${i})" style="cursor:pointer">
       <div style="width:38px;height:38px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;flex-shrink:0;position:relative">
         ${p.name.charAt(0).toUpperCase()}
         ${visits.length?`<span style="position:absolute;bottom:-3px;right:-3px;background:#4caf50;color:#fff;border-radius:8px;font-size:8px;font-weight:900;padding:1px 4px;border:1.5px solid #fff">${visits.length}</span>`:''}
       </div>
       <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:12.5px;font-weight:700;color:var(--tx)">${p.name}</span>
           ${p.blood&&bc?`<span style="font-size:9px;font-weight:800;color:#fff;background:${bc};border-radius:5px;padding:1px 5px">${p.blood}</span>`:''}
           ${p.allergy?`<span style="font-size:9px;font-weight:700;color:#bf360c;background:#fff3e0;border:1px solid #ffcc80;border-radius:5px;padding:1px 5px">⚠️ Allergy</span>`:''}
@@ -1661,9 +1693,9 @@ function renderPatientList(){
         <div style="font-size:10.5px;color:var(--mu)">${[p.age,p.gender,p.weight?p.weight+' kg':null,p.phone].filter(Boolean).join(' · ')}</div>
         <div style="font-size:10px;color:#9b8ee0">${p.lastVisit?'Last: '+p.lastVisit:''} ${p.pmh?'· '+p.pmh:''}</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-        <button onclick="loadPatientToForm(${realIdx});event.stopPropagation()" style="padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Load ↗</button>
-        <button onclick="editPatient(${realIdx},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+        <button onclick="event.stopPropagation();loadPatientToForm(${i})" style="padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Load ↗</button>
+        <button onclick="event.stopPropagation();editPatient(${i},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
       </div>
     </div>`;
   }).join('');
@@ -1709,6 +1741,12 @@ function tc(el,cls){
 function setC(el){
   document.querySelectorAll('.co').forEach(o=>o.classList.remove('act'));
   el.classList.add('act');ctype=el.dataset.val;upd();
+  // Auto-update token if auto-token is on
+  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
+  if(prefs.autoToken){
+    document.getElementById('pI').value=buildToken();upd();
+  }
+  previewToken();
 }
 
 // ─── TEMP UNIT ───
@@ -2300,6 +2338,14 @@ async function sendTelegram(){
 async function printSaveAndSend(){
   // Auto-register patient if new
   autoRegisterIfNew();
+  // Increment token counter if auto-token enabled
+  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
+  if(prefs.autoToken){
+    const cur=parseInt(localStorage.getItem('tokenCounterVal')||1);
+    localStorage.setItem('tokenCounterVal',String(cur+1));
+    const tc=document.getElementById('tokenCounter');if(tc)tc.value=cur+1;
+    savePrefs();
+  }
   const prefSave=document.getElementById('setPrefSave').checked;
   const prefTg=document.getElementById('setPrefTg').checked;
   const prefPrint=document.getElementById('setPrefPrint').checked;
@@ -2456,15 +2502,76 @@ function savePrefs(){
     tg:document.getElementById('setPrefTg').checked,
     print:document.getElementById('setPrefPrint').checked,
     confirm:document.getElementById('setPrefConfirm').checked,
-    bg:document.getElementById('rxBgToggle')?.checked??false
+    bg:document.getElementById('rxBgToggle')?.checked??false,
+    autoToken:document.getElementById('setPrefAutoToken')?.checked??false,
+    tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
+    tokenPrefixTel:document.getElementById('tokenPrefixTel')?.value||'TEL',
+    tokenCounter:parseInt(document.getElementById('tokenCounter')?.value)||1,
   };
   localStorage.setItem('rxPrefs',JSON.stringify(prefs));
+  localStorage.setItem('tokenCounterVal',String(prefs.tokenCounter));
+  previewToken();
 }
 function loadPrefs(){
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
   const set=(id,def)=>{const e=document.getElementById(id);if(e)e.checked=prefs[id.replace('setPref','').toLowerCase()]!==undefined?prefs[id.replace('setPref','').toLowerCase()]:def;};
   set('setPrefSave',true);set('setPrefTg',true);set('setPrefPrint',true);set('setPrefConfirm',false);
   const bg=document.getElementById('rxBgToggle');if(bg)bg.checked=prefs.bg??false;
+  const at=document.getElementById('setPrefAutoToken');if(at){at.checked=prefs.autoToken??false;}
+  const tp=document.getElementById('tokenPrefix');if(tp)tp.value=prefs.tokenPrefix||'OPD';
+  const tpt=document.getElementById('tokenPrefixTel');if(tpt)tpt.value=prefs.tokenPrefixTel||'TEL';
+  const today=getTodayDDMMYYYY();
+  const savedDay=localStorage.getItem('tokenDay');
+  if(savedDay!==today){localStorage.setItem('tokenDay',today);localStorage.setItem('tokenCounterVal','1');}
+  const cval=parseInt(localStorage.getItem('tokenCounterVal')||prefs.tokenCounter||1);
+  const tc=document.getElementById('tokenCounter');if(tc)tc.value=cval;
+  autoTokenChanged();
+  previewToken();
+}
+function adjToken(delta){
+  const tc=document.getElementById('tokenCounter');
+  const v=Math.max(1,(parseInt(tc.value)||1)+delta);
+  tc.value=v;savePrefs();previewToken();
+}
+function getTodayDDMMYYYY(){
+  const d=new Date();
+  return String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+}
+function buildToken(){
+  const isTel=ctype==='Teleconsultation';
+  const prefix=isTel?(document.getElementById('tokenPrefixTel')?.value||'TEL').trim():(document.getElementById('tokenPrefix')?.value||'OPD').trim();
+  const num=parseInt(document.getElementById('tokenCounter')?.value||1);
+  return`${prefix}-${getTodayDDMMYYYY()}-${String(num).padStart(3,'0')}`;
+}
+function previewToken(){
+  const el=document.getElementById('tokenPreview');
+  if(!el)return;
+  const n=String(parseInt(document.getElementById('tokenCounter')?.value||1)).padStart(3,'0');
+  const date=getTodayDDMMYYYY();
+  const opdTok=`${(document.getElementById('tokenPrefix')?.value||'OPD').trim()}-${date}-${n}`;
+  const telTok=`${(document.getElementById('tokenPrefixTel')?.value||'TEL').trim()}-${date}-${n}`;
+  el.innerHTML=`<div>🏥 ${opdTok}</div><div style="color:#1565c0;margin-top:2px">💻 ${telTok}</div>`;
+}
+function autoTokenChanged(){
+  const on=document.getElementById('setPrefAutoToken')?.checked;
+  const row=document.getElementById('autoTokenRow');
+  if(row)row.style.display=on?'block':'none';
+  if(on)previewToken();
+}
+function applyAutoToken(){
+  const token=buildToken();
+  document.getElementById('pI').value=token;
+  const cur=parseInt(document.getElementById('tokenCounter').value||1);
+  document.getElementById('tokenCounter').value=cur+1;
+  localStorage.setItem('tokenCounterVal',String(cur+1));
+  savePrefs();previewToken();
+  document.getElementById('settingsMo').style.display='none';
+  upd();showToast('✅ Token: '+token,2000);
+}
+function onDateChange(){
+  upd();
+  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
+  if(prefs.autoToken&&!g('pI')){document.getElementById('pI').value=buildToken();upd();}
 }
 function getPref(k){return JSON.parse(localStorage.getItem('rxPrefs')||'{}')[k];}
 function openSavedRx(){
@@ -3636,6 +3743,14 @@ buildChips('invCh',INVS,selInv,'si');
 buildChips('advCh',ADVS,selAdv,'sa');
 buildChips('notCh',NOTS,selNot,'sn');
 rebuildPnDatalist();
+// Auto-token on load
+setTimeout(()=>{
+  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
+  if(prefs.autoToken&&!g('pI')){
+    document.getElementById('pI').value=buildToken();
+    upd();
+  }
+},100);
 document.getElementById('pD').value=new Date().toISOString().split('T')[0];
 renderCustomTpls();
 loadPrefs();
