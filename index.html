@@ -757,7 +757,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   </div>
 
   <!-- 3-col grid body — no scroll -->
-  <div style="padding:16px 18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:start;overflow-y:auto;flex:1;">
+  <div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:start;overflow-y:auto;flex:1;">
 
   <!-- COL 1: Telegram -->
   <div style="background:#f8f7ff;border:1px solid #e0d8f8;border-radius:12px;overflow:hidden">
@@ -834,9 +834,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <label class="set-tog"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
       <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
       <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
-      <label class="set-tog"><input type="checkbox" id="setPrefConfirm" onchange="savePrefs()"> <span>✅ Show confirmation before printing</span></label>
       <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead background in PDF / Print</span></label>
       <label class="set-tog" style="border-bottom:none"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
+      <input type="hidden" id="setPrefConfirm">
     </div>
     <!-- Auto Token Format -->
     <div id="autoTokenRow" style="display:none;padding:10px 13px 13px;border-top:1px dashed #e0d8f8">
@@ -2188,6 +2188,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
+// Re-apply background + signature when tab becomes visible again (laptop sleep/resume fix)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&isAuth()){
+    restoreSig();
+    restoreBgImage();
+  }
+});
+
 // ─── SYNC via TELEGRAM ───
 const SYNC_MARKER='#RXSYNC_V1';
 function openSync(){
@@ -2349,17 +2357,6 @@ async function printSaveAndSend(){
   const prefSave=document.getElementById('setPrefSave').checked;
   const prefTg=document.getElementById('setPrefTg').checked;
   const prefPrint=document.getElementById('setPrefPrint').checked;
-  const prefConfirm=document.getElementById('setPrefConfirm').checked;
-
-  // Confirmation dialog if enabled
-  if(prefConfirm){
-    const actions=[];
-    if(prefSave)actions.push('💾 Save to history');
-    if(prefTg)actions.push('✈️ Send to Telegram');
-    if(prefPrint)actions.push('🖨️ Open print dialog');
-    if(!actions.length)actions.push('(nothing — all toggles are off)');
-    if(!confirm('Confirmation:\n\n'+actions.join('\n')+'\n\nProceed?'))return;
-  }
 
   const btn=document.getElementById('printBtn');
   btn.disabled=true;btn.textContent='⏳ Processing...';
@@ -2501,7 +2498,7 @@ function savePrefs(){
     save:document.getElementById('setPrefSave').checked,
     tg:document.getElementById('setPrefTg').checked,
     print:document.getElementById('setPrefPrint').checked,
-    confirm:document.getElementById('setPrefConfirm').checked,
+    confirm:false,
     bg:document.getElementById('rxBgToggle')?.checked??false,
     autoToken:document.getElementById('setPrefAutoToken')?.checked??false,
     tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
@@ -2515,7 +2512,7 @@ function savePrefs(){
 function loadPrefs(){
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
   const set=(id,def)=>{const e=document.getElementById(id);if(e)e.checked=prefs[id.replace('setPref','').toLowerCase()]!==undefined?prefs[id.replace('setPref','').toLowerCase()]:def;};
-  set('setPrefSave',true);set('setPrefTg',true);set('setPrefPrint',true);set('setPrefConfirm',false);
+  set('setPrefSave',true);set('setPrefTg',true);set('setPrefPrint',true);
   const bg=document.getElementById('rxBgToggle');if(bg)bg.checked=prefs.bg??false;
   const at=document.getElementById('setPrefAutoToken');if(at){at.checked=prefs.autoToken??false;}
   const tp=document.getElementById('tokenPrefix');if(tp)tp.value=prefs.tokenPrefix||'OPD';
