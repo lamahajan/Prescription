@@ -145,7 +145,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxb.tele{background:rgba(33,150,243,.12);color:#1565c0;border:1px solid rgba(33,150,243,.3);}
 
 /* Patient row */
-.rxpt{display:flex;flex-wrap:wrap;gap:0;padding-bottom:6px;border-bottom:1.5px solid rgba(106,90,205,.18);margin-top:8px;margin-bottom:7px;row-gap:2px;justify-content:space-between;}
+.rxpt{display:flex;flex-wrap:wrap;gap:0;padding-bottom:4px;margin-top:8px;margin-bottom:7px;row-gap:2px;justify-content:space-between;}
 .rxpf{font-size:13.5px;color:#3a3060;padding-right:10px;margin-right:10px;border-right:1px solid rgba(106,90,205,.2);flex:1;min-width:fit-content;}
 .rxpf:last-child{border-right:none;margin-right:0;}
 .rxpf strong{color:#1a1040;font-weight:700;}
@@ -180,7 +180,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* Advice */
 .rxadv{font-size:11.5px;color:#2a2040;line-height:1.9;}
-.rxnote{font-size:11px;color:#1a1040;font-weight:600;padding:5px 10px;background:rgba(255,244,230,.6);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rxnote{font-size:11px;color:#1565c0;font-weight:600;padding:5px 10px;background:rgba(230,81,0,.06);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .rxfu{font-size:11.5px;color:#4a3fa0;font-weight:700;margin-top:6px;padding:5px 0;}
 .rxfu span{color:#1a1040;font-weight:500;}
 
@@ -474,7 +474,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
   <div class="rxp" id="rxp">
     <div style="position:absolute;top:203px;left:46px;display:flex;align-items:center;gap:8px;">
       <div class="rxb opd" id="rxbadge">🏥 OPD VISIT</div>
-      <div id="rxTokenChip" style="display:none;font-size:10px;font-weight:700;color:#1a1040;background:#fff;border:1.5px solid #3a3060;border-radius:6px;padding:2px 9px;letter-spacing:.4px;"></div>
+      <div id="rxTokenChip" style="display:none;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 11px;border-radius:11px;background:rgba(30,24,64,.07);color:#1e1840;border:1px solid rgba(30,24,64,.25);"></div>
     </div>
 
     <div class="rxc" id="rxc">
@@ -757,7 +757,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .sync-btn{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;border:none;}
 /* ── new compact settings panel ── */
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;overflow-y:auto;max-height:calc(90vh - 130px);}
 .set-col{display:flex;flex-direction:column;gap:9px;}
 .set-block{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;}
 .set-bh{padding:6px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);border-bottom:1px solid #e0d8f8;display:flex;align-items:center;gap:6px;}
@@ -907,6 +907,21 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
             📦 Export — saara data JSON file mein backup karo<br>
             📂 Import — JSON file se data restore karo
           </div>
+        </div>
+      </div>
+
+      <!-- Layout Columns -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">📐</span><span class="set-bh-lbl">Layout — Columns</span></div>
+        <div class="set-bb">
+          <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:8px;letter-spacing:.4px">Choose columns per section on prescription</div>
+          ${['Comp:Chief Complaints','Adv:Advice','Note:Instructions'].map(s=>{const[id,lbl]=s.split(':');return`
+          <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0edf8">
+            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">${lbl}</div>
+            <div style="display:flex;gap:6px">
+              ${[1,2,3].map(n=>`<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="col${id}" value="${n}" onchange="savePrefs();upd()" style="accent-color:var(--p)"> ${n} col</label>`).join('')}
+            </div>
+          </div>`}).join('')}
         </div>
       </div>
 
@@ -2033,10 +2048,11 @@ function upd(){
   const cb=document.getElementById('rxcpb');
   if(cp){
     const lines=cp.split('\n').map(l=>l.trim()).filter(l=>l);
-    if(lines.length>1){
-      document.getElementById('rxcp').innerHTML=`<div class="rxcp-grid">${lines.map(l=>`<div>${l}</div>`).join('')}</div>`;
+    const col2=parseInt(document.querySelector('input[name="colComp"]:checked')?.value||'1');
+    if(lines.length>1&&col2>1){
+      document.getElementById('rxcp').innerHTML=`<div style="display:grid;grid-template-columns:repeat(${col2},1fr);gap:1px 10px">${lines.map(l=>`<div style="line-height:1.8">${l}</div>`).join('')}</div>`;
     }else{
-      document.getElementById('rxcp').textContent=cp;
+      document.getElementById('rxcp').innerHTML=lines.map(l=>`<div style="line-height:1.8">${l}</div>`).join('');
     }
     cb.style.display='block';
   }else cb.style.display='none';
@@ -2075,7 +2091,8 @@ function upd(){
   const allA=[...selAdv,...selAdvCustom];const ca=g('advX');if(ca)allA.push(ca);
   const ab=document.getElementById('rxab'),ae=document.getElementById('rxadv');
   if(allA.length){
-    ae.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px 10px">${allA.map(a=>`<div style="line-height:1.8"><span style="font-size:18px;line-height:0;vertical-align:middle;margin-right:4px;color:#1e1840">•</span>${a}</div>`).join('')}</div>`;
+    const colA=parseInt(document.querySelector('input[name="colAdv"]:checked')?.value||'2');
+    ae.innerHTML=`<div style="display:grid;grid-template-columns:repeat(${colA},1fr);gap:1px 10px">${allA.map(a=>`<div style="line-height:1.8"><span style="font-size:18px;line-height:0;vertical-align:middle;margin-right:4px;color:#1e1840">•</span>${a}</div>`).join('')}</div>`;
     ab.style.display='block';
   }else ab.style.display='none';
 
@@ -2083,7 +2100,12 @@ function upd(){
   const allN=[...selNot];const cn=g('notX');if(cn)allN.push(cn);
   const ne=document.getElementById('rxnote');
   if(allN.length){
-    ne.innerHTML=`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5">⚠</div><div style="flex:1;font-size:11px;color:#1a1040;font-weight:600;line-height:1.7">${allN.join('<span style="color:#e65100;margin:0 4px;font-weight:700">›</span>')}</div></div>`;
+    const colN=parseInt(document.querySelector('input[name="colNote"]:checked')?.value||'1');
+    if(colN>1){
+      ne.innerHTML=`<div style="display:flex;align-items:flex-start;gap:7px"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5;margin-top:1px">⚠</div><div style="flex:1;display:grid;grid-template-columns:repeat(${colN},1fr);gap:1px 10px">${allN.map(n=>`<div style="font-size:11px;color:#1565c0;font-weight:600;line-height:1.7">${n}</div>`).join('')}</div></div>`;
+    }else{
+      ne.innerHTML=`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5">⚠</div><div style="flex:1;font-size:11px;color:#1565c0;font-weight:600;line-height:1.7">${allN.join('<span style="color:#e65100;margin:0 5px;font-weight:700">›</span>')}</div></div>`;
+    }
     ne.style.display='block';
   }
   else ne.style.display='none';
@@ -2596,6 +2618,9 @@ function savePrefs(){
     confirm:false,
     bg:document.getElementById('rxBgToggle')?.checked??false,
     bw:document.getElementById('setPrefBW')?.checked??false,
+    col2Comp:document.querySelector('input[name="colComp"]:checked')?.value??'1',
+    col2Adv:document.querySelector('input[name="colAdv"]:checked')?.value??'2',
+    col2Note:document.querySelector('input[name="colNote"]:checked')?.value??'1',
     autoToken:document.getElementById('setPrefAutoToken')?.checked??false,
     tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
     tokenPrefixTel:document.getElementById('tokenPrefixTel')?.value||'TEL',
@@ -2620,6 +2645,14 @@ function loadPrefs(){
   const tc=document.getElementById('tokenCounter');if(tc)tc.value=cval;
   autoTokenChanged();
   previewToken();
+  // Layout columns
+  const setRadio=(name,val)=>{const el=document.querySelector(`input[name="${name}"][value="${val}"]`);if(el)el.checked=true;};
+  setRadio('colComp',prefs.col2Comp??'1');
+  setRadio('colAdv',prefs.col2Adv??'2');
+  setRadio('colNote',prefs.col2Note??'1');
+  // BW mode
+  const bw=document.getElementById('setPrefBW');if(bw)bw.checked=prefs.bw??false;
+  applyBWMode();
 }
 function adjToken(delta){
   const tc=document.getElementById('tokenCounter');
@@ -4048,16 +4081,14 @@ function printCert(){
 async function sendCertTelegram(){
   const token=localStorage.getItem('tgToken'),chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){return;}
-  showToast('📄 Sending certificate to Telegram...',5000);
+  showToast('📄 Certificate PDF bana raha hai...',5000);
   try{
     const includeBg=document.getElementById('certBgToggle')?.checked;
     const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
     const certContent=document.getElementById('certPreview').innerHTML;
     const {html:certHtml}=_buildCertHtml(certContent,includeBg,activeBgUrl);
 
-    // Render inside an off-screen iframe so the Google Font stylesheet
-    // is actually loaded and applied before html2canvas captures it —
-    // identical to the approach used by printCert() for consistent output.
+    // Render inside off-screen iframe
     const oldIfrm=document.getElementById('_certTgFrame');
     if(oldIfrm)oldIfrm.remove();
     const ifrm=document.createElement('iframe');
@@ -4065,40 +4096,42 @@ async function sendCertTelegram(){
     ifrm.style.cssText='position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;';
     document.body.appendChild(ifrm);
 
-    // Write full styled HTML (including font link) into the iframe
     await new Promise(resolve=>{
       ifrm.onload=resolve;
       const doc=ifrm.contentDocument||ifrm.contentWindow.document;
       doc.open();doc.write(certHtml);doc.close();
     });
-
-    // Wait for fonts inside the iframe to finish loading
     await ifrm.contentDocument.fonts.ready;
-    // Extra buffer for background images and final paint
-    await new Promise(r=>setTimeout(r,700));
+    await new Promise(r=>setTimeout(r,900));
 
-    const captureTarget=ifrm.contentDocument.body;
-    const toast=document.getElementById('toast');toast.style.display='none';
-    const canvas=await html2canvas(captureTarget,{
-      scale:3,
-      backgroundColor:'#ffffff',
-      useCORS:true,
-      allowTaint:true,
-      logging:false,
-      width:794,
-      height:1123,
-      windowWidth:794,
-      windowHeight:1123,
-    });
-    toast.style.display='';
-    document.body.removeChild(ifrm);
-
-    const imgData=canvas.toDataURL('image/jpeg',0.95);
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
-    pdf.addImage(imgData,'JPEG',0,0,pw,ph,undefined,'FAST');
-    const blob=pdf.output('blob');
+
+    // Use html2canvas if available, otherwise fall back to blank PDF with text
+    let blob;
+    try{
+      const toast2=document.getElementById('toast');toast2.style.display='none';
+      const canvas=await html2canvas(ifrm.contentDocument.body,{
+        scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:true,
+        logging:false,width:794,height:1123,windowWidth:794,windowHeight:1123,
+      });
+      toast2.style.display='';
+      const imgData=canvas.toDataURL('image/jpeg',0.92);
+      pdf.addImage(imgData,'JPEG',0,0,pw,ph,undefined,'FAST');
+      blob=pdf.output('blob');
+    }catch(canvasErr){
+      // Fallback: send as text message if canvas fails
+      document.body.removeChild(ifrm);
+      const pn=cv('cPn')||'Patient';
+      const msg=`📋 Medical Certificate\n👤 ${pn}\n🏥 Dr. Lakshaya Mahajan\n\n⚠️ PDF render failed — please use Print button to generate PDF.`;
+      const fd3=new FormData();fd3.append('chat_id',chatId);fd3.append('text',msg);
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',body:fd3});
+      showToast('⚠️ PDF failed — sent as text instead',4000);
+      return;
+    }
+
+    document.body.removeChild(ifrm);
     const pn=cv('cPn')||'Patient';
     const fd2=new FormData();
     fd2.append('chat_id',chatId);
@@ -4107,8 +4140,8 @@ async function sendCertTelegram(){
     const res=await fetch(`https://api.telegram.org/bot${token}/sendDocument`,{method:'POST',body:fd2});
     const data=await res.json();
     if(data.ok)showToast('✅ Certificate sent to Telegram!',3000);
-    else showToast('❌ '+(data.description||'Failed'),4000);
-  }catch(e){showToast('❌ '+e.message,4000);}
+    else showToast('❌ '+(data.description||'Failed — check Bot Token & Chat ID'),4000);
+  }catch(e){showToast('❌ '+e.message,4000);console.error('certTg:',e);}
 }
 
 
