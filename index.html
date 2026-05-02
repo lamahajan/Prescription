@@ -1988,8 +1988,11 @@ function upd(){
   const pf=[];
   const nm=g('pN'),ag=g('pA'),gn=g('pG'),dt=g('pD'),wt=g('pW'),pi=g('pI');
   if(nm)pf.push(`<span class="rxpf"><strong>Name:</strong> ${nm}</span>`);
-  if(ag){const agDisp=/^\d+$/.test(ag)?ag+' Years':ag;pf.push(`<span class="rxpf"><strong>Age:</strong> ${agDisp}</span>`);}
-  if(gn)pf.push(`<span class="rxpf"><strong>Sex:</strong> ${gn}</span>`);
+  if(ag||gn){
+    const agDisp=ag?(/^\d+$/.test(ag)?ag+' Yrs':ag):'';
+    const agGn=[agDisp,gn].filter(Boolean).join(' / ');
+    pf.push(`<span class="rxpf"><strong>Age/Sex:</strong> ${agGn}</span>`);
+  }
   if(wt)pf.push(`<span class="rxpf"><strong>Wt:</strong> ${wt} kg</span>`);
   if(dt)pf.push(`<span class="rxpf"><strong>Date:</strong> ${fd(dt)}</span>`);
   if(pi)pf.push(`<span class="rxpf"><strong>ID:</strong> ${pi}</span>`);
