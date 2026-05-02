@@ -145,11 +145,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxb.tele{background:rgba(33,150,243,.12);color:#1565c0;border:1px solid rgba(33,150,243,.3);}
 
 /* Patient row */
-.rxpt{display:grid;grid-auto-columns:1fr;grid-auto-flow:column;padding-bottom:4px;margin-top:8px;margin-bottom:7px;align-items:center;}
-.rxpf{font-size:13px;color:#3a3060;padding:0 10px;border-right:1px solid rgba(106,90,205,.2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.rxpf:first-child{padding-left:0;}
+.rxpt{display:grid;grid-auto-columns:1fr;grid-auto-flow:column;margin-top:6px;margin-bottom:8px;align-items:stretch;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.14);border-radius:8px;overflow:hidden;}
+.rxpf{font-size:12px;color:#5a4e90;padding:6px 12px;border-right:1px solid rgba(106,90,205,.14);display:flex;flex-direction:column;gap:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rxpf:last-child{border-right:none;}
-.rxpf strong{color:#1a1040;font-weight:700;}
+.rxpf strong{font-size:8.5px;font-weight:700;color:#9b8ee0;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:1px;}
+.rxpf span{font-size:12.5px;font-weight:600;color:#1a1040;}
 
 /* Vitals */
 .rxv{display:flex;gap:14px;background:rgba(106,90,205,.07);border:1px solid rgba(106,90,205,.16);border-radius:7px;padding:7px 12px;margin-bottom:8px;flex-wrap:wrap;row-gap:3px;justify-content:space-between;}
@@ -2019,14 +2019,14 @@ function upd(){
   // Patient
   const pf=[];
   const nm=g('pN'),ag=g('pA'),gn=g('pG'),dt=g('pD'),wt=g('pW');
-  if(nm)pf.push(`<span class="rxpf"><strong>Name:</strong> ${nm}</span>`);
+  const pField=(lbl,val)=>`<span class="rxpf"><strong>${lbl}</strong><span>${val}</span></span>`;
+  if(nm)pf.push(pField('Patient',nm));
   if(ag||gn){
     const agDisp=ag?(/^\d+$/.test(ag)?ag+' Yrs':ag):'';
-    const agGn=[agDisp,gn].filter(Boolean).join(' / ');
-    pf.push(`<span class="rxpf"><strong>Age/Sex:</strong> ${agGn}</span>`);
+    pf.push(pField('Age / Sex',[agDisp,gn].filter(Boolean).join(' / ')));
   }
-  if(wt)pf.push(`<span class="rxpf"><strong>Wt:</strong> ${wt} kg</span>`);
-  if(dt)pf.push(`<span class="rxpf"><strong>Date:</strong> ${fd(dt)}</span>`);
+  if(wt)pf.push(pField('Weight',wt+' kg'));
+  if(dt)pf.push(pField('Date',fd(dt)));
   document.getElementById('rxpt').innerHTML=pf.length?pf.join(''):'<span style="font-size:11px;color:#b8b0d0;font-style:italic;">Patient details will appear here...</span>';
 
   // Vitals
