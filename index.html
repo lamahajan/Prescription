@@ -152,10 +152,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxpf span{font-size:12.5px;font-weight:600;color:#1a1040;}
 
 /* Vitals — sits inside the same card with a top border divider */
-.rxv{display:flex;gap:0;border-top:1px solid rgba(106,90,205,.14);padding:5px 0;flex-wrap:wrap;}
-.rxvf{font-size:11px;color:#6a5acd;font-weight:700;padding:0 14px;border-right:1px solid rgba(106,90,205,.1);}
+.rxv{display:grid;grid-auto-columns:1fr;grid-auto-flow:column;border-top:1px solid rgba(106,90,205,.12);}
+.rxvf{font-size:8.5px;font-weight:700;color:#9b8ee0;text-transform:uppercase;letter-spacing:.6px;padding:5px 12px;border-right:1px solid rgba(106,90,205,.12);display:flex;flex-direction:column;gap:1px;}
 .rxvf:last-child{border-right:none;}
-.rxvf span{color:#1a1040;font-weight:500;font-size:11.5px;}
+.rxvf span{font-size:12px;font-weight:600;color:#1a1040;letter-spacing:0;text-transform:none;}
 
 /* Section label */
 .rxl{font-size:9.5px;font-weight:800;color:#6a5acd;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;margin-top:6px;display:flex;align-items:center;gap:5px;}
@@ -182,7 +182,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* Advice */
 .rxadv{font-size:11.5px;color:#2a2040;line-height:1.9;}
-.rxnote{font-size:11px;color:#4a3fa0;font-weight:600;padding:5px 10px;background:rgba(106,90,205,.08);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rxnote{font-size:11px;color:#4a3fa0;font-weight:600;padding:5px 10px;background:rgba(106,90,205,.04);border:1px solid rgba(106,90,205,.12);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .rxfu{font-size:11.5px;color:#4a3fa0;font-weight:700;margin-top:6px;padding:5px 0;}
 .rxfu span{color:#1a1040;font-weight:500;}
 
@@ -480,7 +480,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     </div>
 
     <!-- Patient + Vitals fixed card — always visible, never clipped -->
-    <div id="rxPatCard" style="position:absolute;left:46px;right:46px;top:228px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.14);border-radius:8px;overflow:hidden;">
+    <div id="rxPatCard" style="position:absolute;left:46px;right:46px;top:280px;background:rgba(106,90,205,.04);border:1px solid rgba(106,90,205,.12);border-radius:8px;overflow:hidden;">
       <div class="rxpt" id="rxpt"><span style="font-size:11px;color:#b8b0d0;font-style:italic;padding:6px 12px;display:block">Patient details will appear here...</span></div>
       <div class="rxv" id="rxvit" style="display:none"></div>
     </div>
@@ -2038,7 +2038,7 @@ function upd(){
     const card=document.getElementById('rxPatCard');
     const rxc=document.getElementById('rxc');
     if(card&&rxc){
-      const cardBottom=228+card.offsetHeight+6;
+      const cardBottom=280+card.offsetHeight+6;
       rxc.style.top=cardBottom+'px';
     }
   });
@@ -2066,14 +2066,14 @@ function upd(){
   const af=document.getElementById('afChk').checked;
   const bs=g('bS'),bd=g('bD'),vp=g('vP'),vt=af?'Afebrile':g('vT'),vs=g('vS'),vr=g('vR');
   const vf=[];
-  if(bs&&bd)vf.push(`<span class="rxvf">BP: <span>${bs}/${bd} mmHg</span></span>`);
-  else if(bs)vf.push(`<span class="rxvf">BP: <span>${bs} mmHg</span></span>`);
-  if(vp)vf.push(`<span class="rxvf">Pulse: <span>${vp} bpm</span></span>`);
-  if(vt)vf.push(`<span class="rxvf">Temp: <span>${vt}${/afebrile/i.test(vt)?'':tempUnitF?'°F':'°C'}</span></span>`);
-  if(vs)vf.push(`<span class="rxvf">SpO₂: <span>${vs}%</span></span>`);
-  if(vr)vf.push(`<span class="rxvf">RR: <span>${vr}/min</span></span>`);
+  if(bs&&bd)vf.push(`<span class="rxvf">BP<span>${bs}/${bd} mmHg</span></span>`);
+  else if(bs)vf.push(`<span class="rxvf">BP<span>${bs} mmHg</span></span>`);
+  if(vp)vf.push(`<span class="rxvf">Pulse<span>${vp} bpm</span></span>`);
+  if(vt)vf.push(`<span class="rxvf">Temp<span>${vt}${/afebrile/i.test(vt)?'':tempUnitF?'°F':'°C'}</span></span>`);
+  if(vs)vf.push(`<span class="rxvf">SpO₂<span>${vs}%</span></span>`);
+  if(vr)vf.push(`<span class="rxvf">RR<span>${vr}/min</span></span>`);
   const ve=document.getElementById('rxvit');
-  if(vf.length){ve.innerHTML=vf.join('');ve.style.display='flex';}else ve.style.display='none';
+  if(vf.length){ve.innerHTML=vf.join('');ve.style.display='grid';}else ve.style.display='none';
 
   // Diag
   const dg=g('diag'),cp=g('comp');
@@ -2164,7 +2164,7 @@ function upd(){
 
     const PAGE_H   = 1123;
     const patCard=document.getElementById('rxPatCard');
-    const TOP = patCard ? 228+patCard.offsetHeight+6 : 310;
+    const TOP = patCard ? 280+patCard.offsetHeight+6 : 340;
     const SIG_RES  = 160;
     const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
