@@ -130,9 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* Consult badge — sits right below divider line */
 .rxb{
-  position:absolute;
-  top:203px;
-  left:46px;
+  position:static;
   display:inline-flex;
   align-items:center;
   gap:5px;
@@ -182,7 +180,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* Advice */
 .rxadv{font-size:11.5px;color:#2a2040;line-height:1.9;}
-.rxnote{font-size:11px;color:#5a4e90;font-weight:700;padding:5px 10px;background:rgba(106,90,205,.06);border-left:3px solid var(--p);border-radius:0 5px 5px 0;margin-top:5px;}
+.rxnote{font-size:11px;color:#1a1040;font-weight:600;padding:5px 10px;background:rgba(255,244,230,.6);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .rxfu{font-size:11.5px;color:#4a3fa0;font-weight:700;margin-top:6px;padding:5px 0;}
 .rxfu span{color:#1a1040;font-weight:500;}
 
@@ -208,6 +206,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   .rxp{width:210mm;min-height:297mm;box-shadow:none;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   @page{size:A4;margin:0;}
 }
+/* Black & white mode */
+body.bw-mode .rxp{filter:grayscale(100%) !important;}
+body.bw-mode .rxp *{color:#000 !important;background:transparent !important;border-color:#555 !important;}
+body.bw-mode .rxp .rxb{background:#eee !important;border:1px solid #555 !important;}
+body.bw-mode .rxp .rxmn{color:#000 !important;}
+body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 </style>
 </head>
 <body>
@@ -468,7 +472,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   </div>
 
   <div class="rxp" id="rxp">
-    <div class="rxb opd" id="rxbadge">🏥 OPD VISIT</div>
+    <div style="position:absolute;top:203px;left:46px;display:flex;align-items:center;gap:8px;">
+      <div class="rxb opd" id="rxbadge">🏥 OPD VISIT</div>
+      <div id="rxTokenChip" style="display:none;font-size:10px;font-weight:700;color:#1a1040;background:#fff;border:1.5px solid #3a3060;border-radius:6px;padding:2px 9px;letter-spacing:.4px;"></div>
+    </div>
 
     <div class="rxc" id="rxc">
       <div class="rxpt" id="rxpt"><span style="font-size:11px;color:#b8b0d0;font-style:italic;">Patient details will appear here...</span></div>
@@ -480,7 +487,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <div id="rxmb" style="display:none">
         <div class="rxl">Medicines</div>
         <table class="rxmt"><thead><tr>
-          <th style="width:20px">#</th><th style="width:32%">Drug Name</th><th style="width:52px">Dose</th>
+          <th style="width:28px">#</th><th style="width:32%">Drug Name</th><th style="width:52px">Dose</th>
           <th style="width:68px">Freq</th><th style="width:75px">Route / Timing</th>
           <th style="width:48px">Duration</th><th>Instructions</th>
         </tr></thead><tbody id="rxmrows"></tbody></table>
@@ -848,6 +855,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
           <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
           <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefBW" onchange="savePrefs();applyBWMode()"> <span>⬛ Black &amp; White print mode</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
           <input type="hidden" id="setPrefConfirm">
           <!-- Auto Token inline section -->
@@ -1984,9 +1992,17 @@ function upd(){
   badge.className='rxb '+(ctype==='Teleconsultation'?'tele':'opd');
   badge.textContent=ctype==='Teleconsultation'?'💻 TELECONSULTATION':'🏥 OPD VISIT';
 
+  // Token ID chip next to badge
+  const pi=g('pI');
+  const tokenChip=document.getElementById('rxTokenChip');
+  if(tokenChip){
+    if(pi){tokenChip.textContent='# '+pi;tokenChip.style.display='inline-block';}
+    else tokenChip.style.display='none';
+  }
+
   // Patient
   const pf=[];
-  const nm=g('pN'),ag=g('pA'),gn=g('pG'),dt=g('pD'),wt=g('pW'),pi=g('pI');
+  const nm=g('pN'),ag=g('pA'),gn=g('pG'),dt=g('pD'),wt=g('pW');
   if(nm)pf.push(`<span class="rxpf"><strong>Name:</strong> ${nm}</span>`);
   if(ag||gn){
     const agDisp=ag?(/^\d+$/.test(ag)?ag+' Yrs':ag):'';
@@ -1995,7 +2011,6 @@ function upd(){
   }
   if(wt)pf.push(`<span class="rxpf"><strong>Wt:</strong> ${wt} kg</span>`);
   if(dt)pf.push(`<span class="rxpf"><strong>Date:</strong> ${fd(dt)}</span>`);
-  if(pi)pf.push(`<span class="rxpf"><strong>ID:</strong> ${pi}</span>`);
   document.getElementById('rxpt').innerHTML=pf.length?pf.join(''):'<span style="font-size:11px;color:#b8b0d0;font-style:italic;">Patient details will appear here...</span>';
 
   // Vitals
@@ -2068,7 +2083,7 @@ function upd(){
   const allN=[...selNot];const cn=g('notX');if(cn)allN.push(cn);
   const ne=document.getElementById('rxnote');
   if(allN.length){
-    ne.innerHTML=`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5">⚠</div><div style="flex:1;font-size:11px;color:#c0392b;font-weight:600;line-height:1.7">${allN.join('<span style="color:#6a5acd;margin:0 4px">›</span>')}</div></div>`;
+    ne.innerHTML=`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5">⚠</div><div style="flex:1;font-size:11px;color:#1a1040;font-weight:600;line-height:1.7">${allN.join('<span style="color:#e65100;margin:0 4px;font-weight:700">›</span>')}</div></div>`;
     ne.style.display='block';
   }
   else ne.style.display='none';
@@ -2091,20 +2106,24 @@ function upd(){
     const disc = document.getElementById('rxdisclaim');
     if(!rxc||!rxsig||!rxp) return;
 
-    const PAGE_H   = 1123;  // A4 px
-    const TOP      = 280;   // header height
-    const SIG_RES  = 160;   // space for sig + disclaimer + footer
-    const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px per page
+    const PAGE_H   = 1123;
+    const TOP      = 280;
+    const SIG_RES  = 160;
+    const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
-    // Remove any existing page 2
+    // Remove old page 2
     const old2=document.getElementById('rxp2');
     if(old2) old2.remove();
 
-    // Always reset page 1
+    // Reset any previously hidden page-1 children
+    [...rxc.children].forEach(c=>{ c.style.visibility=''; });
+
+    // Reset page 1
     rxc.style.overflow='hidden';
     rxc.style.position='absolute';
     rxc.style.top=TOP+'px';
     rxc.style.bottom=SIG_RES+'px';
+    rxc.style.height='';
     rxp.style.height=PAGE_H+'px';
     rxp.style.minHeight='';
     rxsig.style.position='absolute';
@@ -2112,26 +2131,28 @@ function upd(){
     rxsig.style.top='';
     if(disc){disc.style.position='absolute';disc.style.bottom='14px';disc.style.top='';}
 
-    // Temporarily allow overflow to measure
+    // Measure total content height
     rxc.style.overflow='visible';
-    const totalH = rxc.scrollHeight;
+    const totalH=rxc.scrollHeight;
     rxc.style.overflow='hidden';
 
-    if(totalH <= AVAIL) return; // fits on one page — done
+    if(totalH<=AVAIL) return; // single page — done
 
-    // ── Find split index ────────────────────────────────────────────────
+    // Find split index (first element that causes overflow)
     const kids=[...rxc.children];
     let cumH=0, splitIdx=kids.length;
     for(let i=0;i<kids.length;i++){
       const cs=getComputedStyle(kids[i]);
-      const h=kids[i].offsetHeight + parseFloat(cs.marginTop||0) + parseFloat(cs.marginBottom||0);
-      if(cumH+h > AVAIL){ splitIdx=i; break; }
+      const h=kids[i].offsetHeight+parseFloat(cs.marginTop||0)+parseFloat(cs.marginBottom||0);
+      if(cumH+h>AVAIL){ splitIdx=i; break; }
       cumH+=h;
     }
+    if(splitIdx>=kids.length) return;
 
-    if(splitIdx>=kids.length) return; // all fit
+    // Hide page-2 elements from page-1 view (no partial clipping)
+    for(let i=splitIdx;i<kids.length;i++) kids[i].style.visibility='hidden';
 
-    // ── Build page 2 ─────────────────────────────────────────────────────
+    // ── Build page 2 ──────────────────────────────────────────────────
     const activeBg=rxp.style.backgroundImage||'';
     const p2=document.createElement('div');
     p2.id='rxp2';
@@ -2139,21 +2160,23 @@ function upd(){
     p2.style.cssText=`margin-top:28px;height:${PAGE_H}px;position:relative;overflow:hidden;`;
     if(activeBg) p2.style.backgroundImage=activeBg;
 
-    // Continuation header label
+    // Continuation label in header zone of page 2 (matches letterhead)
     const ctHdr=document.createElement('div');
-    ctHdr.style.cssText='position:absolute;top:22px;right:46px;font-size:9.5px;color:#8878b8;font-weight:600;letter-spacing:.4px;font-style:italic';
-    ctHdr.textContent='Dr. Lakshaya Mahajan — Continuation Sheet (Page 2)';
+    ctHdr.style.cssText='position:absolute;top:215px;right:46px;font-size:9px;color:#8878b8;font-weight:600;letter-spacing:.4px;font-style:italic';
+    ctHdr.textContent='Continuation — Page 2';
     p2.appendChild(ctHdr);
 
-    // Page 2 content zone
+    // Page 2 content zone: start at same TOP as page 1 (below letterhead)
     const c2=document.createElement('div');
-    c2.style.cssText=`position:absolute;top:52px;left:0;right:0;bottom:${SIG_RES}px;padding:0 46px;overflow:hidden;`;
+    c2.style.cssText=`position:absolute;top:${TOP}px;left:0;right:0;bottom:${SIG_RES}px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;`;
     for(let i=splitIdx;i<kids.length;i++){
-      c2.appendChild(kids[i].cloneNode(true));
+      const clone=kids[i].cloneNode(true);
+      clone.style.visibility='';
+      c2.appendChild(clone);
     }
     p2.appendChild(c2);
 
-    // Signature on page 2 (clone)
+    // Signature on page 2
     const sig2=rxsig.cloneNode(true);
     sig2.id='rxsig2';
     sig2.removeAttribute('style');
@@ -2167,7 +2190,7 @@ function upd(){
     d2.textContent='Not for medico-legal purpose';
     p2.appendChild(d2);
 
-    rxp.parentNode.insertBefore(p2, rxp.nextSibling);
+    rxp.parentNode.insertBefore(p2,rxp.nextSibling);
   });
 }
 
@@ -2561,6 +2584,10 @@ function saveRxSilent(){
   if(saved.length>50)saved.pop();
   localStorage.setItem('rxSaved',JSON.stringify(saved));
 }
+function applyBWMode(){
+  const on=document.getElementById('setPrefBW')?.checked;
+  document.body.classList.toggle('bw-mode',!!on);
+}
 function savePrefs(){
   const prefs={
     save:document.getElementById('setPrefSave').checked,
@@ -2568,6 +2595,7 @@ function savePrefs(){
     print:document.getElementById('setPrefPrint').checked,
     confirm:false,
     bg:document.getElementById('rxBgToggle')?.checked??false,
+    bw:document.getElementById('setPrefBW')?.checked??false,
     autoToken:document.getElementById('setPrefAutoToken')?.checked??false,
     tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
     tokenPrefixTel:document.getElementById('tokenPrefixTel')?.value||'TEL',
