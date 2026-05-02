@@ -770,7 +770,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .set-tog input[type=checkbox]{width:13px;height:13px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
 </style>
 <div class="mo" id="settingsMo" style="display:none">
-<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:700px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;overflow:hidden;">
+<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:860px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;overflow:hidden;max-height:95vh;">
 
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -916,13 +916,34 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         <div class="set-bh"><span class="set-bh-icon">📐</span><span class="set-bh-lbl">Layout — Columns</span></div>
         <div class="set-bb">
           <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:8px;letter-spacing:.4px">Choose columns per section on prescription</div>
-          ${['Comp:Chief Complaints','Adv:Advice','Note:Instructions'].map(s=>{const[id,lbl]=s.split(':');return`
+
           <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0edf8">
-            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">${lbl}</div>
+            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Chief Complaints</div>
             <div style="display:flex;gap:6px">
-              ${[1,2,3].map(n=>`<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="col${id}" value="${n}" onchange="savePrefs();upd()" style="accent-color:var(--p)"> ${n} col</label>`).join('')}
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
             </div>
-          </div>`}).join('')}
+          </div>
+
+          <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0edf8">
+            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Advice</div>
+            <div style="display:flex;gap:6px">
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Instructions</div>
+            <div style="display:flex;gap:6px">
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
+            </div>
+          </div>
+
         </div>
       </div>
 
