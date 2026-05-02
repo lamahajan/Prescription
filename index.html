@@ -126,17 +126,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   background-repeat:no-repeat;
   font-family:'DM Sans',sans-serif;
 }
-/* Content zone: top ~310px (below Rx symbol), bottom ~95px (above footer) */
-.rxc{
-  position:absolute;
-  top:280px;
-  left:0;right:0;bottom:95px;
-  padding:0 46px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  gap:0;
-}
+/* Content zone: handled by .rxc class below */
 
 /* Consult badge — sits right below divider line */
 .rxb{
@@ -157,8 +147,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxb.tele{background:rgba(33,150,243,.12);color:#1565c0;border:1px solid rgba(33,150,243,.3);}
 
 /* Patient row */
-.rxpt{display:flex;flex-wrap:wrap;gap:0;padding-bottom:6px;border-bottom:1.5px solid rgba(106,90,205,.18);margin-bottom:7px;row-gap:2px;justify-content:space-between;}
-.rxpf{font-size:12.5px;color:#3a3060;padding-right:10px;margin-right:10px;border-right:1px solid rgba(106,90,205,.2);flex:1;min-width:fit-content;}
+.rxpt{display:flex;flex-wrap:wrap;gap:0;padding-bottom:6px;border-bottom:1.5px solid rgba(106,90,205,.18);margin-top:8px;margin-bottom:7px;row-gap:2px;justify-content:space-between;}
+.rxpf{font-size:13.5px;color:#3a3060;padding-right:10px;margin-right:10px;border-right:1px solid rgba(106,90,205,.2);flex:1;min-width:fit-content;}
 .rxpf:last-child{border-right:none;margin-right:0;}
 .rxpf strong{color:#1a1040;font-weight:700;}
 
@@ -177,12 +167,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxcp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px 10px;}
 
 /* Medicines */
-.rxmt{width:100%;border-collapse:collapse;margin-bottom:7px;}
-.rxmt th{font-size:9.5px;font-weight:700;color:#6a5acd;text-transform:uppercase;letter-spacing:.6px;padding:4px 7px;background:rgba(106,90,205,.08);border-bottom:1.5px solid rgba(106,90,205,.2);text-align:left;}
-.rxmt td{font-size:12px;color:#1e1840;padding:5px 7px;border-bottom:1px solid rgba(106,90,205,.08);vertical-align:top;line-height:1.4;}
+.rxmt{width:100%;border-collapse:collapse;margin-bottom:7px;table-layout:fixed;}
+.rxmt th{font-size:9px;font-weight:700;color:#6a5acd;text-transform:uppercase;letter-spacing:.5px;padding:3px 5px;background:rgba(106,90,205,.08);border-bottom:1.5px solid rgba(106,90,205,.2);text-align:left;white-space:nowrap;overflow:hidden;}
+.rxmt td{font-size:11px;color:#1e1840;padding:4px 5px;border-bottom:1px solid rgba(106,90,205,.08);vertical-align:top;line-height:1.35;word-wrap:break-word;}
 .rxmt tr:nth-child(even) td{background:rgba(106,90,205,.03);}
-.rxmn{color:#6a5acd;font-weight:800;font-size:13px;}
-.rxmname{font-weight:700;}
+.rxmn{color:#6a5acd;font-weight:800;font-size:12px;}
+.rxmname{font-weight:700;font-size:11.5px;}
 .inj-tag{display:inline-block;padding:1px 5px;background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.25);border-radius:4px;font-size:9.5px;color:#c62828;font-weight:700;margin-left:3px;}
 
 /* Investigations — 2 col grid like order form */
@@ -197,7 +187,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxfu span{color:#1a1040;font-weight:500;}
 
 /* Signature */
-.rxsig{position:absolute;bottom:230px;right:46px;text-align:right;}
+.rxsig{position:absolute;bottom:145px;right:46px;text-align:right;}
 .rxsl{width:140px;height:1px;background:#4a3fa0;margin:0 0 3px auto;display:block;}
 .rxsn{font-size:11px;font-weight:700;color:#1a1040;}
 .rxss{font-size:9.5px;color:#8878b8;}
@@ -205,7 +195,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
 .rxdisclaim{position:absolute;bottom:72px;left:46px;font-size:8.5px;color:#b0a8cc;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
 /* When content is long, push sig below content instead of overlapping */
-.rxc{position:absolute;top:280px;left:0;right:0;bottom:150px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
+.rxc{position:absolute;top:280px;left:0;right:0;bottom:160px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 .rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
 
 
@@ -490,9 +480,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <div id="rxmb" style="display:none">
         <div class="rxl">Medicines</div>
         <table class="rxmt"><thead><tr>
-          <th style="width:28px">#</th><th>Drug Name</th><th style="width:65px">Dose</th>
-          <th style="width:55px">Freq</th><th style="width:90px">Route / Timing</th>
-          <th style="width:62px">Duration</th><th>Instructions</th>
+          <th style="width:20px">#</th><th style="width:32%">Drug Name</th><th style="width:52px">Dose</th>
+          <th style="width:68px">Freq</th><th style="width:75px">Route / Timing</th>
+          <th style="width:48px">Duration</th><th>Instructions</th>
         </tr></thead><tbody id="rxmrows"></tbody></table>
       </div>
 
@@ -2048,8 +2038,8 @@ function upd(){
         <td class="rxmn">${i+1}.</td>
         <td class="rxmname">${m.name}${inj?'<span class="inj-tag">INJ</span>':''}</td>
         <td>${m.dose}</td><td><strong>${m.freq}</strong></td>
-        <td style="font-size:10.5px;line-height:1.5">${routeHtml}${timingHtml}</td><td>${m.days}</td>
-        <td style="font-size:10.5px;color:#5a4e90">${m.instr||''}</td>
+        <td style="font-size:10px;line-height:1.4">${routeHtml}${timingHtml}</td><td style="font-size:11px">${m.days}</td>
+        <td style="font-size:11px;color:#3a3060;font-weight:500">${m.instr||''}</td>
       </tr>`;
     }).join('');
     mb.style.display='block';
@@ -2075,7 +2065,7 @@ function upd(){
   const allN=[...selNot];const cn=g('notX');if(cn)allN.push(cn);
   const ne=document.getElementById('rxnote');
   if(allN.length){
-    ne.innerHTML=`<div style="display:flex;align-items:flex-start;gap:6px"><div style="background:#e65100;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px;letter-spacing:.5px">INSTRUCTIONS</div><div style="flex:1">${allN.map(n=>`<div style="line-height:1.75"><span style="color:#c0392b;font-weight:700;margin-right:4px">›</span>${n}</div>`).join('')}</div></div>`;
+    ne.innerHTML=`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="background:#e65100;color:#fff;font-size:14px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.5">⚠</div><div style="flex:1;font-size:11px;color:#c0392b;font-weight:600;line-height:1.7">${allN.join('<span style="color:#6a5acd;margin:0 4px">›</span>')}</div></div>`;
     ne.style.display='block';
   }
   else ne.style.display='none';
@@ -2090,38 +2080,91 @@ function upd(){
   const sw=document.getElementById('rxsigimg');
   sw.innerHTML=sigUrl?`<img class="rxsi" src="${sigUrl}" style="vertical-align:bottom;">`:'';
 
-  // Overflow check — if content height > available space, switch to flow mode
+  // ── PAGINATION: split into two A4 pages when needed ──────────────────
   requestAnimationFrame(()=>{
-    const rxc=document.getElementById('rxc');
-    const rxsig=document.getElementById('rxsig');
-    const rxp=document.getElementById('rxp');
-    if(!rxc||!rxsig||!rxp)return;
-    const contentH=rxc.scrollHeight;
-    const available=rxp.getBoundingClientRect().height-280-150; // top offset + sig+footer space
-    if(contentH>available){
-      // Content overflows — push sig below content dynamically
-      rxc.style.position='absolute';
-      rxc.style.bottom='auto';
-      rxc.style.overflow='visible';
-      const sigTop=280+contentH+20;
-      rxsig.style.position='absolute';
-      rxsig.style.bottom='auto';
-      rxsig.style.top=sigTop+'px';
-      const disclaimTop=sigTop+95;
-      const disc=document.getElementById('rxdisclaim');
-      if(disc){disc.style.position='absolute';disc.style.bottom='auto';disc.style.top=disclaimTop+'px';}
-      rxp.style.minHeight=(disclaimTop+50)+'px';
-    } else {
-      rxc.style.position='absolute';
-      rxc.style.bottom='220px';
-      rxc.style.overflow='visible';
-      rxsig.style.position='absolute';
-      rxsig.style.bottom='145px';
-      rxsig.style.top='';
-      const disc=document.getElementById('rxdisclaim');
-      if(disc){disc.style.position='absolute';disc.style.bottom='14px';disc.style.top='';}
-      rxp.style.minHeight='1123px';
+    const rxc  = document.getElementById('rxc');
+    const rxsig= document.getElementById('rxsig');
+    const rxp  = document.getElementById('rxp');
+    const disc = document.getElementById('rxdisclaim');
+    if(!rxc||!rxsig||!rxp) return;
+
+    const PAGE_H   = 1123;  // A4 px
+    const TOP      = 280;   // header height
+    const SIG_RES  = 160;   // space for sig + disclaimer + footer
+    const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px per page
+
+    // Remove any existing page 2
+    const old2=document.getElementById('rxp2');
+    if(old2) old2.remove();
+
+    // Always reset page 1
+    rxc.style.overflow='hidden';
+    rxc.style.position='absolute';
+    rxc.style.top=TOP+'px';
+    rxc.style.bottom=SIG_RES+'px';
+    rxp.style.height=PAGE_H+'px';
+    rxp.style.minHeight='';
+    rxsig.style.position='absolute';
+    rxsig.style.bottom='145px';
+    rxsig.style.top='';
+    if(disc){disc.style.position='absolute';disc.style.bottom='14px';disc.style.top='';}
+
+    // Temporarily allow overflow to measure
+    rxc.style.overflow='visible';
+    const totalH = rxc.scrollHeight;
+    rxc.style.overflow='hidden';
+
+    if(totalH <= AVAIL) return; // fits on one page — done
+
+    // ── Find split index ────────────────────────────────────────────────
+    const kids=[...rxc.children];
+    let cumH=0, splitIdx=kids.length;
+    for(let i=0;i<kids.length;i++){
+      const cs=getComputedStyle(kids[i]);
+      const h=kids[i].offsetHeight + parseFloat(cs.marginTop||0) + parseFloat(cs.marginBottom||0);
+      if(cumH+h > AVAIL){ splitIdx=i; break; }
+      cumH+=h;
     }
+
+    if(splitIdx>=kids.length) return; // all fit
+
+    // ── Build page 2 ─────────────────────────────────────────────────────
+    const activeBg=rxp.style.backgroundImage||'';
+    const p2=document.createElement('div');
+    p2.id='rxp2';
+    p2.className='rxp';
+    p2.style.cssText=`margin-top:28px;height:${PAGE_H}px;position:relative;overflow:hidden;`;
+    if(activeBg) p2.style.backgroundImage=activeBg;
+
+    // Continuation header label
+    const ctHdr=document.createElement('div');
+    ctHdr.style.cssText='position:absolute;top:22px;right:46px;font-size:9.5px;color:#8878b8;font-weight:600;letter-spacing:.4px;font-style:italic';
+    ctHdr.textContent='Dr. Lakshaya Mahajan — Continuation Sheet (Page 2)';
+    p2.appendChild(ctHdr);
+
+    // Page 2 content zone
+    const c2=document.createElement('div');
+    c2.style.cssText=`position:absolute;top:52px;left:0;right:0;bottom:${SIG_RES}px;padding:0 46px;overflow:hidden;`;
+    for(let i=splitIdx;i<kids.length;i++){
+      c2.appendChild(kids[i].cloneNode(true));
+    }
+    p2.appendChild(c2);
+
+    // Signature on page 2 (clone)
+    const sig2=rxsig.cloneNode(true);
+    sig2.id='rxsig2';
+    sig2.removeAttribute('style');
+    sig2.style.cssText='position:absolute;bottom:145px;right:46px;text-align:right;';
+    p2.appendChild(sig2);
+
+    // Disclaimer on page 2
+    const d2=document.createElement('div');
+    d2.className='rxdisclaim';
+    d2.style.cssText='position:absolute;bottom:14px;left:46px;';
+    d2.textContent='Not for medico-legal purpose';
+    p2.appendChild(d2);
+
+    rxp.parentNode.insertBefore(p2, rxp.nextSibling);
   });
 }
 
