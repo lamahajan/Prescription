@@ -145,15 +145,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxb.tele{background:rgba(33,150,243,.12);color:#1565c0;border:1px solid rgba(33,150,243,.3);}
 
 /* Patient row */
-.rxpt{display:grid;grid-auto-columns:1fr;grid-auto-flow:column;margin-top:6px;margin-bottom:8px;align-items:stretch;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.14);border-radius:8px;overflow:hidden;}
+.rxpt{display:grid;grid-auto-columns:1fr;grid-auto-flow:column;align-items:stretch;}
 .rxpf{font-size:12px;color:#5a4e90;padding:6px 12px;border-right:1px solid rgba(106,90,205,.14);display:flex;flex-direction:column;gap:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rxpf:last-child{border-right:none;}
 .rxpf strong{font-size:8.5px;font-weight:700;color:#9b8ee0;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:1px;}
 .rxpf span{font-size:12.5px;font-weight:600;color:#1a1040;}
 
-/* Vitals */
-.rxv{display:flex;gap:14px;background:rgba(106,90,205,.07);border:1px solid rgba(106,90,205,.16);border-radius:7px;padding:7px 12px;margin-bottom:8px;flex-wrap:wrap;row-gap:3px;justify-content:space-between;}
-.rxvf{font-size:11px;color:#6a5acd;font-weight:700;}
+/* Vitals — sits inside the same card with a top border divider */
+.rxv{display:flex;gap:0;border-top:1px solid rgba(106,90,205,.14);padding:5px 0;flex-wrap:wrap;}
+.rxvf{font-size:11px;color:#6a5acd;font-weight:700;padding:0 14px;border-right:1px solid rgba(106,90,205,.1);}
+.rxvf:last-child{border-right:none;}
 .rxvf span{color:#1a1040;font-weight:500;font-size:11.5px;}
 
 /* Section label */
@@ -282,7 +283,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <div class="st">Vitals</div>
     <div class="rw r2">
       <div class="fl"><label>BP (mmHg)</label>
-        <div class="bpw"><input id="bS" type="number" min="0" placeholder="120" style="width:55px" oninput="upd()"><span class="bps">/</span><input id="bD" type="number" min="0" placeholder="80" style="width:55px" oninput="upd()"></div>
+        <div class="bpw"><input id="bS" type="number" min="60" step="2" placeholder="120" style="width:55px" oninput="upd()"><span class="bps">/</span><input id="bD" type="number" min="40" step="2" placeholder="80" style="width:55px" oninput="upd()"></div>
       </div>
       <div class="fl"><label>Pulse (bpm)</label><input id="vP" type="number" min="0" placeholder="72" oninput="upd()"></div>
     </div>
@@ -478,10 +479,13 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div id="rxTokenChip" style="display:none;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 11px;border-radius:11px;background:rgba(30,24,64,.07);color:#1e1840;border:1px solid rgba(30,24,64,.25);"></div>
     </div>
 
-    <div class="rxc" id="rxc">
-      <div class="rxpt" id="rxpt"><span style="font-size:11px;color:#b8b0d0;font-style:italic;">Patient details will appear here...</span></div>
+    <!-- Patient + Vitals fixed card — always visible, never clipped -->
+    <div id="rxPatCard" style="position:absolute;left:46px;right:46px;top:228px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.14);border-radius:8px;overflow:hidden;">
+      <div class="rxpt" id="rxpt"><span style="font-size:11px;color:#b8b0d0;font-style:italic;padding:6px 12px;display:block">Patient details will appear here...</span></div>
       <div class="rxv" id="rxvit" style="display:none"></div>
+    </div>
 
+    <div class="rxc" id="rxc">
       <div id="rxdgb" style="display:none"><div class="rxl">Diagnosis</div><div class="rxdg" id="rxdg"></div></div>
       <div id="rxcpb" style="display:none"><div class="rxl">Chief Complaints</div><div class="rxcp" id="rxcp"></div></div>
 
@@ -2029,7 +2033,15 @@ function upd(){
   badge.className='rxb '+(ctype==='Teleconsultation'?'tele':'opd');
   badge.textContent=ctype==='Teleconsultation'?'💻 TELECONSULTATION':'🏥 OPD VISIT';
 
-  // Token ID chip next to badge
+  // Adjust rxc top based on patient card height
+  requestAnimationFrame(()=>{
+    const card=document.getElementById('rxPatCard');
+    const rxc=document.getElementById('rxc');
+    if(card&&rxc){
+      const cardBottom=228+card.offsetHeight+6;
+      rxc.style.top=cardBottom+'px';
+    }
+  });
   const pi=g('pI');
   const tokenChip=document.getElementById('rxTokenChip');
   if(tokenChip){
@@ -2151,7 +2163,8 @@ function upd(){
     if(!rxc||!rxsig||!rxp) return;
 
     const PAGE_H   = 1123;
-    const TOP      = 280;
+    const patCard=document.getElementById('rxPatCard');
+    const TOP = patCard ? 228+patCard.offsetHeight+6 : 310;
     const SIG_RES  = 160;
     const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
