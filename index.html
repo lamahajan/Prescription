@@ -193,7 +193,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
-.rxdisclaim{position:absolute;bottom:18px;right:140px;font-size:8.5px;color:#b0a8cc;letter-spacing:.3px;font-style:italic;line-height:1.4;text-align:right;}
+.rxdisclaim{position:absolute;bottom:72px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
 /* When content is long, push sig below content instead of overlapping */
 .rxc{position:absolute;top:280px;left:0;right:0;bottom:160px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 .rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
@@ -494,7 +494,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         <table class="rxmt"><thead><tr>
           <th style="width:28px">#</th><th style="width:32%">Drug Name</th><th style="width:52px">Dose</th>
           <th style="width:68px">Freq</th><th style="width:75px">Route &amp; Timing</th>
-          <th style="width:48px">Duration</th><th>Instructions</th>
+          <th style="width:62px">Duration</th><th>Instructions</th>
         </tr></thead><tbody id="rxmrows"></tbody></table>
       </div>
 
@@ -762,7 +762,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .sync-btn{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;border:none;}
 /* ── new compact settings panel ── */
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;overflow-y:auto;max-height:calc(90vh - 130px);}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;overflow-y:auto;flex:1;min-height:0;}
 .set-col{display:flex;flex-direction:column;gap:9px;}
 .set-block{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;}
 .set-bh{padding:6px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);border-bottom:1px solid #e0d8f8;display:flex;align-items:center;gap:6px;}
@@ -774,7 +774,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .set-tog input[type=checkbox]{width:13px;height:13px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
 </style>
 <div class="mo" id="settingsMo" style="display:none">
-<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:860px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;overflow:hidden;max-height:95vh;">
+<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:860px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;max-height:92vh;overflow:hidden;">
 
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -861,11 +861,16 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
           <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
           <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefBW" onchange="savePrefs();applyBWMode()"> <span>⬛ Black &amp; White print mode</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefPage2" onchange="savePrefs();upd()"> <span>📄 Always start content on page 2</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
           <input type="hidden" id="setPrefConfirm">
           <!-- Auto Token inline section -->
           <div id="autoTokenRow" style="display:none;margin-top:8px;padding:8px;background:#f0ecff;border-radius:8px;border:1px solid var(--pl)">
-            <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:5px">FORMAT: <code style="background:#fff;padding:1px 5px;border-radius:3px;color:var(--p)">PREFIX-DDMMYYYY-001</code></div>
+            <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:5px">FORMAT: <code id="tokenFmtLabel" style="background:#fff;padding:1px 5px;border-radius:3px;color:var(--p)">PREFIX-DDMMYYYY-001</code></div>
+            <div style="display:flex;gap:6px;margin-bottom:7px">
+              <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600;color:var(--tx)"><input type="radio" name="tokenFmt" value="date" checked onchange="savePrefs();previewToken();updateTokenFmtLabel()" style="accent-color:var(--p)"> Date</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600;color:var(--tx)"><input type="radio" name="tokenFmt" value="time" onchange="savePrefs();previewToken();updateTokenFmtLabel()" style="accent-color:var(--p)"> Time (24hr)</label>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
               <div>
                 <label style="font-size:9px;color:var(--mu);font-weight:700;display:block;margin-bottom:2px">OPD Prefix</label>
@@ -2165,6 +2170,7 @@ function upd(){
     const PAGE_H   = 1123;
     const patCard=document.getElementById('rxPatCard');
     const TOP = patCard ? 280+patCard.offsetHeight+6 : 340;
+    const forceP2=document.getElementById('setPrefPage2')?.checked;
     const SIG_RES  = 160;
     const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
@@ -2193,16 +2199,20 @@ function upd(){
     const totalH=rxc.scrollHeight;
     rxc.style.overflow='hidden';
 
-    if(totalH<=AVAIL) return; // single page — done
+    if(totalH<=AVAIL && !forceP2) return; // single page — done
 
-    // Find split index (first element that causes overflow)
+    // Find split index
     const kids=[...rxc.children];
     let cumH=0, splitIdx=kids.length;
-    for(let i=0;i<kids.length;i++){
-      const cs=getComputedStyle(kids[i]);
-      const h=kids[i].offsetHeight+parseFloat(cs.marginTop||0)+parseFloat(cs.marginBottom||0);
-      if(cumH+h>AVAIL){ splitIdx=i; break; }
-      cumH+=h;
+    if(forceP2){
+      splitIdx=0; // force all content to page 2
+    }else{
+      for(let i=0;i<kids.length;i++){
+        const cs=getComputedStyle(kids[i]);
+        const h=kids[i].offsetHeight+parseFloat(cs.marginTop||0)+parseFloat(cs.marginBottom||0);
+        if(cumH+h>AVAIL){ splitIdx=i; break; }
+        cumH+=h;
+      }
     }
     if(splitIdx>=kids.length) return;
 
@@ -2243,7 +2253,7 @@ function upd(){
     // Disclaimer on page 2
     const d2=document.createElement('div');
     d2.className='rxdisclaim';
-    d2.style.cssText='position:absolute;bottom:18px;right:140px;text-align:right;';
+    d2.style.cssText='position:absolute;bottom:72px;left:46px;';
     d2.textContent='Not for medico-legal purpose';
     p2.appendChild(d2);
 
@@ -2656,6 +2666,8 @@ function savePrefs(){
     col2Comp:document.querySelector('input[name="colComp"]:checked')?.value??'1',
     col2Adv:document.querySelector('input[name="colAdv"]:checked')?.value??'2',
     col2Note:document.querySelector('input[name="colNote"]:checked')?.value??'1',
+    tokenFmt:document.querySelector('input[name="tokenFmt"]:checked')?.value??'date',
+    forceP2:document.getElementById('setPrefPage2')?.checked??false,
     autoToken:document.getElementById('setPrefAutoToken')?.checked??false,
     tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
     tokenPrefixTel:document.getElementById('tokenPrefixTel')?.value||'TEL',
@@ -2685,6 +2697,9 @@ function loadPrefs(){
   setRadio('colComp',prefs.col2Comp??'1');
   setRadio('colAdv',prefs.col2Adv??'2');
   setRadio('colNote',prefs.col2Note??'1');
+  setRadio('tokenFmt',prefs.tokenFmt??'date');
+  updateTokenFmtLabel();
+  const fp2=document.getElementById('setPrefPage2');if(fp2)fp2.checked=prefs.forceP2??false;
   // BW mode
   const bw=document.getElementById('setPrefBW');if(bw)bw.checked=prefs.bw??false;
   applyBWMode();
@@ -2698,19 +2713,34 @@ function getTodayDDMMYYYY(){
   const d=new Date();
   return String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
 }
+function getNowHHMMSS(){
+  const d=new Date();
+  return String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0');
+}
+function getTokenSuffix(){
+  const fmt=document.querySelector('input[name="tokenFmt"]:checked')?.value||'date';
+  return fmt==='time'?getNowHHMMSS():getTodayDDMMYYYY();
+}
+function updateTokenFmtLabel(){
+  const el=document.getElementById('tokenFmtLabel');
+  if(!el)return;
+  const fmt=document.querySelector('input[name="tokenFmt"]:checked')?.value||'date';
+  el.textContent=fmt==='time'?'PREFIX-HHMMSS-001':'PREFIX-DDMMYYYY-001';
+}
 function buildToken(){
   const isTel=ctype==='Teleconsultation';
   const prefix=isTel?(document.getElementById('tokenPrefixTel')?.value||'TEL').trim():(document.getElementById('tokenPrefix')?.value||'OPD').trim();
   const num=parseInt(document.getElementById('tokenCounter')?.value||1);
-  return`${prefix}-${getTodayDDMMYYYY()}-${String(num).padStart(3,'0')}`;
+  return`${prefix}-${getTokenSuffix()}-${String(num).padStart(3,'0')}`;
 }
 function previewToken(){
   const el=document.getElementById('tokenPreview');
   if(!el)return;
+  updateTokenFmtLabel();
   const n=String(parseInt(document.getElementById('tokenCounter')?.value||1)).padStart(3,'0');
-  const date=getTodayDDMMYYYY();
-  const opdTok=`${(document.getElementById('tokenPrefix')?.value||'OPD').trim()}-${date}-${n}`;
-  const telTok=`${(document.getElementById('tokenPrefixTel')?.value||'TEL').trim()}-${date}-${n}`;
+  const sfx=getTokenSuffix();
+  const opdTok=`${(document.getElementById('tokenPrefix')?.value||'OPD').trim()}-${sfx}-${n}`;
+  const telTok=`${(document.getElementById('tokenPrefixTel')?.value||'TEL').trim()}-${sfx}-${n}`;
   el.innerHTML=`<div>🏥 ${opdTok}</div><div style="color:#1565c0;margin-top:2px">💻 ${telTok}</div>`;
 }
 function autoTokenChanged(){
