@@ -187,16 +187,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxfu span{color:#1a1040;font-weight:500;}
 
 /* Signature */
-.rxsig{position:absolute;bottom:145px;right:46px;text-align:right;}
+.rxsig{text-align:right;margin-top:16px;padding-top:4px;}
 .rxsl{width:140px;height:1px;background:#4a3fa0;margin:0 0 3px auto;display:block;}
 .rxsn{font-size:11px;font-weight:700;color:#1a1040;}
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
-.rxdisclaim{position:absolute;bottom:150px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
-/* When content is long, push sig below content instead of overlapping */
-.rxc{position:absolute;top:280px;left:0;right:0;bottom:160px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
-.rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
+.rxdisclaim{font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;}
+/* Content zone */
+.rxc{position:absolute;top:280px;left:0;right:0;bottom:60px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 
 
 /* PRINT */
@@ -520,16 +519,17 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       </div>
       <div class="rxnote" id="rxnote" style="display:none"></div>
       <div class="rxfu" id="rxfu" style="display:none"></div>
-    </div>
 
-    <div class="rxsig" id="rxsig">
-      <div id="rxsigimg"></div>
+      <!-- Signature flows after content -->
+      <div class="rxsig" id="rxsig" style="margin-top:16px;text-align:right;">
+        <div id="rxsigimg"></div>
       <div class="rxsl"></div>
       <div class="rxsn">Dr. Lakshaya Mahajan</div>
       <div class="rxss">MBBS | PMC Regd. 65784</div>
-    </div>
-    <div class="rxdisclaim">Not for medico-legal purpose</div>
-  </div>
+      </div><!-- /rxsig -->
+      <div class="rxdisclaim" id="rxdisclaim" style="position:static;margin-top:6px;bottom:auto;left:auto;max-width:none;">Not for medico-legal purpose</div>
+    </div><!-- /rxc -->
+  </div><!-- /rxp -->
 </div>
 </div><!-- /main -->
 
@@ -2172,18 +2172,16 @@ function upd(){
   // ── PAGINATION: split into two A4 pages when needed ──────────────────
   requestAnimationFrame(()=>{
     const rxc  = document.getElementById('rxc');
-    const rxsig= document.getElementById('rxsig');
     const rxp  = document.getElementById('rxp');
-    const disc = document.getElementById('rxdisclaim');
-    if(!rxc||!rxsig||!rxp) return;
+    if(!rxc||!rxp) return;
 
     const PAGE_H   = 1123;
     const patCard=document.getElementById('rxPatCard');
     const TOP = patCard ? 280+patCard.offsetHeight+6 : 340;
     const p2chk=document.getElementById('p2SplitChk')?.checked;
     const splitAtId=p2chk?_p2SplitId:null;
-    const SIG_RES  = 160;
-    const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
+    const SIG_RES  = 60;  // just footer bar space
+    const AVAIL    = PAGE_H - TOP - SIG_RES;
 
     // Remove old page 2
     const old2=document.getElementById('rxp2');
@@ -2194,16 +2192,8 @@ function upd(){
 
     // Reset page 1
     rxc.style.overflow='hidden';
-    rxc.style.position='absolute';
-    rxc.style.top=TOP+'px';
-    rxc.style.bottom=SIG_RES+'px';
-    rxc.style.height='';
     rxp.style.height=PAGE_H+'px';
     rxp.style.minHeight='';
-    rxsig.style.position='absolute';
-    rxsig.style.bottom='145px';
-    rxsig.style.top='';
-    if(disc){disc.style.position='absolute';disc.style.bottom='14px';disc.style.top='';}
 
     // Measure total content height
     rxc.style.overflow='visible';
@@ -2254,7 +2244,7 @@ function upd(){
 
     // Page 2 content zone: start at same TOP as page 1 (below letterhead)
     const c2=document.createElement('div');
-    c2.style.cssText=`position:absolute;top:${TOP}px;left:0;right:0;bottom:${SIG_RES}px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;`;
+    c2.style.cssText=`position:absolute;top:${TOP}px;left:0;right:0;bottom:60px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;`;
     for(let i=splitIdx;i<kids.length;i++){
       const clone=kids[i].cloneNode(true);
       clone.style.visibility='';
@@ -2262,11 +2252,11 @@ function upd(){
     }
     p2.appendChild(c2);
 
-    // Signature on page 2
-    const sig2=rxsig.cloneNode(true);
+    // Signature on page 2 (already included in cloned content above)
+    // Add standalone sig block for page 2 in case content doesn't include it
+    const sig2=document.getElementById('rxsig').cloneNode(true);
     sig2.id='rxsig2';
-    sig2.removeAttribute('style');
-    sig2.style.cssText='position:absolute;bottom:145px;right:46px;text-align:right;';
+    sig2.style.cssText='text-align:right;margin-top:16px;padding-top:4px;';
     p2.appendChild(sig2);
 
     // Disclaimer on page 2
