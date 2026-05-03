@@ -193,7 +193,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
-.rxdisclaim{position:absolute;bottom:72px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
+.rxdisclaim{position:absolute;bottom:165px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
 /* When content is long, push sig below content instead of overlapping */
 .rxc{position:absolute;top:280px;left:0;right:0;bottom:160px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 .rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
@@ -239,6 +239,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <button class="btn bw" onclick="clearAll()">✕ Clear</button>
     <button class="btn bw" onclick="openMedDB()">💊 Med DB</button>
     <button class="btn bw" onclick="openMedCert()">📄 Med Cert</button>
+    <button class="btn bw" id="forceP2Btn" onclick="toggleForceP2()" title="Move all content to page 2">📄 Pg 2</button>
     <button class="btn bp" id="printBtn" onclick="printSaveAndSend()">⎙ Print / Save / Send</button>
   </div>
 </div>
@@ -762,7 +763,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .sync-btn{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;border:none;}
 /* ── new compact settings panel ── */
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;overflow-y:auto;flex:1;min-height:0;}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;flex:1;min-height:0;overflow-y:auto;}
 .set-col{display:flex;flex-direction:column;gap:9px;}
 .set-block{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;}
 .set-bh{padding:6px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);border-bottom:1px solid #e0d8f8;display:flex;align-items:center;gap:6px;}
@@ -774,7 +775,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .set-tog input[type=checkbox]{width:13px;height:13px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
 </style>
 <div class="mo" id="settingsMo" style="display:none">
-<div style="background:var(--wh);border-radius:16px;width:96vw;max-width:860px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;max-height:92vh;overflow:hidden;">
+<div style="background:var(--wh);border-radius:16px;width:98vw;max-width:980px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;max-height:92vh;overflow:hidden;">
 
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -861,7 +862,6 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
           <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
           <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefBW" onchange="savePrefs();applyBWMode()"> <span>⬛ Black &amp; White print mode</span></label>
-          <label class="set-tog"><input type="checkbox" id="setPrefPage2" onchange="savePrefs();upd()"> <span>📄 Always start content on page 2</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefAutoToken" onchange="savePrefs();autoTokenChanged()"> <span>🔢 Auto-generate Token / ID number</span></label>
           <input type="hidden" id="setPrefConfirm">
           <!-- Auto Token inline section -->
@@ -2170,7 +2170,7 @@ function upd(){
     const PAGE_H   = 1123;
     const patCard=document.getElementById('rxPatCard');
     const TOP = patCard ? 280+patCard.offsetHeight+6 : 340;
-    const forceP2=document.getElementById('setPrefPage2')?.checked;
+    const forceP2=_forceP2;
     const SIG_RES  = 160;
     const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
@@ -2253,7 +2253,7 @@ function upd(){
     // Disclaimer on page 2
     const d2=document.createElement('div');
     d2.className='rxdisclaim';
-    d2.style.cssText='position:absolute;bottom:72px;left:46px;';
+    d2.style.cssText='position:absolute;bottom:165px;left:46px;';
     d2.textContent='Not for medico-legal purpose';
     p2.appendChild(d2);
 
@@ -2650,6 +2650,17 @@ function saveRxSilent(){
   saved.unshift({name,diag,date:new Date().toISOString(),state:getRxState()});
   if(saved.length>50)saved.pop();
   localStorage.setItem('rxSaved',JSON.stringify(saved));
+}
+let _forceP2=false;
+function toggleForceP2(){
+  _forceP2=!_forceP2;
+  const btn=document.getElementById('forceP2Btn');
+  if(btn){
+    btn.style.background=_forceP2?'#4a3fa0':'';
+    btn.style.color=_forceP2?'#fff':'';
+    btn.title=_forceP2?'Content on page 2 (click to revert)':'Move all content to page 2';
+  }
+  upd();
 }
 function applyBWMode(){
   const on=document.getElementById('setPrefBW')?.checked;
@@ -4052,7 +4063,7 @@ function renderCert(){
   if(_userEditedTs) certTimestamp=_userEditedTs.replace(/^Date:\s*/,'');
   const sigBlock=`<div style="text-align:right;margin-top:20px;line-height:1.4">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:0 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
   const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:10px;font-style:italic;line-height:1.4">Not valid for medico-legal purposes</p>`;
-  const addrLine=addr?`<br><span style="font-size:13px;color:#3a3060;font-family:'DM Sans',sans-serif;">R/o: ${addr}</span>`:'';
+  const addrLine=addr?`<br><span style="font-size:14px;color:#000;font-family:'DM Sans',sans-serif;">R/o: ${addr}</span>`:'';
   let body='';
   const titles={sick:'MEDICAL / SICK LEAVE CERTIFICATE',fitness_work:'FITNESS FOR WORK CERTIFICATE',fitness_travel:'FITNESS FOR TRAVEL CERTIFICATE',fitness_studies:'FITNESS FOR STUDIES CERTIFICATE',recovery:'RECOVERY CERTIFICATE',caretaker:'MEDICAL CARETAKER CERTIFICATE',custom:'MEDICAL CERTIFICATE'};
   const customTitle=certType==='custom'?(cv('cCustomTitle')||'MEDICAL CERTIFICATE').toUpperCase():null;
