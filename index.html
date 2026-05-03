@@ -193,7 +193,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
 #rxsigimg{line-height:0;font-size:0;margin:0;padding:0;display:block;}
-.rxdisclaim{position:absolute;bottom:165px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
+.rxdisclaim{position:absolute;bottom:150px;left:46px;font-size:8.5px;color:#1a1040;letter-spacing:.3px;font-style:italic;line-height:1.4;max-width:260px;}
 /* When content is long, push sig below content instead of overlapping */
 .rxc{position:absolute;top:280px;left:0;right:0;bottom:160px;padding:0 46px;overflow:hidden;display:flex;flex-direction:column;gap:0;}
 .rxc.overflow-mode{position:relative;top:280px;bottom:auto;min-height:auto;padding:0 46px;margin-bottom:160px;}
@@ -239,7 +239,6 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <button class="btn bw" onclick="clearAll()">✕ Clear</button>
     <button class="btn bw" onclick="openMedDB()">💊 Med DB</button>
     <button class="btn bw" onclick="openMedCert()">📄 Med Cert</button>
-    <button class="btn bw" id="forceP2Btn" onclick="toggleForceP2()" title="Move all content to page 2">📄 Pg 2</button>
     <button class="btn bp" id="printBtn" onclick="printSaveAndSend()">⎙ Print / Save / Send</button>
   </div>
 </div>
@@ -424,6 +423,17 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <div class="st">Medicines <span id="mcnt" style="background:var(--p);color:#fff;border-radius:8px;padding:1px 6px;font-size:9px;font-weight:700;margin-left:2px;">0</span></div>
     <div id="mlist"></div>
     <button class="ab" onclick="openMed()">+ Add Medicine</button>
+    <!-- Page 2 split control -->
+    <div style="margin-top:8px;border-top:1px dashed rgba(106,90,205,.2);padding-top:8px;">
+      <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--tx);cursor:pointer;font-weight:500;">
+        <input type="checkbox" id="p2SplitChk" onchange="onP2SplitChange()" style="accent-color:var(--p);width:13px;height:13px;cursor:pointer;">
+        <span>📄 Split — start from here on <strong>Page 2</strong></span>
+      </label>
+      <div id="p2SplitRow" style="display:none;margin-top:7px;padding:7px 10px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.15);border-radius:7px;">
+        <div style="font-size:9.5px;color:#4a3fa0;font-weight:700;margin-bottom:6px;letter-spacing:.3px;">FROM WHICH SECTION ON PAGE 2?</div>
+        <div style="display:flex;flex-direction:column;gap:4px;" id="p2SplitSecs"></div>
+      </div>
+    </div>
   </div>
 
   <div class="sc">
@@ -2170,7 +2180,8 @@ function upd(){
     const PAGE_H   = 1123;
     const patCard=document.getElementById('rxPatCard');
     const TOP = patCard ? 280+patCard.offsetHeight+6 : 340;
-    const forceP2=_forceP2;
+    const p2chk=document.getElementById('p2SplitChk')?.checked;
+    const splitAtId=p2chk?_p2SplitId:null;
     const SIG_RES  = 160;
     const AVAIL    = PAGE_H - TOP - SIG_RES; // ≈683px
 
@@ -2199,14 +2210,22 @@ function upd(){
     const totalH=rxc.scrollHeight;
     rxc.style.overflow='hidden';
 
-    if(totalH<=AVAIL && !forceP2) return; // single page — done
+    if(totalH<=AVAIL && !splitAtId) return; // single page — done
 
     // Find split index
     const kids=[...rxc.children];
-    let cumH=0, splitIdx=kids.length;
-    if(forceP2){
-      splitIdx=0; // force all content to page 2
+    let splitIdx=kids.length;
+    if(splitAtId){
+      // Find the section element and its index in rxc children
+      const targetEl=document.getElementById(splitAtId);
+      if(targetEl){
+        const idx=kids.indexOf(targetEl);
+        if(idx>=0) splitIdx=idx;
+        else splitIdx=0;
+      }else splitIdx=0;
     }else{
+      // Auto-split at overflow point
+      let cumH=0;
       for(let i=0;i<kids.length;i++){
         const cs=getComputedStyle(kids[i]);
         const h=kids[i].offsetHeight+parseFloat(cs.marginTop||0)+parseFloat(cs.marginBottom||0);
@@ -2253,7 +2272,7 @@ function upd(){
     // Disclaimer on page 2
     const d2=document.createElement('div');
     d2.className='rxdisclaim';
-    d2.style.cssText='position:absolute;bottom:165px;left:46px;';
+    d2.style.cssText='position:absolute;bottom:150px;left:46px;';
     d2.textContent='Not for medico-legal purpose';
     p2.appendChild(d2);
 
@@ -2651,14 +2670,43 @@ function saveRxSilent(){
   if(saved.length>50)saved.pop();
   localStorage.setItem('rxSaved',JSON.stringify(saved));
 }
-let _forceP2=false;
-function toggleForceP2(){
-  _forceP2=!_forceP2;
-  const btn=document.getElementById('forceP2Btn');
-  if(btn){
-    btn.style.background=_forceP2?'#4a3fa0':'';
-    btn.style.color=_forceP2?'#fff':'';
-    btn.title=_forceP2?'Content on page 2 (click to revert)':'Move all content to page 2';
+// ── Page 2 split control ─────────────────────────────────────
+const P2_SECTIONS=[
+  {id:'rxdgb',  label:'Diagnosis'},
+  {id:'rxcpb',  label:'Chief Complaints'},
+  {id:'rxmb',   label:'Medicines'},
+  {id:'rxib',   label:'Investigations'},
+  {id:'rxab',   label:'Advice'},
+  {id:'rxnb',   label:'Special Notes / Instructions'},
+  {id:'rxfub',  label:'Follow-Up'},
+];
+let _p2SplitId=null;
+
+function onP2SplitChange(){
+  const on=document.getElementById('p2SplitChk')?.checked;
+  const row=document.getElementById('p2SplitRow');
+  if(row) row.style.display=on?'block':'none';
+  if(on){
+    // Build section radio list based on currently visible sections
+    const cont=document.getElementById('p2SplitSecs');
+    if(cont){
+      cont.innerHTML=P2_SECTIONS.map(s=>{
+        const el=document.getElementById(s.id);
+        if(!el||el.style.display==='none') return '';
+        const checked=_p2SplitId===s.id?'checked':'';
+        return `<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 0">
+          <input type="radio" name="p2sec" value="${s.id}" ${checked} onchange="_p2SplitId=this.value;upd()" style="accent-color:var(--p)">
+          ${s.label}
+        </label>`;
+      }).join('');
+      // Auto-select first if none chosen
+      if(!_p2SplitId){
+        const first=cont.querySelector('input[type=radio]');
+        if(first){first.checked=true;_p2SplitId=first.value;}
+      }
+    }
+  }else{
+    _p2SplitId=null;
   }
   upd();
 }
