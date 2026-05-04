@@ -298,6 +298,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <button class="btn bw" onclick="clearAll()">✕ Clear</button>
     <button class="btn bw" onclick="openMedDB()">💊 Med DB</button>
     <button class="btn bw" onclick="openMedCert()">📄 Med Cert</button>
+    <button class="btn bw" id="fuReminderBtn" onclick="openFollowUpReminders()" title="Send follow-up reminders to patients">📅 Follow-Ups</button>
     <button class="btn bwa" onclick="sendWhatsApp()" title="Send via WhatsApp">💬 WhatsApp</button>
     <button class="btn bp" id="printBtn" onclick="printSaveAndSend()">⎙ Print / Save / Send</button>
   </div>
@@ -603,6 +604,34 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 </div>
 </div><!-- /main -->
 
+<!-- ─── FOLLOW-UP REMINDERS MODAL ─── -->
+<div class="mo" id="fuReminderMo" style="display:none">
+<div class="mb" style="max-width:580px;max-height:90vh;overflow:hidden;padding:0;border-radius:16px;display:flex;flex-direction:column;">
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#2e2480,#6a5acd 60%,#9b8ee0);padding:14px 18px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div>
+      <div style="font-size:15px;font-weight:700;color:#fff">📅 Follow-Up Reminders</div>
+      <div id="fuReminderSubtitle" style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">Patients with scheduled follow-ups</div>
+    </div>
+    <button onclick="document.getElementById('fuReminderMo').style.display='none'" style="width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+  </div>
+  <!-- Filter tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--br);background:var(--wh);flex-shrink:0">
+    <button class="fu-tab active" id="fuTabAll" onclick="fuSetTab('all')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--p);cursor:pointer;border-bottom:2px solid var(--p);font-family:inherit">All</button>
+    <button class="fu-tab" id="fuTabOverdue" onclick="fuSetTab('overdue')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">⚠️ Overdue</button>
+    <button class="fu-tab" id="fuTabToday" onclick="fuSetTab('today')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">📌 Today</button>
+    <button class="fu-tab" id="fuTabUpcoming" onclick="fuSetTab('upcoming')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">🔜 Upcoming</button>
+  </div>
+  <!-- List -->
+  <div id="fuReminderList" style="overflow-y:auto;flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:8px;"></div>
+  <!-- Footer -->
+  <div style="padding:10px 14px;border-top:1px solid var(--br);background:#faf9ff;flex-shrink:0;display:flex;gap:8px;justify-content:space-between;align-items:center">
+    <button onclick="fuSendAllWhatsApp()" style="padding:8px 16px;background:#25d366;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💬 Send All WhatsApp</button>
+    <button onclick="document.getElementById('fuReminderMo').style.display='none'" style="padding:8px 16px;border:1px solid var(--br);border-radius:8px;background:var(--wh);color:var(--mu);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Close</button>
+  </div>
+</div>
+</div>
+
 <!-- ─── MEDICAL CERTIFICATE MODAL ─── -->
 <div class="mo" id="certMo" style="display:none">
 <div class="mb" style="max-width:680px;max-height:92vh;overflow-y:auto">
@@ -895,9 +924,9 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         <div class="set-bh"><span class="set-bh-icon">💬</span><span class="set-bh-lbl">WhatsApp Integration</span></div>
         <div class="set-bb" style="display:flex;flex-direction:column;gap:7px;">
           <div style="font-size:9.5px;color:var(--mu);line-height:1.6;background:rgba(37,211,102,.06);border-radius:7px;padding:8px 10px;border:1px solid rgba(37,211,102,.2)">
-            💬 WhatsApp button click karne pe prescription ka text <strong>patient ke registered phone number</strong> pe directly WhatsApp pe jayega.<br><br>
-            📋 Patient ka number <strong>Patient Registry</strong> mein save hona chahiye (Mobile/WhatsApp field).<br><br>
-            📱 Mobile pe click karne se directly WhatsApp app mein khuljayega!
+            💬 Clicking WhatsApp sends the prescription text directly to the patient's registered phone number.<br><br>
+            📋 Patient's number must be saved in <strong>Patient Registry</strong> (Mobile/WhatsApp field).<br><br>
+            📱 On mobile, it opens directly inside the WhatsApp app!
           </div>
         </div>
       </div>
@@ -1007,8 +1036,8 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
             </label>
           </div>
           <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.04);border-radius:7px;padding:6px 9px">
-            📦 Export — saara data JSON file mein backup karo<br>
-            📂 Import — JSON file se data restore karo
+            📦 Export — backup all data to a JSON file<br>
+            📂 Import — restore data from a JSON file
           </div>
         </div>
       </div>
@@ -2469,7 +2498,7 @@ async function syncPush(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
-  setSyncStatus('📦 Data package kar raha hai...');
+  setSyncStatus('📦 Packaging data...');
   const payload=JSON.stringify({
     _marker:SYNC_MARKER,_ts:Date.now(),
     sigUrl:localStorage.getItem('sigUrl')||'',
@@ -2499,7 +2528,7 @@ async function syncPull(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
-  setSyncStatus('🔍 Telegram mein sync dhundh raha hai...');
+  setSyncStatus('🔍 Searching for sync in Telegram...');
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=50&allowed_updates=["message"]`);
     const data=await res.json();
@@ -2514,7 +2543,7 @@ async function syncPull(){
       }
     }
     if(!syncFileId){setSyncStatus('⚠️ No sync data found. Please Push from a device first.','#e65100');return;}
-    setSyncStatus('📥 Sync file download ho rahi hai...');
+    setSyncStatus('📥 Downloading sync file...');
     const fpRes=await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${syncFileId}`);
     const fpData=await fpRes.json();
     if(!fpData.ok){setSyncStatus('❌ File fetch failed','#c62828');return;}
@@ -2586,7 +2615,7 @@ async function sendTelegram(){
     showToast('⚙️ Please configure Bot Token & Chat ID first',3000);
     openSettings();return;
   }
-  showToast('📄 PDF bana raha hai...',4000);
+  showToast('📄 Generating PDF...',4000);
   try{
     const blob=await generatePdfBlob(true);
     const nm=g('pN')||'Patient';
@@ -2637,10 +2666,10 @@ function buildRxText(){
 }
 
 async function sendWhatsApp(silent=false){
-  // Pehle hidden phone field dekho (jab patient load hota hai tab fill hota hai)
+  // First check hidden phone field (filled when patient is loaded)
   let patientPhone=(document.getElementById('pPhone')?.value||'').replace(/\D/g,'');
 
-  // Agar hidden field empty hai toh registry mein naam se dhundho
+  // If hidden field empty, search registry by name
   if(!patientPhone){
     const nm=g('pN')||'';
     if(nm){
@@ -2658,11 +2687,11 @@ async function sendWhatsApp(silent=false){
     url=`https://wa.me/${fullNum}?text=${encodedText}`;
   }else{
     url=`https://wa.me/?text=${encodedText}`;
-    if(!silent) showToast('⚠️ Patient ka phone number nahi mila — manually choose karo',3500);
+    if(!silent) showToast('⚠️ Patient phone not found — please choose contact manually',3500);
   }
 
   window.open(url,'_blank');
-  if(!silent && patientPhone) showToast('💬 WhatsApp patient ke liye khulega!',2000);
+  if(!silent && patientPhone) showToast('💬 Opening WhatsApp for patient!',2000);
 }
 
 // ─── MOBILE TAB SWITCH ───
@@ -2729,7 +2758,7 @@ async function printSaveAndSend(){  // Auto-register patient if new
     const chatId=localStorage.getItem('tgChatId');
     if(token&&chatId){
       try{
-        showToast('📄 PDF bana raha hai...',4000);
+        showToast('📄 Generating PDF...',4000);
         const blob=await generatePdfBlob(true);
         const nm=g('pN')||'Patient';
         const dt=g('pD')?fd(g('pD')):new Date().toLocaleDateString('en-IN');
@@ -2852,6 +2881,13 @@ function saveRxSilent(){
   saved.unshift({name,diag,date:new Date().toISOString(),state:getRxState()});
   if(saved.length>50)saved.pop();
   localStorage.setItem('rxSaved',JSON.stringify(saved));
+  // Also update follow-up date in patient registry so reminder system can use it
+  const fuD=g('fuD');
+  if(fuD&&nm&&nm!=='Patient'){
+    const list=getPatientRegistry();
+    const idx=list.findIndex(p=>p.name.toLowerCase()===nm.toLowerCase());
+    if(idx>=0){list[idx].nextFollowUp=fuD;savePatientRegistry(list);}
+  }
 }
 // ── Page 2 split control ─────────────────────────────────────
 const P2_SECTIONS=[
@@ -4390,7 +4426,7 @@ function printCert(){
 async function sendCertTelegram(){
   const token=localStorage.getItem('tgToken'),chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){return;}
-  showToast('📄 Certificate PDF bana raha hai...',5000);
+  showToast('📄 Generating certificate PDF...',5000);
   try{
     const includeBg=document.getElementById('certBgToggle')?.checked;
     const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
@@ -4574,7 +4610,7 @@ async function storDelete(path){
 //  PUSH  — Local → Firebase
 // ══════════════════════════════════════════════════════════════════════════
 async function fbPushAll(){
-  fbToast('☁️ Firebase pe upload ho raha hai...', 6000);
+  fbToast('☁️ Uploading to Firebase...', 6000);
 
   // 1. Prescriptions
   const rxSaved = JSON.parse(localStorage.getItem('rxSaved')||'[]');
@@ -4603,7 +4639,7 @@ async function fbPushAll(){
   // 4. Signature image → Firebase Storage
   const sigUrlLocal = localStorage.getItem('sigUrl');
   if(sigUrlLocal && sigUrlLocal.startsWith('data:')){
-    fbToast('📷 Signature upload ho rahi hai...', 4000);
+    fbToast('📷 Uploading signature...', 4000);
     const sigDownload = await storUpload('images/signature.png', sigUrlLocal);
     if(sigDownload){
       await fbSet('images', { sigUrl: sigDownload, updatedAt: Date.now() });
@@ -4613,7 +4649,7 @@ async function fbPushAll(){
   // 5. Background image → Firebase Storage
   const bgUrlLocal = localStorage.getItem('bgUrl');
   if(bgUrlLocal && bgUrlLocal.startsWith('data:')){
-    fbToast('🖼️ Letterhead upload ho raha hai...', 4000);
+    fbToast('🖼️ Uploading letterhead...', 4000);
     const bgDownload = await storUpload('images/letterhead.jpg', bgUrlLocal);
     if(bgDownload){
       const imgDoc = await fbGet('images') || {};
@@ -4628,7 +4664,7 @@ async function fbPushAll(){
 //  PULL  — Firebase → Local
 // ══════════════════════════════════════════════════════════════════════════
 async function fbPullAll(){
-  fbToast('📥 Firebase se data aa raha hai...', 6000);
+  fbToast('📥 Fetching data from Firebase...', 6000);
 
   // 1. Prescriptions
   const rx = await fbGet('prescriptions');
@@ -4673,7 +4709,7 @@ async function fbPullAll(){
     window.restoreBgImage && window.restoreBgImage();
   }
 
-  fbToast('✅ Firebase pull complete! Sab kuch restore ho gaya.', 3000);
+  fbToast('✅ Firebase pull complete! All data restored.', 3000);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -4724,12 +4760,147 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     // If Firebase has data and local is empty → auto pull
     if(rx?.list && localRx.length===0){
       await fbPullAll();
-      fbToast('☁️ Firebase se data restore hua!', 3000);
+      fbToast('☁️ Data restored from Firebase!', 3000);
     }
   }catch(_){}
 });
 
 console.log('🔥 Firebase ready — Dr. Lakshaya Rx connected to Firestore + Storage');
+
+// ══════════════════════════════════════════════════════════════════════════
+//  FOLLOW-UP REMINDERS
+// ══════════════════════════════════════════════════════════════════════════
+let _fuCurrentTab='all';
+
+function openFollowUpReminders(){
+  _fuCurrentTab='all';
+  fuSetTab('all');
+  document.getElementById('fuReminderMo').style.display='flex';
+}
+
+function fuSetTab(tab){
+  _fuCurrentTab=tab;
+  ['all','overdue','today','upcoming'].forEach(t=>{
+    const btn=document.getElementById('fuTab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(!btn)return;
+    btn.style.color=t===tab?'var(--p)':'var(--mu)';
+    btn.style.fontWeight=t===tab?'700':'600';
+    btn.style.borderBottom=t===tab?'2px solid var(--p)':'2px solid transparent';
+  });
+  renderFuList(tab);
+}
+
+function getFuPatients(){
+  const saved=JSON.parse(localStorage.getItem('rxSaved')||'[]');
+  const registry=JSON.parse(localStorage.getItem('patientRegistry')||'[]');
+  const today=new Date();today.setHours(0,0,0,0);
+  const results=[];
+  const seen=new Set();
+
+  saved.forEach(rx=>{
+    const state=rx.state||{};
+    const fuD=state.fuD;
+    if(!fuD)return;
+    const fuDate=new Date(fuD);fuDate.setHours(0,0,0,0);
+    const name=state.pN||'Unknown';
+    const key=name+'|'+fuD;
+    if(seen.has(key))return;
+    seen.add(key);
+
+    const diffDays=Math.round((fuDate-today)/(1000*60*60*24));
+    let status;
+    if(diffDays<0) status='overdue';
+    else if(diffDays===0) status='today';
+    else status='upcoming';
+
+    // Find phone from registry
+    const reg=registry.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    const phone=reg?.phone||'';
+
+    results.push({name,fuD,fuDate,diffDays,status,phone,diag:state.diag||'',rxDate:rx.state?.pD||''});
+  });
+
+  // Sort: overdue first (most overdue at top), then today, then upcoming
+  results.sort((a,b)=>a.diffDays-b.diffDays);
+  return results;
+}
+
+function renderFuList(tab){
+  const all=getFuPatients();
+  const filtered=tab==='all'?all:all.filter(p=>p.status===tab);
+  const el=document.getElementById('fuReminderList');
+  const subtitle=document.getElementById('fuReminderSubtitle');
+  const counts={all:all.length,overdue:all.filter(p=>p.status==='overdue').length,today:all.filter(p=>p.status==='today').length,upcoming:all.filter(p=>p.status==='upcoming').length};
+  subtitle.textContent=`${counts.all} total · ${counts.overdue} overdue · ${counts.today} today · ${counts.upcoming} upcoming`;
+
+  if(!filtered.length){
+    el.innerHTML=`<div style="text-align:center;color:#b0a8cc;font-size:12px;padding:30px">No patients found for this filter.</div>`;
+    return;
+  }
+
+  el.innerHTML=filtered.map((p,i)=>{
+    const statusColor=p.status==='overdue'?'#c62828':p.status==='today'?'#e65100':'#1565c0';
+    const statusBg=p.status==='overdue'?'#ffebee':p.status==='today'?'#fff3e0':'#e3f2fd';
+    const statusLabel=p.status==='overdue'?`⚠️ Overdue by ${Math.abs(p.diffDays)} day${Math.abs(p.diffDays)!==1?'s':''}`:p.status==='today'?'📌 Due Today':`🔜 In ${p.diffDays} day${p.diffDays!==1?'s':''}`;
+    const fuFormatted=p.fuDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    const hasPhone=!!p.phone;
+    return`<div style="background:var(--wh);border:1px solid var(--br);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:var(--tx)">${p.name}</div>
+        <div style="font-size:10.5px;color:var(--mu)">${p.diag?p.diag+' · ':''}<span style="color:${statusColor};font-weight:700;background:${statusBg};padding:1px 6px;border-radius:5px">${statusLabel}</span></div>
+        <div style="font-size:10px;color:#9b8ee0;margin-top:2px">📅 ${fuFormatted}${p.phone?' · 📞 '+p.phone:' · <em style=color:#c62828>No phone saved</em>'}</div>
+      </div>
+      <button onclick="fuSendWhatsApp(${i},'${tab}')" ${!hasPhone?'title="No phone number in registry"':''} style="padding:7px 12px;background:${hasPhone?'#25d366':'#aaa'};color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:${hasPhone?'pointer':'default'};font-family:inherit;white-space:nowrap;flex-shrink:0">💬 ${hasPhone?'Send':'No Phone'}</button>
+    </div>`;
+  }).join('');
+}
+
+function buildFuReminderText(p){
+  const fuFormatted=p.fuDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  const isOverdue=p.status==='overdue';
+  const isToday=p.status==='today';
+  let msg=`📅 *Follow-Up Reminder*\n🏥 Dr. Lakshaya Mahajan, MBBS | PMC Regd. 65784\n\nDear *${p.name}*,`;
+  if(isOverdue){
+    msg+=`\n\nYour follow-up appointment was scheduled for *${fuFormatted}* (${Math.abs(p.diffDays)} day${Math.abs(p.diffDays)!==1?'s':''} ago). Please visit at your earliest convenience.`;
+  } else if(isToday){
+    msg+=`\n\nYour follow-up appointment is *today — ${fuFormatted}*. Please visit the clinic as scheduled.`;
+  } else {
+    msg+=`\n\nThis is a reminder that your follow-up appointment is scheduled for *${fuFormatted}* (in ${p.diffDays} day${p.diffDays!==1?'s':''}).`;
+  }
+  if(p.diag) msg+=`\n\nCondition: ${p.diag}`;
+  msg+=`\n\nFor any queries, please contact the clinic.\n\n_Dr. Lakshaya Mahajan_`;
+  return msg;
+}
+
+function fuSendWhatsApp(idx,tab){
+  const all=getFuPatients();
+  const filtered=tab==='all'?all:all.filter(p=>p.status===tab);
+  const p=filtered[idx];
+  if(!p||!p.phone){showToast('⚠️ No phone number for this patient',2500);return;}
+  const phone=p.phone.replace(/\D/g,'');
+  const fullNum=phone.length===10?'91'+phone:phone;
+  const text=buildFuReminderText(p);
+  window.open(`https://wa.me/${fullNum}?text=${encodeURIComponent(text)}`,'_blank');
+  showToast('💬 Follow-up reminder sent to '+p.name,2500);
+}
+
+function fuSendAllWhatsApp(){
+  const all=getFuPatients();
+  const filtered=_fuCurrentTab==='all'?all:all.filter(p=>p.status===_fuCurrentTab);
+  const withPhone=filtered.filter(p=>!!p.phone);
+  if(!withPhone.length){showToast('⚠️ No patients with phone numbers in this list',2500);return;}
+  if(!confirm(`Send WhatsApp follow-up reminder to ${withPhone.length} patient${withPhone.length!==1?'s':''}?`))return;
+  withPhone.forEach((p,i)=>{
+    setTimeout(()=>{
+      const phone=p.phone.replace(/\D/g,'');
+      const fullNum=phone.length===10?'91'+phone:phone;
+      const text=buildFuReminderText(p);
+      window.open(`https://wa.me/${fullNum}?text=${encodeURIComponent(text)}`,'_blank');
+    },i*600);
+  });
+  showToast(`💬 Sending to ${withPhone.length} patients...`,3000);
+}
 </script>
 </body>
 </html>
