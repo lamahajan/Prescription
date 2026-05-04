@@ -213,6 +213,66 @@ body.bw-mode .rxp *{color:#000 !important;background:transparent !important;bord
 body.bw-mode .rxp .rxb{background:#eee !important;border:1px solid #555 !important;}
 body.bw-mode .rxp .rxmn{color:#000 !important;}
 body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
+
+/* ═══ MOBILE RESPONSIVE ═══ */
+/* Mobile tab bar */
+.mob-tabs{display:none;background:var(--wh);border-bottom:2px solid var(--br);flex-shrink:0;}
+.mob-tab{flex:1;padding:10px 6px;font-size:12px;font-weight:700;border:none;background:transparent;color:var(--mu);cursor:pointer;font-family:'DM Sans',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
+.mob-tab.active{color:var(--p);border-bottom-color:var(--p);}
+
+/* WhatsApp button */
+.bwa{background:#25d366;color:#fff;border:none;}
+.bwa:hover{background:#1ebe5a;}
+
+@media(max-width:768px){
+  /* Header */
+  .ah{padding:8px 12px;flex-wrap:wrap;gap:6px;}
+  .ah h1{font-size:12px;}
+  .ah span{font-size:9px;}
+  .hb{display:flex;flex-wrap:wrap;gap:5px;width:100%;}
+  .hb .btn{font-size:10.5px;padding:5px 9px;flex:1;min-width:fit-content;}
+  #printBtn{flex:2;background:#fff;color:var(--pd);}
+
+  /* Mobile tab bar visible */
+  .mob-tabs{display:flex;}
+
+  /* Layout stacked */
+  .main{display:block;height:calc(100vh - 100px);overflow:hidden;}
+  .fp{height:calc(100vh - 100px);border-right:none;display:none;}
+  .fp.mob-active{display:flex;}
+  .pp{height:calc(100vh - 100px);display:none;padding:10px 6px;}
+  .pp.mob-active{display:flex;}
+
+  /* A4 preview scaled to fit mobile */
+  .rxp{
+    transform-origin:top center;
+    width:794px;
+  }
+  .pp-scaler{
+    width:100%;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+  }
+
+  /* Form sections padding */
+  .sc{padding:9px 10px;}
+  .fp{padding:10px 10px;}
+
+  /* Grid fixes on mobile */
+  .r2,.r3{grid-template-columns:1fr 1fr;}
+  .r3{grid-template-columns:1fr 1fr 1fr;}
+
+  /* Modals full width */
+  .mb{max-width:100%;border-radius:10px;padding:16px 14px;}
+  .mo{padding:8px;}
+}
+
+@media(max-width:480px){
+  .r3{grid-template-columns:1fr 1fr;}
+  .ah h1{font-size:11px;}
+  .hb .btn{font-size:10px;padding:5px 7px;}
+}
 </style>
 </head>
 <body>
@@ -238,13 +298,20 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <button class="btn bw" onclick="clearAll()">✕ Clear</button>
     <button class="btn bw" onclick="openMedDB()">💊 Med DB</button>
     <button class="btn bw" onclick="openMedCert()">📄 Med Cert</button>
+    <button class="btn bwa" onclick="sendWhatsApp()" title="Send via WhatsApp">💬 WhatsApp</button>
     <button class="btn bp" id="printBtn" onclick="printSaveAndSend()">⎙ Print / Save / Send</button>
   </div>
 </div>
 
+<!-- Mobile Tab Bar -->
+<div class="mob-tabs">
+  <button class="mob-tab active" id="mobTabForm" onclick="mobSwitch('form')">📝 Form</button>
+  <button class="mob-tab" id="mobTabPreview" onclick="mobSwitch('preview')">👁️ Preview</button>
+</div>
+
 <div class="main">
 <!-- ═══ FORM ═══ -->
-<div class="fp">
+<div class="fp mob-active" id="mobFormPanel">
 
   <div class="sc">
     <div class="st">Visit Type</div>
@@ -477,12 +544,13 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 </div><!-- /fp -->
 
 <!-- ═══ PREVIEW ═══ -->
-<div class="pp">
+<div class="pp" id="mobPreviewPanel">
   <div class="pb">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
     A4 Live Preview — Actual Letterhead
   </div>
 
+  <div class="pp-scaler" id="ppScaler">
   <div class="rxp" id="rxp">
     <div style="position:absolute;top:203px;left:46px;display:flex;align-items:center;gap:8px;">
       <div class="rxb opd" id="rxbadge">🏥 OPD VISIT</div>
@@ -530,6 +598,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div class="rxdisclaim" id="rxdisclaim" style="position:static;margin-top:6px;bottom:auto;left:auto;max-width:none;">Not for medico-legal purpose</div>
     </div><!-- /rxc -->
   </div><!-- /rxp -->
+  </div><!-- /pp-scaler -->
 </div>
 </div><!-- /main -->
 
@@ -820,6 +889,22 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         </div>
       </div>
 
+      <!-- WhatsApp -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">💬</span><span class="set-bh-lbl">WhatsApp Integration</span></div>
+        <div class="set-bb" style="display:flex;flex-direction:column;gap:7px;">
+          <div class="mf">
+            <label>WhatsApp Number (with country code)</label>
+            <input id="waNumber" type="tel" placeholder="e.g. 919876543210" style="font-family:monospace;font-size:11px">
+          </div>
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(37,211,102,.06);border-radius:7px;padding:6px 9px;border:1px solid rgba(37,211,102,.2)">
+            💡 <strong>91</strong> = India code, no + or spaces · e.g. <strong>919876543210</strong><br>
+            Clicking 💬 WhatsApp opens wa.me link with prescription summary.<br>
+            On mobile it opens directly in WhatsApp app!
+          </div>
+        </div>
+      </div>
+
       <!-- Letterhead -->
       <div class="set-block">
         <div class="set-bh"><span class="set-bh-icon">🖼️</span><span class="set-bh-lbl">Letterhead Background</span></div>
@@ -869,6 +954,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         <div class="set-bb">
           <label class="set-tog"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
+          <label class="set-tog"><input type="checkbox" id="setPrefWa" onchange="savePrefs()"> <span>💬 Auto-send to WhatsApp on Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
           <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefBW" onchange="savePrefs();applyBWMode()"> <span>⬛ Black &amp; White print mode</span></label>
@@ -1655,12 +1741,16 @@ function editPatient(idx,e){
 
 function deletePatient(idx,e){
   e.stopPropagation();
-  if(!confirm('Delete patient record?'))return;
   const list=getPatientRegistry();
+  const nm=list[idx]?.name||'this patient';
+  if(!confirm(`Delete "${nm}" ka record permanently delete hoga.\n\nConfirm?`))return;
   list.splice(idx,1);
   savePatientRegistry(list);
   prUpdateStats();
-  renderPatientList();
+  // If we're in profile view, go back to list
+  if(prCurrentView==='profile') prSetView('list');
+  else renderPatientList();
+  showToast('🗑️ Patient deleted: '+nm, 2500);
 }
 
 function viewPatientProfile(idx){
@@ -1771,7 +1861,10 @@ function renderPatientList(){
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
         <button onclick="event.stopPropagation();loadPatientToForm(${i})" style="padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Load ↗</button>
-        <button onclick="event.stopPropagation();editPatient(${i},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
+        <div style="display:flex;gap:4px">
+          <button onclick="event.stopPropagation();editPatient(${i},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
+          <button onclick="event.stopPropagation();deletePatient(${i},event)" style="padding:3px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit" title="Delete patient">🗑</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -2451,6 +2544,7 @@ function showToast(msg,dur=2500){
 function openSettings(){
   document.getElementById('tgToken').value=localStorage.getItem('tgToken')||'';
   document.getElementById('tgChatId').value=localStorage.getItem('tgChatId')||'';
+  const waEl=document.getElementById('waNumber');if(waEl)waEl.value=localStorage.getItem('waNumber')||'';
   loadPrefs();
   restoreBgImage();
   document.getElementById('settingsMo').style.display='flex';
@@ -2458,6 +2552,7 @@ function openSettings(){
 function saveSettings(){
   localStorage.setItem('tgToken',document.getElementById('tgToken').value.trim());
   localStorage.setItem('tgChatId',document.getElementById('tgChatId').value.trim());
+  const waEl=document.getElementById('waNumber');if(waEl)localStorage.setItem('waNumber',waEl.value.trim());
   document.getElementById('settingsMo').style.display='none';
   showToast('✅ Settings saved!');
 }
@@ -2510,8 +2605,93 @@ async function sendTelegram(){
   }catch(e){showToast('❌ Error: '+e.message,4000);console.error(e);}
 }
 
-async function printSaveAndSend(){
-  // Auto-register patient if new
+// ─── WHATSAPP SEND ───
+function buildRxText(){
+  const nm=g('pN')||'Patient';
+  const dt=g('pD')?fd(g('pD')):new Date().toLocaleDateString('en-IN');
+  const diag=g('diag');
+  const comp=g('comp');
+  const fu=g('fuD');
+  let txt=`📋 *PRESCRIPTION*\n🏥 Dr. Lakshaya Mahajan, MBBS | PMC Regd. 65784\n📅 ${dt}\n\n👤 *Patient:* ${nm}`;
+  const age=g('pA');const gen=document.getElementById('pG').value;
+  if(age||gen) txt+=` | ${[age,gen].filter(Boolean).join(', ')}`;
+  if(diag) txt+=`\n🩺 *Diagnosis:* ${diag}`;
+  if(comp) txt+=`\n📝 *Complaints:* ${comp.replace(/\n/g,', ')}`;
+  const fm=meds.filter(m=>m.name);
+  if(fm.length){
+    txt+=`\n\n💊 *Medicines:*`;
+    fm.forEach((m,i)=>{
+      txt+=`\n${i+1}. ${m.name}`;
+      if(m.dose) txt+=` — ${m.dose}`;
+      if(m.freq) txt+=`, ${m.freq}`;
+      if(m.days) txt+=` x ${m.days}`;
+      if(m.timing) txt+=` (${m.timing})`;
+    });
+  }
+  const allI=[...selInv,...selInvCustom];
+  if(allI.length) txt+=`\n\n🔬 *Investigations:* ${allI.join(', ')}`;
+  const allA=[...selAdv,...selAdvCustom];const ca=g('advX');if(ca)allA.push(ca);
+  if(allA.length) txt+=`\n\n✅ *Advice:*\n${allA.map(a=>'• '+a).join('\n')}`;
+  if(fu) txt+=`\n\n📅 *Follow-Up:* ${fd(fu)}`;
+  txt+=`\n\n_Not for medico-legal purpose_`;
+  return txt;
+}
+
+async function sendWhatsApp(silent=false){
+  const waNum=localStorage.getItem('waNumber')||'';
+  const text=buildRxText();
+  const encodedText=encodeURIComponent(text);
+  let url;
+  if(waNum){
+    url=`https://wa.me/${waNum}?text=${encodedText}`;
+  }else{
+    url=`https://wa.me/?text=${encodedText}`;
+  }
+  // Try Web Share API on mobile (shares text natively)
+  if(!silent && navigator.share){
+    try{
+      await navigator.share({title:'Prescription — Dr. Lakshaya Mahajan',text:text});
+      showToast('✅ Shared!',2500);
+      return;
+    }catch(_){}
+  }
+  window.open(url,'_blank');
+  if(!silent) showToast('💬 WhatsApp khuljaya!',2000);
+}
+
+// ─── MOBILE TAB SWITCH ───
+function mobSwitch(tab){
+  const fp=document.getElementById('mobFormPanel');
+  const pp=document.getElementById('mobPreviewPanel');
+  const tf=document.getElementById('mobTabForm');
+  const tp=document.getElementById('mobTabPreview');
+  if(tab==='form'){
+    fp.classList.add('mob-active');pp.classList.remove('mob-active');
+    tf.classList.add('active');tp.classList.remove('active');
+  }else{
+    pp.classList.add('mob-active');fp.classList.remove('mob-active');
+    tp.classList.add('active');tf.classList.remove('active');
+    scalePreviewForMobile();
+  }
+}
+function scalePreviewForMobile(){
+  const scaler=document.getElementById('ppScaler');
+  const rxp=document.getElementById('rxp');
+  if(!scaler||!rxp)return;
+  if(window.innerWidth>768){rxp.style.transform='';rxp.style.marginBottom='';return;}
+  const vw=scaler.offsetWidth||window.innerWidth-24;
+  const scale=Math.min((vw)/794,1);
+  rxp.style.transform=`scale(${scale})`;
+  rxp.style.transformOrigin='top center';
+  const scaledH=1123*scale;
+  scaler.style.height=scaledH+'px';
+}
+window.addEventListener('resize',()=>{
+  if(window.innerWidth<=768) scalePreviewForMobile();
+  else{const rxp=document.getElementById('rxp');if(rxp){rxp.style.transform='';rxp.style.marginBottom='';}}
+});
+
+async function printSaveAndSend(){  // Auto-register patient if new
   autoRegisterIfNew();
   // Increment token counter if auto-token enabled
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
@@ -2523,6 +2703,7 @@ async function printSaveAndSend(){
   }
   const prefSave=document.getElementById('setPrefSave').checked;
   const prefTg=document.getElementById('setPrefTg').checked;
+  const prefWa=document.getElementById('setPrefWa')?.checked??false;
   const prefPrint=document.getElementById('setPrefPrint').checked;
 
   const btn=document.getElementById('printBtn');
@@ -2565,7 +2746,13 @@ async function printSaveAndSend(){
 
   btn.disabled=false;btn.textContent='⎙ Print / Save / Send';
 
-  // 3. Print if pref enabled — do it before showing toast so toast doesn't appear on print
+  // 3. Auto WhatsApp if pref enabled
+  if(prefWa){
+    sendWhatsApp(true);
+    toastMessages.push('💬 WhatsApp opened');
+  }
+
+  // 4. Print if pref enabled — do it before showing toast so toast doesn't appear on print
   if(prefPrint){
     window.print();
   }
@@ -2708,6 +2895,7 @@ function savePrefs(){
   const prefs={
     save:document.getElementById('setPrefSave').checked,
     tg:document.getElementById('setPrefTg').checked,
+    wa:document.getElementById('setPrefWa')?.checked??false,
     print:document.getElementById('setPrefPrint').checked,
     confirm:false,
     bg:document.getElementById('rxBgToggle')?.checked??false,
@@ -2730,6 +2918,7 @@ function loadPrefs(){
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
   const set=(id,def)=>{const e=document.getElementById(id);if(e)e.checked=prefs[id.replace('setPref','').toLowerCase()]!==undefined?prefs[id.replace('setPref','').toLowerCase()]:def;};
   set('setPrefSave',true);set('setPrefTg',true);set('setPrefPrint',true);
+  const waChk=document.getElementById('setPrefWa');if(waChk)waChk.checked=prefs.wa??false;
   const bg=document.getElementById('rxBgToggle');if(bg)bg.checked=prefs.bg??false;
   const at=document.getElementById('setPrefAutoToken');if(at){at.checked=prefs.autoToken??false;}
   const tp=document.getElementById('tokenPrefix');if(tp)tp.value=prefs.tokenPrefix||'OPD';
