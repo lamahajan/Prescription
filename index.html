@@ -332,6 +332,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       </div>
       <div id="pNSuggest" style="display:none;position:absolute;z-index:200;background:#fff;border:1px solid var(--br);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);width:280px;max-height:180px;overflow-y:auto;margin-top:2px"></div>
     </div></div>
+    <input type="hidden" id="pPhone">
     <div class="rw r2">
       <div class="fl" style="min-width:0"><label>Age</label><input id="pA" type="text" placeholder="34 Yrs" oninput="upd()" style="width:100%"></div>
       <div class="fl" style="min-width:0"><label>Gender</label><select id="pG" onchange="upd()" style="width:100%"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
@@ -893,14 +894,10 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div class="set-block">
         <div class="set-bh"><span class="set-bh-icon">💬</span><span class="set-bh-lbl">WhatsApp Integration</span></div>
         <div class="set-bb" style="display:flex;flex-direction:column;gap:7px;">
-          <div class="mf">
-            <label>WhatsApp Number (with country code)</label>
-            <input id="waNumber" type="tel" placeholder="e.g. 919876543210" style="font-family:monospace;font-size:11px">
-          </div>
-          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(37,211,102,.06);border-radius:7px;padding:6px 9px;border:1px solid rgba(37,211,102,.2)">
-            💡 <strong>91</strong> = India code, no + or spaces · e.g. <strong>919876543210</strong><br>
-            Clicking 💬 WhatsApp opens wa.me link with prescription summary.<br>
-            On mobile it opens directly in WhatsApp app!
+          <div style="font-size:9.5px;color:var(--mu);line-height:1.6;background:rgba(37,211,102,.06);border-radius:7px;padding:8px 10px;border:1px solid rgba(37,211,102,.2)">
+            💬 WhatsApp button click karne pe prescription ka text <strong>patient ke registered phone number</strong> pe directly WhatsApp pe jayega.<br><br>
+            📋 Patient ka number <strong>Patient Registry</strong> mein save hona chahiye (Mobile/WhatsApp field).<br><br>
+            📱 Mobile pe click karne se directly WhatsApp app mein khuljayega!
           </div>
         </div>
       </div>
@@ -1707,6 +1704,8 @@ function loadPatientToForm(idx){
   document.getElementById('pA').value=p.age||'';
   document.getElementById('pG').value=p.gender||'';
   if(p.weight)document.getElementById('pW').value=p.weight;
+  // Store phone for WhatsApp
+  const ph=document.getElementById('pPhone');if(ph)ph.value=p.phone||'';
   // Log visit
   const today=new Date().toISOString().split('T')[0];
   if(!p.visits)p.visits=[];
@@ -2365,7 +2364,7 @@ function upd(){
 
 function clearAll(){
   if(!confirm('Clear entire prescription?'))return;
-  ['pN','pA','pG','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','advX','notX','fuD','fuN'].forEach(i=>{
+  ['pN','pA','pG','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','advX','notX','fuD','fuN','pPhone'].forEach(i=>{
     const e=document.getElementById(i);if(e)e.value=e.tagName==='SELECT'?e.options[0].value:'';
   });
   document.getElementById('pD').value=new Date().toISOString().split('T')[0];
@@ -2638,25 +2637,32 @@ function buildRxText(){
 }
 
 async function sendWhatsApp(silent=false){
-  const waNum=localStorage.getItem('waNumber')||'';
+  // Pehle hidden phone field dekho (jab patient load hota hai tab fill hota hai)
+  let patientPhone=(document.getElementById('pPhone')?.value||'').replace(/\D/g,'');
+
+  // Agar hidden field empty hai toh registry mein naam se dhundho
+  if(!patientPhone){
+    const nm=g('pN')||'';
+    if(nm){
+      const list=getPatientRegistry();
+      const found=list.find(p=>p.name.toLowerCase()===nm.toLowerCase());
+      if(found&&found.phone) patientPhone=found.phone.replace(/\D/g,'');
+    }
+  }
+
   const text=buildRxText();
   const encodedText=encodeURIComponent(text);
   let url;
-  if(waNum){
-    url=`https://wa.me/${waNum}?text=${encodedText}`;
+  if(patientPhone){
+    const fullNum=patientPhone.length===10?'91'+patientPhone:patientPhone;
+    url=`https://wa.me/${fullNum}?text=${encodedText}`;
   }else{
     url=`https://wa.me/?text=${encodedText}`;
+    if(!silent) showToast('⚠️ Patient ka phone number nahi mila — manually choose karo',3500);
   }
-  // Try Web Share API on mobile (shares text natively)
-  if(!silent && navigator.share){
-    try{
-      await navigator.share({title:'Prescription — Dr. Lakshaya Mahajan',text:text});
-      showToast('✅ Shared!',2500);
-      return;
-    }catch(_){}
-  }
+
   window.open(url,'_blank');
-  if(!silent) showToast('💬 WhatsApp khuljaya!',2000);
+  if(!silent && patientPhone) showToast('💬 WhatsApp patient ke liye khulega!',2000);
 }
 
 // ─── MOBILE TAB SWITCH ───
