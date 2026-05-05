@@ -237,23 +237,32 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
   .mob-tabs{display:flex;}
 
   /* Layout stacked */
-  .main{display:block;height:calc(100vh - 100px);overflow:hidden;}
-  .fp{height:calc(100vh - 100px);border-right:none;display:none;}
+  .main{display:block;height:calc(100vh - 88px);overflow:hidden;}
+  .fp{height:calc(100vh - 88px);border-right:none;display:none;overflow-y:auto;}
   .fp.mob-active{display:flex;}
-  .pp{height:calc(100vh - 100px);display:none;padding:10px 6px;}
+
+  /* Preview panel — scrollable */
+  .pp{height:calc(100vh - 88px);display:none;padding:8px 4px;overflow-y:auto;overflow-x:hidden;align-items:flex-start;}
   .pp.mob-active{display:flex;}
 
-  /* A4 preview scaled to fit mobile */
+  /* pp-scaler fills width, lets rxp scale inside */
+  .pp-scaler{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    overflow:visible;
+  }
+
+  /* A4 scaled to fit screen */
   .rxp{
     transform-origin:top center;
     width:794px;
+    flex-shrink:0;
   }
-  .pp-scaler{
-    width:100%;
-    overflow:hidden;
-    display:flex;
-    justify-content:center;
-  }
+
+  /* pb bar compact */
+  .pb{font-size:9.5px;padding:4px 9px;gap:4px;}
 
   /* Form sections padding */
   .sc{padding:9px 10px;}
@@ -2448,6 +2457,7 @@ function checkPass(){
     restoreSig();
     restoreBgImage();
     setTimeout(()=>maybeShowFuPopup(),600);
+    setTimeout(()=>autoSyncFromFirebase(),1000);
   }else{
     document.getElementById('lockErr').textContent='❌ Incorrect password';
     document.getElementById('lockInput').value='';
@@ -2724,24 +2734,46 @@ function mobSwitch(tab){
   }else{
     pp.classList.add('mob-active');fp.classList.remove('mob-active');
     tp.classList.add('active');tf.classList.remove('active');
-    scalePreviewForMobile();
+    setTimeout(scalePreviewForMobile,50);
   }
 }
 function scalePreviewForMobile(){
   const scaler=document.getElementById('ppScaler');
   const rxp=document.getElementById('rxp');
   if(!scaler||!rxp)return;
-  if(window.innerWidth>768){rxp.style.transform='';rxp.style.marginBottom='';return;}
-  const vw=scaler.offsetWidth||window.innerWidth-24;
-  const scale=Math.min((vw)/794,1);
+  if(window.innerWidth>768){
+    rxp.style.transform='';
+    rxp.style.marginBottom='';
+    scaler.style.height='';
+    return;
+  }
+  // Available width = screen width minus padding (8px each side)
+  const vw=Math.min(window.innerWidth,scaler.offsetWidth||window.innerWidth) - 16;
+  const scale=vw/794;
   rxp.style.transform=`scale(${scale})`;
   rxp.style.transformOrigin='top center';
-  const scaledH=1123*scale;
+  // Set scaler height so pp can scroll correctly
+  const scaledH=Math.ceil(1123*scale);
   scaler.style.height=scaledH+'px';
+  // If page 2 exists, update total height
+  const rxp2=document.getElementById('rxp2');
+  if(rxp2){
+    rxp2.style.transform=`scale(${scale})`;
+    rxp2.style.transformOrigin='top center';
+    scaler.style.height=(scaledH*2+20)+'px';
+  }
 }
 window.addEventListener('resize',()=>{
   if(window.innerWidth<=768) scalePreviewForMobile();
-  else{const rxp=document.getElementById('rxp');if(rxp){rxp.style.transform='';rxp.style.marginBottom='';}}
+  else{
+    const rxp=document.getElementById('rxp');
+    if(rxp){rxp.style.transform='';rxp.style.marginBottom='';}
+    const sc=document.getElementById('ppScaler');if(sc)sc.style.height='';
+  }
+});
+// Auto-scale on load for mobile
+window.addEventListener('DOMContentLoaded',()=>{
+  if(window.innerWidth<=768) setTimeout(scalePreviewForMobile,200);
 });
 
 async function printSaveAndSend(){  // Auto-register patient if new
@@ -4761,28 +4793,32 @@ if(_origSaveRxSilent){
 }
 
 // ─── On load: auto-pull if Firebase has newer data ────────────────────────
-window.addEventListener('DOMContentLoaded', async ()=>{
-  // Wait for auth
-  const waitAuth = (ms=5000) => new Promise(res=>{
-    const start=Date.now();
-    const t=setInterval(()=>{
-      if(window.isAuth && window.isAuth()){clearInterval(t);res(true);}
-      if(Date.now()-start>ms){clearInterval(t);res(false);}
-    },200);
-  });
-  const authed = await waitAuth();
-  if(!authed) return;
-
-  // Check if Firebase has data newer than local
+async function autoSyncFromFirebase(){
   try{
     const rx = await fbGet('prescriptions');
+    const pt = await fbGet('patients');
     const localRx = JSON.parse(localStorage.getItem('rxSaved')||'[]');
-    // If Firebase has data and local is empty → auto pull
-    if(rx?.list && localRx.length===0){
+    const localPt = JSON.parse(localStorage.getItem('patientRegistry')||'[]');
+    // Pull if either prescriptions OR patient registry is empty on this device
+    if((rx?.list && localRx.length===0) || (pt?.list && localPt.length===0)){
       await fbPullAll();
       fbToast('☁️ Data restored from Firebase!', 3000);
     }
   }catch(_){}
+}
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  // Wait for auth — up to 3 minutes (user may be slow typing password on phone)
+  const waitAuth = (ms=180000) => new Promise(res=>{
+    const start=Date.now();
+    const t=setInterval(()=>{
+      if(window.isAuth && window.isAuth()){clearInterval(t);res(true);}
+      if(Date.now()-start>ms){clearInterval(t);res(false);}
+    },300);
+  });
+  const authed = await waitAuth();
+  if(!authed) return;
+  autoSyncFromFirebase();
 });
 
 console.log('🔥 Firebase ready — Dr. Lakshaya Rx connected to Firestore + Storage');
