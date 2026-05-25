@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Lakshaya Mahajan — Prescription Writer</title>
+<title>Prescription</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,7 +25,7 @@
 <style>
 :root{--p:#6a5acd;--pd:#4a3fa0;--pl:#9b8ee0;--bg:#e8e4f4;--tx:#1e1840;--mu:#7a6e9a;--br:#d0c8ec;--wh:#fff;--ca:#faf9ff;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden;}
 
 /* HEADER */
 .ah{background:linear-gradient(135deg,#3a308a,#6a5acd 55%,#9b8ee0);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(74,63,160,.3);}
@@ -126,6 +126,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   background-repeat:no-repeat;
   font-family:'DM Sans',sans-serif;
 }
+/* LakshayFont for content — NOT labels/section headers/titles */
+.rxp .rxcp,.rxp .rxadv,.rxp .rxvf span,
+.rxp .rxmt td,.rxp .rxnote,
+.rxp .rxfu span,.rxp .rxinv-item,
+.rxp .rxdisclaim{font-family:'CustomRxFont','DM Sans',sans-serif;}
 /* Content zone: handled by .rxc class below */
 
 /* Consult badge — sits right below divider line */
@@ -180,6 +185,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .rxinv-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#1565c0;line-height:1.4;}
 .rxinv-item::before{content:'✓';color:#1976d2;font-weight:700;font-size:12px;}
 
+/* Investigation Results — compact 3-col */
+.rxinvres-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px 8px;margin-bottom:6px;}
+.rxinvres-item{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 4px;border-bottom:1px solid rgba(21,101,192,.1);}
+.rxinvres-name{font-size:10px;font-weight:600;color:#1a1040;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rxinvres-val{font-size:11px;font-weight:800;color:#1a1040;white-space:nowrap;flex-shrink:0;}
+.rxinvres-unit{font-size:9px;font-weight:500;color:#7a6e9a;margin-left:2px;}
+.rxinvres-badge{font-size:8px;font-weight:700;padding:0 3px;margin-left:3px;flex-shrink:0;}
+.rxinvres-badge.high{color:#c62828;}
+.rxinvres-badge.low{color:#1565c0;}
+.rxinvres-badge.normal{color:#2e7d32;}
 /* Advice */
 .rxadv{font-size:11.5px;color:#2a2040;line-height:1.9;}
 .rxnote{font-size:11px;color:#4a3fa0;font-weight:600;padding:5px 10px;background:rgba(106,90,205,.04);border:1px solid rgba(106,90,205,.12);border-radius:5px;margin-top:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -189,6 +204,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 /* Signature */
 .rxsig{text-align:right;margin-top:16px;padding-top:4px;}
 .rxsl{width:140px;height:1px;background:#4a3fa0;margin:0 0 3px auto;display:block;}
+#rxsigimg:empty + .rxsl{margin-top:45px;}
 .rxsn{font-size:11px;font-weight:700;color:#1a1040;}
 .rxss{font-size:9.5px;color:#8878b8;}
 .rxsi{max-height:46px;max-width:130px;object-fit:contain;display:block;margin:0 0 0 auto;vertical-align:bottom;}
@@ -213,77 +229,8 @@ body.bw-mode .rxp *{color:#000 !important;background:transparent !important;bord
 body.bw-mode .rxp .rxb{background:#eee !important;border:1px solid #555 !important;}
 body.bw-mode .rxp .rxmn{color:#000 !important;}
 body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
-
-/* ═══ MOBILE RESPONSIVE ═══ */
-/* Mobile tab bar */
-.mob-tabs{display:none;background:var(--wh);border-bottom:2px solid var(--br);flex-shrink:0;}
-.mob-tab{flex:1;padding:10px 6px;font-size:12px;font-weight:700;border:none;background:transparent;color:var(--mu);cursor:pointer;font-family:'DM Sans',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
-.mob-tab.active{color:var(--p);border-bottom-color:var(--p);}
-
-/* WhatsApp button */
-.bwa{background:#25d366;color:#fff;border:none;}
-.bwa:hover{background:#1ebe5a;}
-
-@media(max-width:768px){
-  /* Header */
-  .ah{padding:8px 12px;flex-wrap:wrap;gap:6px;}
-  .ah h1{font-size:12px;}
-  .ah span{font-size:9px;}
-  .hb{display:flex;flex-wrap:wrap;gap:5px;width:100%;}
-  .hb .btn{font-size:10.5px;padding:5px 9px;flex:1;min-width:fit-content;}
-  #printBtn{flex:2;background:#fff;color:var(--pd);}
-
-  /* Mobile tab bar visible */
-  .mob-tabs{display:flex;}
-
-  /* Layout stacked */
-  .main{display:block;height:calc(100vh - 88px);overflow:hidden;}
-  .fp{height:calc(100vh - 88px);border-right:none;display:none;overflow-y:auto;}
-  .fp.mob-active{display:flex;}
-
-  /* Preview panel — scrollable */
-  .pp{height:calc(100vh - 88px);display:none;padding:8px 4px;overflow-y:auto;overflow-x:hidden;align-items:flex-start;}
-  .pp.mob-active{display:flex;}
-
-  /* pp-scaler fills width, lets rxp scale inside */
-  .pp-scaler{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    overflow:visible;
-  }
-
-  /* A4 scaled to fit screen */
-  .rxp{
-    transform-origin:top center;
-    width:794px;
-    flex-shrink:0;
-  }
-
-  /* pb bar compact */
-  .pb{font-size:9.5px;padding:4px 9px;gap:4px;}
-
-  /* Form sections padding */
-  .sc{padding:9px 10px;}
-  .fp{padding:10px 10px;}
-
-  /* Grid fixes on mobile */
-  .r2,.r3{grid-template-columns:1fr 1fr;}
-  .r3{grid-template-columns:1fr 1fr 1fr;}
-
-  /* Modals full width */
-  .mb{max-width:100%;border-radius:10px;padding:16px 14px;}
-  .mo{padding:8px;}
-}
-
-@media(max-width:480px){
-  .r3{grid-template-columns:1fr 1fr;}
-  .ah h1{font-size:11px;}
-  .hb .btn{font-size:10px;padding:5px 7px;}
-}
 </style>
-</head>
+<style id="customFontStyle"></style>
 <body>
 
 <!-- ─── PASSWORD LOCK ─── -->
@@ -311,15 +258,9 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
   </div>
 </div>
 
-<!-- Mobile Tab Bar -->
-<div class="mob-tabs">
-  <button class="mob-tab active" id="mobTabForm" onclick="mobSwitch('form')">📝 Form</button>
-  <button class="mob-tab" id="mobTabPreview" onclick="mobSwitch('preview')">👁️ Preview</button>
-</div>
-
 <div class="main">
 <!-- ═══ FORM ═══ -->
-<div class="fp mob-active" id="mobFormPanel">
+<div class="fp">
 
   <div class="sc">
     <div class="st">Visit Type</div>
@@ -340,7 +281,6 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       </div>
       <div id="pNSuggest" style="display:none;position:absolute;z-index:200;background:#fff;border:1px solid var(--br);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);width:280px;max-height:180px;overflow-y:auto;margin-top:2px"></div>
     </div></div>
-    <input type="hidden" id="pPhone">
     <div class="rw r2">
       <div class="fl" style="min-width:0"><label>Age</label><input id="pA" type="text" placeholder="34 Yrs" oninput="upd()" style="width:100%"></div>
       <div class="fl" style="min-width:0"><label>Gender</label><select id="pG" onchange="upd()" style="width:100%"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
@@ -512,7 +452,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
   </div>
 
   <div class="sc">
-    <div class="st">Investigations</div>
+    <div class="st">Investigations &amp; Results</div>
     <div class="ig" id="invCh"></div>
     <div class="fl" style="margin-top:4px">
       <label>Custom Investigation</label>
@@ -522,6 +462,12 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       </div>
     </div>
     <div class="ig" id="invCustomCh" style="margin-top:4px"></div>
+    <!-- Results sub-section -->
+    <div style="margin-top:10px;border-top:1px dashed rgba(106,90,205,.2);padding-top:9px;">
+      <div style="font-size:10px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🔬 Results</div>
+      <div id="invResList" style="display:flex;flex-direction:column;gap:5px;margin-bottom:7px;"></div>
+      <button class="ab" onclick="addInvResult()">+ Add Result</button>
+    </div>
   </div>
 
   <div class="sc">
@@ -553,13 +499,12 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 </div><!-- /fp -->
 
 <!-- ═══ PREVIEW ═══ -->
-<div class="pp" id="mobPreviewPanel">
+<div class="pp">
   <div class="pb">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
     A4 Live Preview — Actual Letterhead
   </div>
 
-  <div class="pp-scaler" id="ppScaler">
   <div class="rxp" id="rxp">
     <div style="position:absolute;top:203px;left:46px;display:flex;align-items:center;gap:8px;">
       <div class="rxb opd" id="rxbadge">🏥 OPD VISIT</div>
@@ -590,6 +535,12 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         <div class="rxinv" id="rxilist"></div>
       </div>
 
+      <!-- Investigation Results block -->
+      <div id="rxirb" style="display:none">
+        <div class="rxl">Investigation Results</div>
+        <div class="rxinvres-grid" id="rxirrows"></div>
+      </div>
+
       <div id="rxab" style="display:none">
         <div class="rxl">Advice &amp; Instructions</div>
         <div class="rxadv" id="rxadv"></div>
@@ -607,37 +558,8 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div class="rxdisclaim" id="rxdisclaim" style="position:static;margin-top:6px;bottom:auto;left:auto;max-width:none;">Not for medico-legal purpose</div>
     </div><!-- /rxc -->
   </div><!-- /rxp -->
-  </div><!-- /pp-scaler -->
 </div>
 </div><!-- /main -->
-
-<!-- ─── FOLLOW-UP REMINDERS MODAL ─── -->
-<div class="mo" id="fuReminderMo" style="display:none">
-<div class="mb" style="max-width:580px;max-height:90vh;overflow:hidden;padding:0;border-radius:16px;display:flex;flex-direction:column;">
-  <!-- Header -->
-  <div style="background:linear-gradient(135deg,#2e2480,#6a5acd 60%,#9b8ee0);padding:14px 18px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div>
-      <div style="font-size:15px;font-weight:700;color:#fff">📅 Follow-Up Reminders</div>
-      <div id="fuReminderSubtitle" style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px">Patients with scheduled follow-ups</div>
-    </div>
-    <button onclick="document.getElementById('fuReminderMo').style.display='none'" style="width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
-  </div>
-  <!-- Filter tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid var(--br);background:var(--wh);flex-shrink:0">
-    <button class="fu-tab active" id="fuTabAll" onclick="fuSetTab('all')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--p);cursor:pointer;border-bottom:2px solid var(--p);font-family:inherit">All</button>
-    <button class="fu-tab" id="fuTabOverdue" onclick="fuSetTab('overdue')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">⚠️ Overdue</button>
-    <button class="fu-tab" id="fuTabToday" onclick="fuSetTab('today')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">📌 Today</button>
-    <button class="fu-tab" id="fuTabUpcoming" onclick="fuSetTab('upcoming')" style="flex:1;padding:9px 6px;font-size:11px;font-weight:600;border:none;background:transparent;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">🔜 Upcoming</button>
-  </div>
-  <!-- List -->
-  <div id="fuReminderList" style="overflow-y:auto;flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:8px;"></div>
-  <!-- Footer -->
-  <div style="padding:10px 14px;border-top:1px solid var(--br);background:#faf9ff;flex-shrink:0;display:flex;gap:8px;justify-content:space-between;align-items:center">
-    <button onclick="fuSendAllWhatsApp()" style="padding:8px 16px;background:#25d366;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💬 Send All WhatsApp</button>
-    <button onclick="document.getElementById('fuReminderMo').style.display='none'" style="padding:8px 16px;border:1px solid var(--br);border-radius:8px;background:var(--wh);color:var(--mu);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Close</button>
-  </div>
-</div>
-</div>
 
 <!-- ─── MEDICAL CERTIFICATE MODAL ─── -->
 <div class="mo" id="certMo" style="display:none">
@@ -668,6 +590,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     </div>
     <div class="mf certf-diagnosis"><label>Diagnosis</label><input id="cDx" type="text" oninput="renderCert()"></div>
     <div class="mf" style="grid-column:1/-1"><label>Address (optional)</label><input id="cAddr" type="text" placeholder="e.g. Village / City, District" oninput="renderCert()"></div>
+    <div class="mf" style="grid-column:1/-1"><label>Aadhar Card No. (optional)</label><input id="cAadhar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="this.value=this.value.replace(/[^0-9 ]/g,'');renderCert()"></div>
     <div class="mf certf-days"><label>Rest Days</label><input id="cDays" type="number" value="3" min="1" oninput="renderCert()"></div>
     <div class="mf certf-from"><label>From Date</label><input id="cFrom" type="date" oninput="renderCert()"></div>
     <div class="mf certf-to"><label>To Date</label><input id="cTo" type="date" oninput="renderCert()"></div>
@@ -686,7 +609,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     </label>
   </div>
   <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">📄 Preview</div>
-  <div id="certPreview" style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:18px 22px;font-size:14.5px;line-height:2;color:#000;font-family:'DM Sans',sans-serif;max-height:48vh;overflow-y:auto"></div>
+  <div id="certPreview" style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:18px 22px;font-size:14.5px;line-height:2;color:#000;font-family:'DM Sans',sans-serif;max-height:48vh;overflow-y:auto;text-align:justify"></div>
   <div class="mfoot" style="margin-top:10px">
     <button class="mcc" onclick="document.getElementById('certMo').style.display='none'">Cancel</button>
     <button onclick="printCert()" style="padding:9px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ Print / Send</button>
@@ -733,6 +656,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <div id="prViewAdd" style="display:none">
       <div id="prEditBanner" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#2e7d32;font-weight:600;margin-bottom:10px">✏️ Editing existing patient record</div>
       <input type="hidden" id="prEditId">
+      <input type="hidden" id="currentPatientAadhar">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
         <div class="mf" style="grid-column:1/-1"><label>Full Name *</label><input id="prName" type="text" placeholder="Patient full name" style="font-size:13px;font-weight:600"></div>
         <!-- DOB + Age smart row -->
@@ -759,6 +683,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         </div>
         <div class="mf"><label>Occupation</label><input id="prOcc" type="text" placeholder="Farmer, Teacher..."></div>
         <div class="mf" style="grid-column:1/-1"><label>Address</label><input id="prAddr" type="text" placeholder="Village / City, District"></div>
+        <div class="mf" style="grid-column:1/-1"><label>🪪 Aadhar Card No.</label><input id="prAadhar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')"></div>
         <div class="mf" style="grid-column:1/-1"><label>🚨 Known Allergies</label><input id="prAllergy" type="text" placeholder="Penicillin, Sulfa, NSAIDs... (leave blank if none)"></div>
         <div class="mf" style="grid-column:1/-1"><label>🩺 Chronic Conditions / PMH</label><input id="prPmh" type="text" placeholder="HTN, DM, Asthma, CKD, CAD..."></div>
         <div class="mf" style="grid-column:1/-1"><label>💊 Current Regular Medicines</label><input id="prMeds" type="text" placeholder="Metformin, Amlodipine..."></div>
@@ -879,7 +804,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .sync-btn{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s;border:none;}
 /* ── new compact settings panel ── */
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;flex:1;min-height:0;overflow-y:auto;}
+.set-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px 14px;flex:1;min-height:0;overflow-y:auto;}
 .set-col{display:flex;flex-direction:column;gap:9px;}
 .set-block{background:#f8f7ff;border:1px solid #e0d8f8;border-radius:10px;overflow:hidden;}
 .set-bh{padding:6px 12px;background:linear-gradient(90deg,rgba(106,90,205,.1),transparent);border-bottom:1px solid #e0d8f8;display:flex;align-items:center;gap:6px;}
@@ -891,7 +816,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
 .set-tog input[type=checkbox]{width:13px;height:13px;flex-shrink:0;accent-color:var(--p);cursor:pointer;}
 </style>
 <div class="mo" id="settingsMo" style="display:none">
-<div style="background:var(--wh);border-radius:16px;width:98vw;max-width:980px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;max-height:92vh;overflow:hidden;">
+<div style="background:var(--wh);border-radius:16px;width:98vw;max-width:1380px;box-shadow:0 20px 60px rgba(74,63,160,.3);display:flex;flex-direction:column;max-height:92vh;overflow:hidden;">
 
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#3a308a,#6a5acd 60%,#9b8ee0);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -922,19 +847,6 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
           </div>
           <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.06);border-radius:7px;padding:6px 9px">
             💡 <strong>@BotFather</strong> → create bot → copy token · Chat ID from <strong>@userinfobot</strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- WhatsApp -->
-      <div class="set-block">
-        <div class="set-bh"><span class="set-bh-icon">💬</span><span class="set-bh-lbl">WhatsApp Integration</span></div>
-        <div class="set-bb" style="display:flex;flex-direction:column;gap:7px;">
-          <div style="font-size:9.5px;color:var(--mu);line-height:1.6;background:rgba(37,211,102,.06);border-radius:7px;padding:8px 10px;border:1px solid rgba(37,211,102,.2)">
-            📄 <strong>WhatsApp now sends a PDF</strong> — the prescription is generated as a PDF file and shared to the patient.<br><br>
-            📱 On mobile: uses <strong>native Share</strong> — PDF goes directly to WhatsApp.<br><br>
-            💻 On desktop: PDF is <strong>downloaded</strong>, then WhatsApp opens with a message — attach the PDF manually.<br><br>
-            📋 Patient's number must be saved in <strong>Patient Registry</strong> (Mobile/WhatsApp field).
           </div>
         </div>
       </div>
@@ -986,10 +898,8 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div class="set-block">
         <div class="set-bh"><span class="set-bh-icon">🖨️</span><span class="set-bh-lbl">Print / Save Preferences</span></div>
         <div class="set-bb">
-          <label class="set-tog"><input type="checkbox" id="setPrefFuPopup" onchange="savePrefs()"> <span>📅 Show Follow-Up reminders popup on login</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefSave" onchange="savePrefs()"> <span>💾 Auto-save to history on Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefTg" onchange="savePrefs()"> <span>✈️ Auto-send to Telegram on Print</span></label>
-          <label class="set-tog"><input type="checkbox" id="setPrefWa" onchange="savePrefs()"> <span>💬 Auto-send to WhatsApp on Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefPrint" onchange="savePrefs()"> <span>🖨️ Open print dialog on Print button</span></label>
           <label class="set-tog"><input type="checkbox" id="rxBgToggle" onchange="savePrefs()"> <span>🖼️ Include letterhead in PDF / Print</span></label>
           <label class="set-tog"><input type="checkbox" id="setPrefBW" onchange="savePrefs();applyBWMode()"> <span>⬛ Black &amp; White print mode</span></label>
@@ -1024,29 +934,40 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
         </div>
       </div>
 
-      <!-- Firebase + Import/Export -->
+    </div><!-- /right col -->
+
+    <!-- ── THIRD COLUMN — Font ── -->
+    <div class="set-col">
+
+      <!-- Custom Font -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">🔤</span><span class="set-bh-lbl">Prescription Content Font</span></div>
+        <div class="set-bb">
+          <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:7px;letter-spacing:.4px">Upload a custom font for prescription body text. Labels &amp; headers stay as-is. Supports .ttf .otf .woff .woff2</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--p);color:#fff;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+              📂 Upload Font<input type="file" accept=".ttf,.otf,.woff,.woff2" style="display:none" onchange="loadCustomFont(this)">
+            </label>
+            <span id="customFontName" style="font-size:11px;color:var(--mu);font-style:italic">No custom font loaded</span>
+            <button onclick="clearCustomFont()" style="padding:4px 10px;border:1px solid var(--br);border-radius:6px;font-size:11px;background:#fff;color:var(--tx);cursor:pointer;font-family:inherit">✕ Remove</button>
+          </div>
+          <div id="customFontPreview" style="display:none;margin-top:8px;padding:7px 10px;background:rgba(106,90,205,.05);border:1px solid rgba(106,90,205,.15);border-radius:6px;font-size:13px;color:#1a1040;font-family:'CustomRxFont',sans-serif">
+            The quick brown fox jumps over the lazy dog — 0123456789
+          </div>
+        </div>
+      </div>
+
+      <!-- Cloud Sync & Backup — compact -->
       <div class="set-block">
         <div class="set-bh"><span class="set-bh-icon">🔥</span><span class="set-bh-lbl">Cloud Sync &amp; Backup</span></div>
         <div class="set-bb">
-          <!-- Firebase row -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-            <button onclick="window.fbPushAll&&window.fbPushAll()" style="padding:9px 6px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#ff6f00;color:#fff;border:none;transition:opacity .13s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">🔥 Firebase Push</button>
-            <button onclick="window.fbPullAll&&window.fbPullAll()" style="padding:9px 6px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#ff6f00;border:2px solid #ff6f00;transition:background .13s" onmouseover="this.style.background='#fff3e0'" onmouseout="this.style.background='#fff'">🔥 Firebase Pull</button>
-          </div>
-          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(255,111,0,.05);border-radius:7px;padding:6px 9px;border:1px solid rgba(255,111,0,.15);margin-bottom:8px">
-            🔥 <strong>Push</strong> — prescriptions, patients, settings &amp; images → Firebase<br>
-            🔥 <strong>Pull</strong> — restore everything on any device
-          </div>
-          <!-- Import/Export row -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-            <button onclick="exportData()" style="padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7;transition:background .13s" onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#e8f5e9'">📦 Export JSON</button>
-            <label style="padding:8px 5px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff8e1;color:#e65100;border:1.5px solid #ffcc80;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .13s" onmouseover="this.style.background='#ffe0b2'" onmouseout="this.style.background='#fff8e1'">
-              📂 Import JSON<input type="file" accept=".json" onchange="importData(this)" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+            <button onclick="window.fbPushAll&&window.fbPushAll()" style="padding:7px 5px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;background:#ff6f00;color:#fff;border:none;transition:opacity .13s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🔥 FB Push</button>
+            <button onclick="window.fbPullAll&&window.fbPullAll()" style="padding:7px 5px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#ff6f00;border:2px solid #ff6f00;transition:background .13s" onmouseover="this.style.background='#fff3e0'" onmouseout="this.style.background='#fff'">🔥 FB Pull</button>
+            <button onclick="exportData()" style="padding:7px 5px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7;transition:background .13s" onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#e8f5e9'">📦 Export</button>
+            <label style="padding:7px 5px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff8e1;color:#e65100;border:1.5px solid #ffcc80;text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;transition:background .13s" onmouseover="this.style.background='#ffe0b2'" onmouseout="this.style.background='#fff8e1'">
+              📂 Import<input type="file" accept=".json" onchange="importData(this)" style="display:none">
             </label>
-          </div>
-          <div style="font-size:9.5px;color:var(--mu);line-height:1.5;background:rgba(106,90,205,.04);border-radius:7px;padding:6px 9px">
-            📦 Export — backup all data to a JSON file<br>
-            📂 Import — restore data from a JSON file
           </div>
         </div>
       </div>
@@ -1055,39 +976,34 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
       <div class="set-block">
         <div class="set-bh"><span class="set-bh-icon">📐</span><span class="set-bh-lbl">Layout — Columns</span></div>
         <div class="set-bb">
-          <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:8px;letter-spacing:.4px">Choose columns per section on prescription</div>
-
-          <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0edf8">
-            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Chief Complaints</div>
-            <div style="display:flex;gap:6px">
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
+          <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid #f0edf8">
+            <div style="font-size:9.5px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Chief Complaints</div>
+            <div style="display:flex;gap:5px">
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colComp" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3</label>
             </div>
           </div>
-
-          <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0edf8">
-            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Advice</div>
-            <div style="display:flex;gap:6px">
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
+          <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid #f0edf8">
+            <div style="font-size:9.5px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Advice</div>
+            <div style="display:flex;gap:5px">
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colAdv" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3</label>
             </div>
           </div>
-
           <div>
-            <div style="font-size:10px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Instructions</div>
-            <div style="display:flex;gap:6px">
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2 col</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx);cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3 col</label>
+            <div style="font-size:9.5px;font-weight:700;color:#4a3fa0;margin-bottom:4px">Instructions</div>
+            <div style="display:flex;gap:5px">
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="1" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 1</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="2" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 2</label>
+              <label style="display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--tx);cursor:pointer;padding:3px 6px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600"><input type="radio" name="colNote" value="3" onchange="savePrefs();upd()" style="accent-color:var(--p)"> 3</label>
             </div>
           </div>
-
         </div>
       </div>
 
-    </div><!-- /right col -->
+    </div><!-- /third col -->
 
   </div><!-- /set-grid -->
 
@@ -1637,7 +1553,7 @@ function prSetView(v){
   if(v==='add'){
     const isEdit=!!document.getElementById('prEditId').value;
     if(!isEdit){
-      ['prName','prAge','prDob','prPhone','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+      ['prName','prAge','prDob','prPhone','prOcc','prAddr','prAadhar','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
       document.getElementById('prGender').value='';
       document.getElementById('prBlood').value='';
       document.getElementById('prEditId').value='';
@@ -1706,6 +1622,7 @@ function addPatientToRegistry(){
     phone:document.getElementById('prPhone').value.trim(),
     occ:document.getElementById('prOcc').value.trim(),
     addr:document.getElementById('prAddr').value.trim(),
+    aadhar:document.getElementById('prAadhar').value.trim(),
     allergy:document.getElementById('prAllergy').value.trim(),
     pmh:document.getElementById('prPmh').value.trim(),
     meds:document.getElementById('prMeds').value.trim(),
@@ -1742,8 +1659,8 @@ function loadPatientToForm(idx){
   document.getElementById('pA').value=p.age||'';
   document.getElementById('pG').value=p.gender||'';
   if(p.weight)document.getElementById('pW').value=p.weight;
-  // Store phone for WhatsApp
-  const ph=document.getElementById('pPhone');if(ph)ph.value=p.phone||'';
+  // Store aadhar for cert autofill
+  const _aa=document.getElementById('currentPatientAadhar');if(_aa)_aa.value=p.aadhar||'';
   // Log visit
   const today=new Date().toISOString().split('T')[0];
   if(!p.visits)p.visits=[];
@@ -1763,8 +1680,8 @@ function editPatient(idx,e){
   e.stopPropagation();
   const list=getPatientRegistry();
   const p=list[idx];if(!p)return;
-  ['prName','prAge','prPhone','prOcc','prAddr','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{
-    const field={prName:'name',prAge:'age',prPhone:'phone',prOcc:'occ',prAddr:'addr',prAllergy:'allergy',prPmh:'pmh',prMeds:'meds',prEmName:'emName',prEmRel:'emRel',prEmPhone:'emPhone',prNotes:'notes',prWeight:'weight'}[id];
+  ['prName','prAge','prPhone','prOcc','prAddr','prAadhar','prAllergy','prPmh','prMeds','prEmName','prEmRel','prEmPhone','prNotes','prWeight'].forEach(id=>{
+    const field={prName:'name',prAge:'age',prPhone:'phone',prOcc:'occ',prAddr:'addr',prAadhar:'aadhar',prAllergy:'allergy',prPmh:'pmh',prMeds:'meds',prEmName:'emName',prEmRel:'emRel',prEmPhone:'emPhone',prNotes:'notes',prWeight:'weight'}[id];
     const el=document.getElementById(id);if(el&&field)el.value=p[field]||'';
   });
   document.getElementById('prDob').value=p.dob||'';
@@ -1778,16 +1695,12 @@ function editPatient(idx,e){
 
 function deletePatient(idx,e){
   e.stopPropagation();
+  if(!confirm('Delete patient record?'))return;
   const list=getPatientRegistry();
-  const nm=list[idx]?.name||'this patient';
-  if(!confirm(`Delete "${nm}" ka record permanently delete hoga.\n\nConfirm?`))return;
   list.splice(idx,1);
   savePatientRegistry(list);
   prUpdateStats();
-  // If we're in profile view, go back to list
-  if(prCurrentView==='profile') prSetView('list');
-  else renderPatientList();
-  showToast('🗑️ Patient deleted: '+nm, 2500);
+  renderPatientList();
 }
 
 function viewPatientProfile(idx){
@@ -1820,6 +1733,7 @@ function viewPatientProfile(idx){
       ${p.phone?`<div><span style="color:var(--mu);font-weight:600">📞 Mobile: </span><a href="tel:${p.phone}" style="color:var(--p);font-weight:700;text-decoration:none">${p.phone}</a> <a href="https://wa.me/91${p.phone.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-size:11px;text-decoration:none;margin-left:4px">💬 WhatsApp</a></div>`:''}
       ${p.dob?`<div><span style="color:var(--mu);font-weight:600">🎂 DOB: </span>${p.dob}</div>`:''}
       ${p.addr?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">📍 </span>${p.addr}</div>`:''}
+      ${p.aadhar?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">🪪 Aadhar: </span><span style="font-weight:700;letter-spacing:1px">${p.aadhar}</span></div>`:''}
       ${p.emName?`<div style="grid-column:1/-1"><span style="color:var(--mu);font-weight:600">🆘 Emergency: </span>${p.emName}${p.emRel?' ('+p.emRel+')':''}${p.emPhone?' — '+p.emPhone:''}</div>`:''}
     </div>
   </div>
@@ -1898,10 +1812,7 @@ function renderPatientList(){
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
         <button onclick="event.stopPropagation();loadPatientToForm(${i})" style="padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Load ↗</button>
-        <div style="display:flex;gap:4px">
-          <button onclick="event.stopPropagation();editPatient(${i},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
-          <button onclick="event.stopPropagation();deletePatient(${i},event)" style="padding:3px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit" title="Delete patient">🗑</button>
-        </div>
+        <button onclick="event.stopPropagation();editPatient(${i},event)" style="padding:3px 9px;background:#f0ecff;color:var(--p);border:1px solid var(--pl);border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit">✎ Edit</button>
       </div>
     </div>`;
   }).join('');
@@ -2266,6 +2177,23 @@ function upd(){
     ib.style.display='block';
   }else ib.style.display='none';
 
+  // Investigation Results
+  const irb=document.getElementById('rxirb'), irr=document.getElementById('rxirrows');
+  const validRes=invResults.filter(r=>r.test||r.result);
+  if(validRes.length && irb && irr){
+    const badgeHtml=(f)=>{
+      if(!f) return '';
+      const map={high:'⬆H',low:'⬇L',normal:'✓'};
+      return `<span class="rxinvres-badge ${f}">${map[f]||f}</span>`;
+    };
+    irr.innerHTML=validRes.map(r=>`
+      <div class="rxinvres-item">
+        <span class="rxinvres-name" title="${r.test||''}">${r.test||'—'}</span>
+        <span class="rxinvres-val" style="color:${r.flag==='high'?'#c62828':r.flag==='low'?'#1565c0':'#1a1040'}">${r.result||'—'}<span class="rxinvres-unit">${r.unit||''}</span>${badgeHtml(r.flag)}</span>
+      </div>`).join('');
+    irb.style.display='block';
+  }else if(irb) irb.style.display='none';
+
   // Advice
   const allA=[...selAdv,...selAdvCustom];const ca=g('advX');if(ca)allA.push(ca);
   const ab=document.getElementById('rxab'),ae=document.getElementById('rxadv');
@@ -2298,7 +2226,6 @@ function upd(){
   // Signature
   const sw=document.getElementById('rxsigimg');
   sw.innerHTML=sigUrl?`<img class="rxsi" src="${sigUrl}" style="vertical-align:bottom;">`:'';
-
   // ── PAGINATION: split into two A4 pages when needed ──────────────────
   requestAnimationFrame(()=>{
     const rxc  = document.getElementById('rxc');
@@ -2402,7 +2329,7 @@ function upd(){
 
 function clearAll(){
   if(!confirm('Clear entire prescription?'))return;
-  ['pN','pA','pG','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','advX','notX','fuD','fuN','pPhone'].forEach(i=>{
+  ['pN','pA','pG','pD','pW','pI','bS','bD','vP','vT','vS','vR','diag','comp','advX','notX','fuD','fuN'].forEach(i=>{
     const e=document.getElementById(i);if(e)e.value=e.tagName==='SELECT'?e.options[0].value:'';
   });
   document.getElementById('pD').value=new Date().toISOString().split('T')[0];
@@ -2411,6 +2338,7 @@ function clearAll(){
   document.getElementById('invCustomCh').innerHTML='';
   document.getElementById('advCustomCh').innerHTML='';
   document.querySelectorAll('.ck').forEach(c=>c.classList.remove('si','sa','sn'));
+  invResults=[];saveInvResults();renderInvResultsForm();
   renderMeds();upd();
 }
 
@@ -2456,8 +2384,6 @@ function checkPass(){
     document.getElementById('lockInput').value='';
     restoreSig();
     restoreBgImage();
-    setTimeout(()=>maybeShowFuPopup(),600);
-    setTimeout(()=>autoSyncFromFirebase(),1000);
   }else{
     document.getElementById('lockErr').textContent='❌ Incorrect password';
     document.getElementById('lockInput').value='';
@@ -2466,14 +2392,6 @@ function checkPass(){
   }
 }
 function isAuth(){return sessionStorage.getItem('rxAuth')==='1';}
-
-function maybeShowFuPopup(){
-  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
-  if(!prefs.fuPopup)return;
-  const all=getFuPatients();
-  const urgent=all.filter(p=>p.status==='overdue'||p.status==='today');
-  if(urgent.length>0) openFollowUpReminders();
-}
 function restoreSig(){
   const s=localStorage.getItem('sigUrl');
   if(s&&isAuth()){
@@ -2517,7 +2435,7 @@ async function syncPush(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
-  setSyncStatus('📦 Packaging data...');
+  setSyncStatus('📦 Data package kar raha hai...');
   const payload=JSON.stringify({
     _marker:SYNC_MARKER,_ts:Date.now(),
     sigUrl:localStorage.getItem('sigUrl')||'',
@@ -2547,7 +2465,7 @@ async function syncPull(){
   const token=localStorage.getItem('tgToken');
   const chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){setSyncStatus('❌ Please configure your Bot Token & Chat ID in ⚙️ Settings first','#c62828');return;}
-  setSyncStatus('🔍 Searching for sync in Telegram...');
+  setSyncStatus('🔍 Telegram mein sync dhundh raha hai...');
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=50&allowed_updates=["message"]`);
     const data=await res.json();
@@ -2562,7 +2480,7 @@ async function syncPull(){
       }
     }
     if(!syncFileId){setSyncStatus('⚠️ No sync data found. Please Push from a device first.','#e65100');return;}
-    setSyncStatus('📥 Downloading sync file...');
+    setSyncStatus('📥 Sync file download ho rahi hai...');
     const fpRes=await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${syncFileId}`);
     const fpData=await fpRes.json();
     if(!fpData.ok){setSyncStatus('❌ File fetch failed','#c62828');return;}
@@ -2591,15 +2509,14 @@ function showToast(msg,dur=2500){
 function openSettings(){
   document.getElementById('tgToken').value=localStorage.getItem('tgToken')||'';
   document.getElementById('tgChatId').value=localStorage.getItem('tgChatId')||'';
-  const waEl=document.getElementById('waNumber');if(waEl)waEl.value=localStorage.getItem('waNumber')||'';
   loadPrefs();
+  restoreCustomFont();
   restoreBgImage();
   document.getElementById('settingsMo').style.display='flex';
 }
 function saveSettings(){
   localStorage.setItem('tgToken',document.getElementById('tgToken').value.trim());
   localStorage.setItem('tgChatId',document.getElementById('tgChatId').value.trim());
-  const waEl=document.getElementById('waNumber');if(waEl)localStorage.setItem('waNumber',waEl.value.trim());
   document.getElementById('settingsMo').style.display='none';
   showToast('✅ Settings saved!');
 }
@@ -2634,7 +2551,7 @@ async function sendTelegram(){
     showToast('⚙️ Please configure Bot Token & Chat ID first',3000);
     openSettings();return;
   }
-  showToast('📄 Generating PDF...',4000);
+  showToast('📄 PDF bana raha hai...',4000);
   try{
     const blob=await generatePdfBlob(true);
     const nm=g('pN')||'Patient';
@@ -2652,131 +2569,8 @@ async function sendTelegram(){
   }catch(e){showToast('❌ Error: '+e.message,4000);console.error(e);}
 }
 
-// ─── WHATSAPP SEND (PDF) ───
-function buildWhatsAppMsg(){
-  const nm=g('pN')||'Patient';
-  const dt=g('pD')?fd(g('pD')):new Date().toLocaleDateString('en-IN');
-  const diag=g('diag');
-  const fu=g('fuD');
-  let msg=`📋 *Prescription*\n🏥 Dr. Lakshaya Mahajan, MBBS | PMC Regd. 65784\n📅 ${dt}\n\n👤 *Patient:* ${nm}`;
-  const age=g('pA');const gen=document.getElementById('pG').value;
-  if(age||gen) msg+=` | ${[age,gen].filter(Boolean).join(', ')}`;
-  if(diag) msg+=`\n🩺 *Diagnosis:* ${diag}`;
-  if(fu) msg+=`\n📅 *Follow-Up:* ${fd(fu)}`;
-  msg+=`\n\nPlease find your prescription PDF attached.\n\n_Not for medico-legal purpose_\n_Dr. Lakshaya Mahajan_`;
-  return msg;
-}
-
-async function sendWhatsApp(silent=false){
-  let patientPhone=(document.getElementById('pPhone')?.value||'').replace(/\D/g,'');
-  if(!patientPhone){
-    const nm=g('pN')||'';
-    if(nm){
-      const list=getPatientRegistry();
-      const found=list.find(p=>p.name.toLowerCase()===nm.toLowerCase());
-      if(found&&found.phone) patientPhone=found.phone.replace(/\D/g,'');
-    }
-  }
-
-  try{
-    showToast('📄 Generating prescription PDF...',5000);
-    const blob=await generatePdfBlob(false);
-    const nm=g('pN')||'Patient';
-    const dt=g('pD')?fd(g('pD')):new Date().toLocaleDateString('en-IN');
-    const fileName=`Rx_${nm.replace(/\s+/g,'_')}_${dt.replace(/[\/\s]/g,'-')}.pdf`;
-    const pdfFile=new File([blob],fileName,{type:'application/pdf'});
-    const msg=buildWhatsAppMsg();
-
-    // Try Web Share API (works on mobile — can share PDF directly to WhatsApp)
-    if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
-      try{
-        await navigator.share({title:`Prescription — ${nm}`,text:msg,files:[pdfFile]});
-        showToast('✅ Prescription PDF shared!',2500);
-        return;
-      }catch(e){
-        if(e.name==='AbortError')return; // User cancelled — don't proceed
-      }
-    }
-
-    // Fallback for desktop: download PDF, then open WhatsApp
-    const objUrl=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=objUrl;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(objUrl),3000);
-
-    // Open WhatsApp with message text (user can attach the downloaded PDF manually)
-    const encodedMsg=encodeURIComponent(msg+'\n\n_(PDF downloaded — please attach it to this message)_');
-    let waUrl;
-    if(patientPhone){
-      const fullNum=patientPhone.length===10?'91'+patientPhone:patientPhone;
-      waUrl=`https://wa.me/${fullNum}?text=${encodedMsg}`;
-    }else{
-      waUrl=`https://wa.me/?text=${encodedMsg}`;
-      if(!silent) showToast('⚠️ No phone found — PDF downloaded, choose contact in WhatsApp',4000);
-    }
-    setTimeout(()=>window.open(waUrl,'_blank'),400);
-    if(!silent&&patientPhone) showToast('📄 PDF downloaded — attach it in WhatsApp!',3000);
-
-  }catch(e){
-    showToast('❌ Error generating PDF: '+e.message,4000);
-    console.error(e);
-  }
-}
-
-// ─── MOBILE TAB SWITCH ───
-function mobSwitch(tab){
-  const fp=document.getElementById('mobFormPanel');
-  const pp=document.getElementById('mobPreviewPanel');
-  const tf=document.getElementById('mobTabForm');
-  const tp=document.getElementById('mobTabPreview');
-  if(tab==='form'){
-    fp.classList.add('mob-active');pp.classList.remove('mob-active');
-    tf.classList.add('active');tp.classList.remove('active');
-  }else{
-    pp.classList.add('mob-active');fp.classList.remove('mob-active');
-    tp.classList.add('active');tf.classList.remove('active');
-    setTimeout(scalePreviewForMobile,50);
-  }
-}
-function scalePreviewForMobile(){
-  const scaler=document.getElementById('ppScaler');
-  const rxp=document.getElementById('rxp');
-  if(!scaler||!rxp)return;
-  if(window.innerWidth>768){
-    rxp.style.transform='';
-    rxp.style.marginBottom='';
-    scaler.style.height='';
-    return;
-  }
-  // Available width = screen width minus padding (8px each side)
-  const vw=Math.min(window.innerWidth,scaler.offsetWidth||window.innerWidth) - 16;
-  const scale=vw/794;
-  rxp.style.transform=`scale(${scale})`;
-  rxp.style.transformOrigin='top center';
-  // Set scaler height so pp can scroll correctly
-  const scaledH=Math.ceil(1123*scale);
-  scaler.style.height=scaledH+'px';
-  // If page 2 exists, update total height
-  const rxp2=document.getElementById('rxp2');
-  if(rxp2){
-    rxp2.style.transform=`scale(${scale})`;
-    rxp2.style.transformOrigin='top center';
-    scaler.style.height=(scaledH*2+20)+'px';
-  }
-}
-window.addEventListener('resize',()=>{
-  if(window.innerWidth<=768) scalePreviewForMobile();
-  else{
-    const rxp=document.getElementById('rxp');
-    if(rxp){rxp.style.transform='';rxp.style.marginBottom='';}
-    const sc=document.getElementById('ppScaler');if(sc)sc.style.height='';
-  }
-});
-// Auto-scale on load for mobile
-window.addEventListener('DOMContentLoaded',()=>{
-  if(window.innerWidth<=768) setTimeout(scalePreviewForMobile,200);
-});
-
-async function printSaveAndSend(){  // Auto-register patient if new
+async function printSaveAndSend(){
+  // Auto-register patient if new
   autoRegisterIfNew();
   // Increment token counter if auto-token enabled
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
@@ -2788,7 +2582,6 @@ async function printSaveAndSend(){  // Auto-register patient if new
   }
   const prefSave=document.getElementById('setPrefSave').checked;
   const prefTg=document.getElementById('setPrefTg').checked;
-  const prefWa=document.getElementById('setPrefWa')?.checked??false;
   const prefPrint=document.getElementById('setPrefPrint').checked;
 
   const btn=document.getElementById('printBtn');
@@ -2808,7 +2601,7 @@ async function printSaveAndSend(){  // Auto-register patient if new
     const chatId=localStorage.getItem('tgChatId');
     if(token&&chatId){
       try{
-        showToast('📄 Generating PDF...',4000);
+        showToast('📄 PDF bana raha hai...',4000);
         const blob=await generatePdfBlob(true);
         const nm=g('pN')||'Patient';
         const dt=g('pD')?fd(g('pD')):new Date().toLocaleDateString('en-IN');
@@ -2831,13 +2624,7 @@ async function printSaveAndSend(){  // Auto-register patient if new
 
   btn.disabled=false;btn.textContent='⎙ Print / Save / Send';
 
-  // 3. Auto WhatsApp if pref enabled
-  if(prefWa){
-    sendWhatsApp(true);
-    toastMessages.push('📄 PDF→WhatsApp');
-  }
-
-  // 4. Print if pref enabled — do it before showing toast so toast doesn't appear on print
+  // 3. Print if pref enabled — do it before showing toast so toast doesn't appear on print
   if(prefPrint){
     window.print();
   }
@@ -2931,13 +2718,6 @@ function saveRxSilent(){
   saved.unshift({name,diag,date:new Date().toISOString(),state:getRxState()});
   if(saved.length>50)saved.pop();
   localStorage.setItem('rxSaved',JSON.stringify(saved));
-  // Also update follow-up date in patient registry so reminder system can use it
-  const fuD=g('fuD');
-  if(fuD&&nm&&nm!=='Patient'){
-    const list=getPatientRegistry();
-    const idx=list.findIndex(p=>p.name.toLowerCase()===nm.toLowerCase());
-    if(idx>=0){list[idx].nextFollowUp=fuD;savePatientRegistry(list);}
-  }
 }
 // ── Page 2 split control ─────────────────────────────────────
 const P2_SECTIONS=[
@@ -2979,6 +2759,44 @@ function onP2SplitChange(){
   }
   upd();
 }
+function loadCustomFont(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const b64=btoa(String.fromCharCode(...new Uint8Array(e.target.result)));
+    const ext=file.name.split('.').pop().toLowerCase();
+    const fmt={ttf:'truetype',otf:'opentype',woff:'woff',woff2:'woff2'}[ext]||'truetype';
+    const css=`@font-face{font-family:'CustomRxFont';src:url('data:font/${ext};base64,${b64}') format('${fmt}');font-weight:normal;font-style:normal;}`;
+    document.getElementById('customFontStyle').textContent=css;
+    document.getElementById('customFontName').textContent=file.name;
+    document.getElementById('customFontName').style.color='var(--p)';
+    document.getElementById('customFontPreview').style.display='block';
+    // persist
+    try{localStorage.setItem('customFontB64',b64);localStorage.setItem('customFontExt',ext);localStorage.setItem('customFontName',file.name);}catch(e){}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function clearCustomFont(){
+  document.getElementById('customFontStyle').textContent='';
+  document.getElementById('customFontName').textContent='No custom font loaded';
+  document.getElementById('customFontName').style.color='var(--mu)';
+  document.getElementById('customFontPreview').style.display='none';
+  try{localStorage.removeItem('customFontB64');localStorage.removeItem('customFontExt');localStorage.removeItem('customFontName');}catch(e){}
+}
+function restoreCustomFont(){
+  try{
+    const b64=localStorage.getItem('customFontB64');
+    const ext=localStorage.getItem('customFontExt')||'ttf';
+    const name=localStorage.getItem('customFontName')||'Custom font';
+    if(!b64)return;
+    const fmt={ttf:'truetype',otf:'opentype',woff:'woff',woff2:'woff2'}[ext]||'truetype';
+    document.getElementById('customFontStyle').textContent=`@font-face{font-family:'CustomRxFont';src:url('data:font/${ext};base64,${b64}') format('${fmt}');font-weight:normal;font-style:normal;}`;
+    document.getElementById('customFontName').textContent=name;
+    document.getElementById('customFontName').style.color='var(--p)';
+    document.getElementById('customFontPreview').style.display='block';
+  }catch(e){}
+}
 function applyBWMode(){
   const on=document.getElementById('setPrefBW')?.checked;
   document.body.classList.toggle('bw-mode',!!on);
@@ -2987,12 +2805,10 @@ function savePrefs(){
   const prefs={
     save:document.getElementById('setPrefSave').checked,
     tg:document.getElementById('setPrefTg').checked,
-    wa:document.getElementById('setPrefWa')?.checked??false,
     print:document.getElementById('setPrefPrint').checked,
     confirm:false,
     bg:document.getElementById('rxBgToggle')?.checked??false,
     bw:document.getElementById('setPrefBW')?.checked??false,
-    fuPopup:document.getElementById('setPrefFuPopup')?.checked??false,
     col2Comp:document.querySelector('input[name="colComp"]:checked')?.value??'1',
     col2Adv:document.querySelector('input[name="colAdv"]:checked')?.value??'2',
     col2Note:document.querySelector('input[name="colNote"]:checked')?.value??'1',
@@ -3011,8 +2827,6 @@ function loadPrefs(){
   const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
   const set=(id,def)=>{const e=document.getElementById(id);if(e)e.checked=prefs[id.replace('setPref','').toLowerCase()]!==undefined?prefs[id.replace('setPref','').toLowerCase()]:def;};
   set('setPrefSave',true);set('setPrefTg',true);set('setPrefPrint',true);
-  const waChk=document.getElementById('setPrefWa');if(waChk)waChk.checked=prefs.wa??false;
-  const fuPopupChk=document.getElementById('setPrefFuPopup');if(fuPopupChk)fuPopupChk.checked=prefs.fuPopup??false;
   const bg=document.getElementById('rxBgToggle');if(bg)bg.checked=prefs.bg??false;
   const at=document.getElementById('setPrefAutoToken');if(at){at.checked=prefs.autoToken??false;}
   const tp=document.getElementById('tokenPrefix');if(tp)tp.value=prefs.tokenPrefix||'OPD';
@@ -4261,6 +4075,281 @@ function applyDisease(key) {
   setTimeout(() => document.getElementById('mlist').scrollIntoView({behavior:'smooth', block:'nearest'}), 200);
 }
 
+// ── INVESTIGATION RESULTS ─────────────────────────────────────────────────
+// Lab test database: { name, unit, range }
+const LAB_DB = [
+  // CBC
+  {n:'Hemoglobin (Hb)',         u:'g/dL',    r:'M: 13.5–17.5 | F: 12.0–15.5'},
+  {n:'WBC Count',               u:'/μL',     r:'4,000–11,000'},
+  {n:'Platelet Count',          u:'/μL',     r:'1,50,000–4,00,000'},
+  {n:'RBC Count',               u:'million/μL', r:'M: 4.5–5.9 | F: 4.0–5.2'},
+  {n:'Haematocrit (PCV)',       u:'%',       r:'M: 41–53 | F: 36–46'},
+  {n:'MCV',                     u:'fL',      r:'80–100'},
+  {n:'MCH',                     u:'pg',      r:'27–33'},
+  {n:'MCHC',                    u:'g/dL',    r:'32–36'},
+  {n:'Neutrophils',             u:'%',       r:'50–70'},
+  {n:'Lymphocytes',             u:'%',       r:'20–40'},
+  {n:'Eosinophils',             u:'%',       r:'1–4'},
+  {n:'Monocytes',               u:'%',       r:'2–8'},
+  {n:'ESR',                     u:'mm/hr',   r:'M: 0–15 | F: 0–20'},
+  // Blood Sugar
+  {n:'Fasting Blood Sugar (FBS)', u:'mg/dL', r:'70–100'},
+  {n:'Post Prandial Blood Sugar (PPBS)', u:'mg/dL', r:'<140'},
+  {n:'Random Blood Sugar (RBS)', u:'mg/dL',  r:'<200'},
+  {n:'HbA1c',                   u:'%',       r:'<5.7 (Normal) | 5.7–6.4 (Pre-DM) | ≥6.5 (DM)'},
+  {n:'Fasting Insulin',         u:'μIU/mL',  r:'2–25'},
+  // Kidney Function
+  {n:'Serum Creatinine',        u:'mg/dL',   r:'M: 0.7–1.3 | F: 0.6–1.1'},
+  {n:'Blood Urea Nitrogen (BUN)', u:'mg/dL', r:'7–20'},
+  {n:'Blood Urea',              u:'mg/dL',   r:'15–40'},
+  {n:'Uric Acid',               u:'mg/dL',   r:'M: 3.5–7.2 | F: 2.6–6.0'},
+  {n:'eGFR',                    u:'mL/min/1.73m²', r:'≥60'},
+  {n:'Serum Sodium (Na)',        u:'mEq/L',  r:'136–145'},
+  {n:'Serum Potassium (K)',      u:'mEq/L',  r:'3.5–5.1'},
+  {n:'Serum Chloride (Cl)',      u:'mEq/L',  r:'98–107'},
+  {n:'Serum Bicarbonate',       u:'mEq/L',   r:'22–29'},
+  // Liver Function
+  {n:'Total Bilirubin',         u:'mg/dL',   r:'0.2–1.2'},
+  {n:'Direct Bilirubin',        u:'mg/dL',   r:'0.0–0.3'},
+  {n:'Indirect Bilirubin',      u:'mg/dL',   r:'0.1–1.0'},
+  {n:'SGOT (AST)',              u:'U/L',     r:'10–40'},
+  {n:'SGPT (ALT)',              u:'U/L',     r:'7–56'},
+  {n:'Alkaline Phosphatase (ALP)', u:'U/L',  r:'44–147'},
+  {n:'GGT',                     u:'U/L',     r:'M: 8–61 | F: 5–36'},
+  {n:'Total Protein',           u:'g/dL',    r:'6.3–8.2'},
+  {n:'Serum Albumin',           u:'g/dL',    r:'3.5–5.0'},
+  {n:'Serum Globulin',          u:'g/dL',    r:'2.0–3.5'},
+  {n:'A/G Ratio',               u:'',        r:'1.2–2.2'},
+  // Lipid Profile
+  {n:'Total Cholesterol',       u:'mg/dL',   r:'<200 (Desirable)'},
+  {n:'LDL Cholesterol',         u:'mg/dL',   r:'<100 (Optimal)'},
+  {n:'HDL Cholesterol',         u:'mg/dL',   r:'M: >40 | F: >50'},
+  {n:'Triglycerides',           u:'mg/dL',   r:'<150'},
+  {n:'VLDL Cholesterol',        u:'mg/dL',   r:'2–30'},
+  // Thyroid
+  {n:'TSH',                     u:'μIU/mL',  r:'0.4–4.0'},
+  {n:'Free T3 (fT3)',           u:'pg/mL',   r:'2.3–4.2'},
+  {n:'Free T4 (fT4)',           u:'ng/dL',   r:'0.8–1.8'},
+  {n:'Total T3',                u:'ng/dL',   r:'80–200'},
+  {n:'Total T4',                u:'μg/dL',   r:'5.0–12.0'},
+  // Iron Studies
+  {n:'Serum Iron',              u:'μg/dL',   r:'M: 60–170 | F: 50–150'},
+  {n:'TIBC',                    u:'μg/dL',   r:'240–450'},
+  {n:'Serum Ferritin',          u:'ng/mL',   r:'M: 12–300 | F: 10–150'},
+  {n:'Transferrin Saturation',  u:'%',       r:'20–50'},
+  // Vitamins / Minerals
+  {n:'Serum Calcium',           u:'mg/dL',   r:'8.5–10.5'},
+  {n:'Serum Phosphorus',        u:'mg/dL',   r:'2.5–4.5'},
+  {n:'Serum Magnesium',         u:'mg/dL',   r:'1.7–2.2'},
+  {n:'Vitamin D (25-OH)',       u:'ng/mL',   r:'30–100 (Sufficient)'},
+  {n:'Vitamin B12',             u:'pg/mL',   r:'200–900'},
+  {n:'Folic Acid',              u:'ng/mL',   r:'3–17'},
+  // Cardiac
+  {n:'Troponin I',              u:'ng/mL',   r:'<0.04'},
+  {n:'CPK-MB',                  u:'U/L',     r:'0–25'},
+  {n:'CRP (C-Reactive Protein)',u:'mg/L',    r:'<5.0'},
+  {n:'Pro-BNP',                 u:'pg/mL',   r:'<125'},
+  // Infection / Inflammation
+  {n:'Procalcitonin (PCT)',     u:'ng/mL',   r:'<0.5'},
+  {n:'Widal Test (O)',          u:'titre',   r:'<1:80'},
+  {n:'Widal Test (H)',          u:'titre',   r:'<1:80'},
+  {n:'Dengue NS1 Antigen',      u:'',        r:'Negative'},
+  {n:'Dengue IgM',              u:'',        r:'Negative'},
+  {n:'Dengue IgG',              u:'',        r:'Negative'},
+  {n:'Malaria Antigen (RDT)',   u:'',        r:'Negative'},
+  {n:'HIV I & II',              u:'',        r:'Non-Reactive'},
+  {n:'HBsAg (Hepatitis B)',     u:'',        r:'Non-Reactive'},
+  {n:'Anti-HCV',                u:'',        r:'Non-Reactive'},
+  {n:'VDRL',                    u:'',        r:'Non-Reactive'},
+  // Urine
+  {n:'Urine Routine (Protein)', u:'',        r:'Nil'},
+  {n:'Urine Routine (Sugar)',   u:'',        r:'Nil'},
+  {n:'Urine Routine (Pus Cells)',u:'/HPF',   r:'0–5'},
+  {n:'Urine Routine (RBCs)',    u:'/HPF',    r:'0–2'},
+  {n:'Urine Routine (Casts)',   u:'',        r:'Nil'},
+  {n:'Spot Urine Protein/Creatinine Ratio', u:'', r:'<0.2'},
+  {n:'24h Urine Protein',       u:'mg/day',  r:'<150'},
+  // Hormones
+  {n:'Serum Cortisol (AM)',     u:'μg/dL',   r:'6–23'},
+  {n:'LH',                      u:'mIU/mL',  r:'M: 1–9 | F (follicular): 2–15'},
+  {n:'FSH',                     u:'mIU/mL',  r:'M: 1–12 | F (follicular): 3–10'},
+  {n:'Prolactin',               u:'ng/mL',   r:'M: 4–15 | F: 4–29'},
+  {n:'Testosterone (Total)',    u:'ng/dL',   r:'M: 270–1070 | F: 15–70'},
+  {n:'Beta-HCG',                u:'mIU/mL',  r:'Non-pregnant: <5'},
+  // Stool
+  {n:'Stool Routine (Consistency)', u:'',    r:'Semi-formed/Formed'},
+  {n:'Stool Occult Blood',      u:'',        r:'Negative'},
+  {n:'H. pylori Antigen (Stool)',u:'',       r:'Negative'},
+  // Misc
+  {n:'Amylase',                 u:'U/L',     r:'30–110'},
+  {n:'Lipase',                  u:'U/L',     r:'0–160'},
+  {n:'LDH',                     u:'U/L',     r:'140–280'},
+  {n:'Serum Protein Electrophoresis', u:'',  r:'Normal pattern'},
+  {n:'D-Dimer',                 u:'μg/mL FEU', r:'<0.50'},
+  {n:'PT/INR',                  u:'',        r:'INR 0.8–1.2'},
+  {n:'aPTT',                    u:'seconds', r:'25–35'},
+  {n:'Blood Group & Rh',        u:'',        r:''},
+];
+
+// Build datalist for autocomplete
+function buildLabDatalist(){
+  let dl = document.getElementById('labTestDL');
+  if(!dl){ dl=document.createElement('datalist'); dl.id='labTestDL'; document.body.appendChild(dl); }
+  dl.innerHTML = LAB_DB.map(t=>`<option value="${t.n}">`).join('');
+}
+
+function labAutofill(i, testName){
+  const match = LAB_DB.find(t=>t.n.toLowerCase()===testName.toLowerCase());
+  if(match){
+    invResults[i].test  = match.n;
+    invResults[i].unit  = match.u;
+    invResults[i].range = match.r;
+  } else {
+    invResults[i].test = testName;
+  }
+  autoFlag(i);
+  saveInvResults();
+  renderInvResultsForm();
+  upd();
+}
+
+function autoFlag(i){
+  const r = invResults[i];
+  if(!r.result) return;
+
+  // String-based results (Negative / Non-Reactive / Nil)
+  const strRes = r.result.trim().toLowerCase();
+  const strRng = (r.range||'').trim().toLowerCase();
+  const strKeywords = ['negative','non-reactive','nil','absent','normal pattern'];
+  if(strKeywords.some(k => strRng.includes(k))){
+    r.flag = strKeywords.some(k => strRes.includes(k)) ? 'normal' : 'high';
+    return;
+  }
+
+  const val = parseFloat(r.result.replace(/,/g,''));
+  if(isNaN(val)) return;
+
+  // Take first segment when range has M/F split like "M: 13.5–17.5 | F: 12–15.5"
+  let rng = (r.range||'').split('|')[0];
+  // Strip label prefix like "M: ", "INR ", etc.
+  rng = rng.replace(/^[A-Za-z0-9 ]+:\s*/, '').trim();
+
+  // < NUMBER  (upper limit only)
+  if(/^</.test(rng)){
+    const max = parseFloat(rng.replace(/[<,]/g,''));
+    r.flag = val < max ? 'normal' : 'high';
+    return;
+  }
+  // ≤ NUMBER
+  if(/^≤/.test(rng)){
+    const max = parseFloat(rng.replace(/[≤,]/g,''));
+    r.flag = val <= max ? 'normal' : 'high';
+    return;
+  }
+  // > NUMBER or ≥ NUMBER (lower limit only)
+  if(/^[>≥]/.test(rng)){
+    const min = parseFloat(rng.replace(/[>≥,]/g,''));
+    r.flag = val >= min ? 'normal' : 'low';
+    return;
+  }
+  // NUMBER – NUMBER  (range)
+  const m = rng.match(/([\d.,]+)\s*[–\-]\s*([\d.,]+)/);
+  if(m){
+    const min = parseFloat(m[1].replace(',','')), max = parseFloat(m[2].replace(',',''));
+    if(val < min)      r.flag = 'low';
+    else if(val > max) r.flag = 'high';
+    else               r.flag = 'normal';
+  }
+}
+
+let invResults = [];
+function saveInvResults(){ /* session-only, no persistence needed */ }
+
+function flagStyle(flag){
+  if(flag==='high')   return {color:'#c62828',bg:'#ffebee',border:'#ef9a9a',text:'⬆ High'};
+  if(flag==='low')    return {color:'#1565c0',bg:'#e3f2fd',border:'#90caf9',text:'⬇ Low'};
+  if(flag==='normal') return {color:'#2e7d32',bg:'#e8f5e9',border:'#a5d6a7',text:'✓ Normal'};
+  return {color:'#aaa',bg:'transparent',border:'transparent',text:'—'};
+}
+
+function updateFlagBadge(i){
+  const badge = document.getElementById(`irFlag_${i}`);
+  if(!badge) return;
+  const f = flagStyle(invResults[i].flag);
+  badge.textContent    = f.text;
+  badge.style.color    = f.color;
+  badge.style.background = f.bg;
+  badge.style.borderColor= f.border;
+}
+
+function cycleFlag(i){
+  const order=['','normal','high','low'];
+  const cur = invResults[i].flag||'';
+  invResults[i].flag = order[(order.indexOf(cur)+1)%order.length];
+  saveInvResults();
+  updateFlagBadge(i);
+  upd();
+}
+
+function renderInvResultsForm(){
+  const container = document.getElementById('invResList');
+  if(!container) return;
+  buildLabDatalist();
+  if(!invResults.length){
+    container.innerHTML = '<div style="font-size:11px;color:var(--mu);font-style:italic;text-align:center;padding:8px 0;">Koi result nahi. "+ Add Result" dabao.</div>';
+    return;
+  }
+  container.innerHTML = invResults.map((r,i)=>{
+    const f = flagStyle(r.flag);
+    const unitSpan = r.unit ? `<span style="font-size:9.5px;color:var(--mu);font-weight:700;padding:2px 5px;flex-shrink:0;border-left:1px solid var(--br);">${r.unit}</span>` : '';
+    return `
+    <div style="background:var(--wh);border:1px solid var(--br);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <span style="font-size:10px;font-weight:700;color:var(--mu);min-width:16px;text-align:center;flex-shrink:0;">${i+1}.</span>
+        <input type="text" value="${r.test||''}" placeholder="🔍 Test name type karo..." list="labTestDL"
+          style="flex:1;border:1px solid var(--br);border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;outline:none;"
+          oninput="invResults[${i}].test=this.value;saveInvResults();"
+          onchange="labAutofill(${i},this.value)">
+        <button onclick="removeInvResult(${i})" style="width:22px;height:22px;border:1px solid #ef9a9a;border-radius:5px;background:#ffebee;color:#c62828;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding-left:21px;">
+        <div style="display:flex;align-items:center;border:1.5px solid var(--br);border-radius:7px;overflow:hidden;background:#f8f7ff;flex:2;min-width:0;">
+          <input type="text" id="irVal_${i}" value="${r.result||''}" placeholder="Value"
+            style="flex:1;border:none;padding:5px 8px;font-size:13px;font-weight:700;font-family:inherit;outline:none;background:transparent;min-width:0;width:0;"
+            oninput="invResults[${i}].result=this.value;autoFlag(${i});saveInvResults();updateFlagBadge(${i});upd()">
+          ${unitSpan}
+          <span id="irFlag_${i}"
+            style="font-size:10px;font-weight:700;padding:4px 8px;border-left:1px solid var(--br);color:${f.color};background:${f.bg};border-color:${f.border};white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s;"
+            title="Click to override" onclick="cycleFlag(${i})">${f.text}</span>
+        </div>
+        <input type="text" id="irRange_${i}" value="${r.range||''}" placeholder="Range"
+          style="flex:1;border:1px solid var(--br);border-radius:7px;padding:5px 8px;font-size:10px;font-family:inherit;outline:none;color:var(--mu);min-width:0;"
+          oninput="invResults[${i}].range=this.value;saveInvResults();autoFlag(${i});updateFlagBadge(${i});upd()">
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addInvResult(){
+  invResults.push({test:'',result:'',unit:'',range:'',flag:''});
+  saveInvResults();
+  renderInvResultsForm();
+  // Focus the last test name input
+  setTimeout(()=>{
+    const inputs=document.querySelectorAll('#invResList input[list="labTestDL"]');
+    if(inputs.length) inputs[inputs.length-1].focus();
+  },50);
+}
+
+function removeInvResult(i){
+  invResults.splice(i,1);
+  saveInvResults();
+  renderInvResultsForm();
+  upd();
+}
+
+// ── END INVESTIGATION RESULTS ──────────────────────────────────────────────
+
 // ─── DISEASE TEMPLATES ─── END
 buildChips('invCh',INVS,selInv,'si');
 buildChips('advCh',ADVS,selAdv,'sa');
@@ -4278,6 +4367,7 @@ document.getElementById('pD').value=new Date().toISOString().split('T')[0];
 renderCustomTpls();
 loadPrefs();
 renderMeds();upd();
+renderInvResultsForm();
 
 // Add cert-tab-btn style dynamically
 const certStyle=document.createElement('style');
@@ -4329,6 +4419,8 @@ function autofillCertFromRx(){
     if(rxGender)document.getElementById('cGender').value=rxGender;
     const rxDiag=g('diag');
     if(rxDiag&&!cv('cDx'))document.getElementById('cDx').value=rxDiag;
+    const rxAadhar=document.getElementById('currentPatientAadhar')?.value||'';
+    if(rxAadhar&&!cv('cAadhar'))document.getElementById('cAadhar').value=rxAadhar;
   }
 }
 function cv(id){return(document.getElementById(id)?.value||'').trim();}
@@ -4351,6 +4443,7 @@ function renderCert(){
   const age=cv('cAge')||'___';
   const gender=cv('cGender')||'';
   const addr=cv('cAddr');
+  const aadhar=cv('cAadhar');
   const dx=cv('cDx')||'__________________';
 
   // Gender-based pronouns
@@ -4382,9 +4475,9 @@ function renderCert(){
     }
   } else { certTimestamp=cdate('cFrom'); }
   if(_userEditedTs) certTimestamp=_userEditedTs.replace(/^Date:\s*/,'');
-  const sigBlock=`<div style="text-align:right;margin-top:20px;line-height:1.4">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:0 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
-  const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:10px;font-style:italic;line-height:1.4">Not valid for medico-legal purposes</p>`;
-  const addrLine=addr?`<br><span style="font-size:14px;color:#000;font-family:'DM Sans',sans-serif;">R/o: ${addr}</span>`:'';
+  const sigBlock=`<div style="text-align:right;margin-top:20px;line-height:1.4">${sig}<div style="width:130px;height:1px;background:#4a3fa0;margin:${sig?'0':'45px'} 0 3px auto"></div><strong>Dr. Lakshaya Mahajan</strong><br><span style="font-size:10px;color:#8878b8">MBBS &nbsp;·&nbsp; PMC Regd. 65784</span><br><span id="certTimestampSpan" contenteditable="true" spellcheck="false" style="font-size:10px;color:#8878b8;outline:none;border-bottom:1px dashed #c0b8e0;cursor:text;display:inline-block;min-width:80px;padding:1px 2px;border-radius:2px" title="Click to edit date/time">Date: ${certTimestamp}</span></div>`;
+  const disc=`<p style="text-align:center;font-size:9px;color:#b0a8cc;margin-top:30px;font-style:italic;line-height:1.5">This certificate is issued in good faith based on clinical examination and information furnished by the patient. It is not valid for medico-legal, insurance claim, or judicial proceedings unless specifically stated. The certifying physician shall not be held liable for any consequence arising from reliance on this certificate beyond its stated purpose.</p>`;
+  const addrLine=(addr||aadhar)?`, <span style="font-size:14px;color:#000;font-family:'DM Sans',sans-serif;">${addr?`R/o: ${addr}`:''}${addr&&aadhar?' &nbsp;|&nbsp; ':''}${aadhar?`Aadhar: ${aadhar}`:''}</span>`:'';
   let body='';
   const titles={sick:'MEDICAL / SICK LEAVE CERTIFICATE',fitness_work:'FITNESS FOR WORK CERTIFICATE',fitness_travel:'FITNESS FOR TRAVEL CERTIFICATE',fitness_studies:'FITNESS FOR STUDIES CERTIFICATE',recovery:'RECOVERY CERTIFICATE',caretaker:'MEDICAL CARETAKER CERTIFICATE',custom:'MEDICAL CERTIFICATE'};
   const customTitle=certType==='custom'?(cv('cCustomTitle')||'MEDICAL CERTIFICATE').toUpperCase():null;
@@ -4400,22 +4493,22 @@ function renderCert(){
       document.getElementById('cTo').value=`${fromD.getFullYear()}-${pad(fromD.getMonth()+1)}-${pad(fromD.getDate())}`;
     }
     const days=cv('cDays')||'___';const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me and is found to be suffering from <strong>${dx}</strong>.</p><p>In my considered medical opinion, ${he} requires complete rest and is unfit to perform ${his} duties for <strong>${days} day(s)</strong>, with effect from <strong>${from}</strong> to <strong>${to}</strong> (both days inclusive).</p><p>This certificate is issued on ${his} request for the purpose of availing medical leave.</p>`;
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To Whomsoever It May Concern</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was clinically examined by the undersigned on <strong>${from}</strong> at this medical facility.</p><p>On clinical examination, ${he} was found to be suffering from <strong>${dx}</strong> and has been advised complete rest and appropriate medical treatment.</p><p>In my considered medical opinion, ${he} is unfit to attend ${his} occupational duties for a period of <strong>${days} day(s)</strong>, from <strong>${from}</strong> to <strong>${to}</strong> (both days inclusive).</p><p>This certificate is issued solely on the patient's request for the purpose of availing medical/sick leave and is valid only for the stated purpose.</p>`;
   } else if(certType==='fitness_work'){
-    const purpose=cv('cPurpose')||'regular duties';const restrict=cv('cRestrict');const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong>.</p><p>${He} has recovered from <strong>${dx}</strong> and is now <strong>medically fit to resume: ${purpose}</strong>.</p>${restrict?`<p><strong>Restrictions / Special Instructions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request.</p>`;
+    const purpose=cv('cPurpose')||'regular occupational duties';const restrict=cv('cRestrict');const from=cdate('cFrom');
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To Whomsoever It May Concern</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was clinically examined by the undersigned on <strong>${from}</strong>.</p><p>Based on my clinical assessment, ${he} has sufficiently recovered from <strong>${dx}</strong> and is, in my considered medical opinion, fit to resume <strong>${purpose}</strong> with effect from <strong>${from}</strong>.</p>${restrict?`<p><strong>Restrictions / Special Instructions:</strong> ${restrict}</p>`:''}<p>This opinion reflects the patient's clinical condition as on the date of examination only. This certificate is issued on the patient's request and is valid solely for the stated purpose.</p>`;
   } else if(certType==='fitness_travel'){
-    const dest=cv('cPurpose')||'travel';const restrict=cv('cRestrict');const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was examined by me on <strong>${from}</strong> for <strong>${dx}</strong>.</p><p>In my medical opinion, ${he} is currently <strong>medically fit to travel to ${dest}</strong>.</p>${restrict?`<p><strong>Special Instructions:</strong> ${restrict}</p>`:''}<p>This certificate is issued on ${his} request for travel purpose.</p>`;
+    const dest=cv('cPurpose')||'the intended destination';const restrict=cv('cRestrict');const from=cdate('cFrom');
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To Whomsoever It May Concern</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was clinically examined by the undersigned on <strong>${from}</strong>.</p><p>Based on my clinical assessment, and to the best of my knowledge at the time of examination, ${he} is medically fit to undertake travel to <strong>${dest}</strong> as on the date of this certificate.</p><p>The current clinical condition pertains to <strong>${dx}</strong>.</p>${restrict?`<p><strong>Medical Instructions / Precautions:</strong> ${restrict}</p>`:''}<p>This opinion is valid as on the date of issue only and is based solely on examination findings at the time of consultation. This certificate is issued on the patient's request for travel purpose only.</p>`;
   } else if(certType==='fitness_studies'){
     const inst=cv('cPurpose')||'resume academic studies';const from=cdate('cFrom');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under medical care for <strong>${dx}</strong>.</p><p>${He} has made satisfactory recovery and is now <strong>medically fit to ${inst}</strong> with effect from <strong>${from}</strong>.</p><p>This certificate is issued on ${his} request for submission to the educational institution.</p>`;
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To The Concerned Authority</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under my medical care and supervision for <strong>${dx}</strong>.</p><p>Based on clinical re-assessment, ${he} has recovered adequately from the aforementioned condition and is, in my considered medical opinion, fit to <strong>${inst}</strong> with effect from <strong>${from}</strong>.</p><p>This certificate is issued on the patient's request for submission to the educational institution and is valid for the stated purpose only. It reflects the patient's clinical condition as on the date of examination.</p>`;
   } else if(certType==='recovery'){
     const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under my medical supervision from <strong>${from}</strong> to <strong>${to}</strong> for <strong>${dx}</strong>.</p><p>${He} has <strong>recovered satisfactorily</strong> and is now in a clinically stable condition.</p><p>This certificate is issued on ${his} request to confirm recovery.</p>`;
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To Whomsoever It May Concern</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, was under my direct medical supervision and care from <strong>${from}</strong> to <strong>${to}</strong> for <strong>${dx}</strong>.</p><p>Based on clinical re-evaluation on <strong>${to}</strong>, ${he} has recovered satisfactorily from the aforementioned condition and is presently in a clinically stable condition with no acute medical concerns noted at the time of this examination.</p><p>This certificate is issued on the patient's request to formally confirm clinical recovery and is valid as on the date of issue only.</p>`;
   } else if(certType==='caretaker'){
     const ct=cv('cCt')||'__________________';const rel=cv('cRel')||'relative';const from=cdate('cFrom');const to=cdate('cTo');
-    body=`<p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, is under my medical care for <strong>${dx}</strong> and requires dedicated home-based medical care.</p><p><strong>${ct}</strong> (${rel} of the patient) is required to be present as a <strong>medical caretaker</strong> from <strong>${from}</strong> to <strong>${to}</strong>.</p><p>This certificate is issued on the patient's request for the purpose of caretaker leave.</p>`;
+    body=`<p style="margin-bottom:10px;text-align:center;font-weight:700;font-size:14px;letter-spacing:.3px">To Whomsoever It May Concern</p><p>This is to certify that <strong>${pn}</strong>, Age: <strong>${agLine}</strong>${addrLine}, is presently under my medical care for <strong>${dx}</strong>.</p><p>Based on my clinical assessment, the patient's condition necessitates dedicated personal assistance and home-based medical care during the course of treatment and recovery. ${He} is unable to independently manage ${his} daily activities and healthcare needs during this period.</p><p>In view of the above, <strong>${ct}</strong> (${rel} of the patient) is medically required to remain in attendance as a personal caretaker from <strong>${from}</strong> to <strong>${to}</strong>.</p><p>This certificate is issued on the patient's request for the sole purpose of obtaining caretaker leave and reflects the patient's clinical condition as on the date of examination. It is valid only for the stated purpose and period.</p>`;
   } else if(certType==='custom'){
     body=`<p>${(cv('cCustom')||'Enter certificate text above...').replace(/\n/g,'</p><p>')}</p>`;
   }
@@ -4478,7 +4571,7 @@ function printCert(){
 async function sendCertTelegram(){
   const token=localStorage.getItem('tgToken'),chatId=localStorage.getItem('tgChatId');
   if(!token||!chatId){return;}
-  showToast('📄 Generating certificate PDF...',5000);
+  showToast('📄 Certificate PDF bana raha hai...',5000);
   try{
     const includeBg=document.getElementById('certBgToggle')?.checked;
     const activeBgUrl=bgUrl||localStorage.getItem('bgUrl')||'';
@@ -4662,7 +4755,7 @@ async function storDelete(path){
 //  PUSH  — Local → Firebase
 // ══════════════════════════════════════════════════════════════════════════
 async function fbPushAll(){
-  fbToast('☁️ Uploading to Firebase...', 6000);
+  fbToast('☁️ Firebase pe upload ho raha hai...', 6000);
 
   // 1. Prescriptions
   const rxSaved = JSON.parse(localStorage.getItem('rxSaved')||'[]');
@@ -4691,7 +4784,7 @@ async function fbPushAll(){
   // 4. Signature image → Firebase Storage
   const sigUrlLocal = localStorage.getItem('sigUrl');
   if(sigUrlLocal && sigUrlLocal.startsWith('data:')){
-    fbToast('📷 Uploading signature...', 4000);
+    fbToast('📷 Signature upload ho rahi hai...', 4000);
     const sigDownload = await storUpload('images/signature.png', sigUrlLocal);
     if(sigDownload){
       await fbSet('images', { sigUrl: sigDownload, updatedAt: Date.now() });
@@ -4701,7 +4794,7 @@ async function fbPushAll(){
   // 5. Background image → Firebase Storage
   const bgUrlLocal = localStorage.getItem('bgUrl');
   if(bgUrlLocal && bgUrlLocal.startsWith('data:')){
-    fbToast('🖼️ Uploading letterhead...', 4000);
+    fbToast('🖼️ Letterhead upload ho raha hai...', 4000);
     const bgDownload = await storUpload('images/letterhead.jpg', bgUrlLocal);
     if(bgDownload){
       const imgDoc = await fbGet('images') || {};
@@ -4716,7 +4809,7 @@ async function fbPushAll(){
 //  PULL  — Firebase → Local
 // ══════════════════════════════════════════════════════════════════════════
 async function fbPullAll(){
-  fbToast('📥 Fetching data from Firebase...', 6000);
+  fbToast('📥 Firebase se data aa raha hai...', 6000);
 
   // 1. Prescriptions
   const rx = await fbGet('prescriptions');
@@ -4761,7 +4854,7 @@ async function fbPullAll(){
     window.restoreBgImage && window.restoreBgImage();
   }
 
-  fbToast('✅ Firebase pull complete! All data restored.', 3000);
+  fbToast('✅ Firebase pull complete! Sab kuch restore ho gaya.', 3000);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -4793,170 +4886,31 @@ if(_origSaveRxSilent){
 }
 
 // ─── On load: auto-pull if Firebase has newer data ────────────────────────
-async function autoSyncFromFirebase(){
-  try{
-    const rx = await fbGet('prescriptions');
-    const pt = await fbGet('patients');
-    const localRx = JSON.parse(localStorage.getItem('rxSaved')||'[]');
-    const localPt = JSON.parse(localStorage.getItem('patientRegistry')||'[]');
-    // Pull if either prescriptions OR patient registry is empty on this device
-    if((rx?.list && localRx.length===0) || (pt?.list && localPt.length===0)){
-      await fbPullAll();
-      fbToast('☁️ Data restored from Firebase!', 3000);
-    }
-  }catch(_){}
-}
-
 window.addEventListener('DOMContentLoaded', async ()=>{
-  // Wait for auth — up to 3 minutes (user may be slow typing password on phone)
-  const waitAuth = (ms=180000) => new Promise(res=>{
+  // Wait for auth
+  const waitAuth = (ms=5000) => new Promise(res=>{
     const start=Date.now();
     const t=setInterval(()=>{
       if(window.isAuth && window.isAuth()){clearInterval(t);res(true);}
       if(Date.now()-start>ms){clearInterval(t);res(false);}
-    },300);
+    },200);
   });
   const authed = await waitAuth();
   if(!authed) return;
-  autoSyncFromFirebase();
+
+  // Check if Firebase has data newer than local
+  try{
+    const rx = await fbGet('prescriptions');
+    const localRx = JSON.parse(localStorage.getItem('rxSaved')||'[]');
+    // If Firebase has data and local is empty → auto pull
+    if(rx?.list && localRx.length===0){
+      await fbPullAll();
+      fbToast('☁️ Firebase se data restore hua!', 3000);
+    }
+  }catch(_){}
 });
 
 console.log('🔥 Firebase ready — Dr. Lakshaya Rx connected to Firestore + Storage');
-
-// ══════════════════════════════════════════════════════════════════════════
-//  FOLLOW-UP REMINDERS
-// ══════════════════════════════════════════════════════════════════════════
-let _fuCurrentTab='all';
-
-function openFollowUpReminders(){
-  _fuCurrentTab='all';
-  fuSetTab('all');
-  document.getElementById('fuReminderMo').style.display='flex';
-}
-
-function fuSetTab(tab){
-  _fuCurrentTab=tab;
-  ['all','overdue','today','upcoming'].forEach(t=>{
-    const btn=document.getElementById('fuTab'+t.charAt(0).toUpperCase()+t.slice(1));
-    if(!btn)return;
-    btn.style.color=t===tab?'var(--p)':'var(--mu)';
-    btn.style.fontWeight=t===tab?'700':'600';
-    btn.style.borderBottom=t===tab?'2px solid var(--p)':'2px solid transparent';
-  });
-  renderFuList(tab);
-}
-
-function getFuPatients(){
-  const saved=JSON.parse(localStorage.getItem('rxSaved')||'[]');
-  const registry=JSON.parse(localStorage.getItem('patientRegistry')||'[]');
-  const today=new Date();today.setHours(0,0,0,0);
-  const results=[];
-  const seen=new Set();
-
-  saved.forEach(rx=>{
-    const state=rx.state||{};
-    const fuD=state.fuD;
-    if(!fuD)return;
-    const fuDate=new Date(fuD);fuDate.setHours(0,0,0,0);
-    const name=state.pN||'Unknown';
-    const key=name+'|'+fuD;
-    if(seen.has(key))return;
-    seen.add(key);
-
-    const diffDays=Math.round((fuDate-today)/(1000*60*60*24));
-    let status;
-    if(diffDays<0) status='overdue';
-    else if(diffDays===0) status='today';
-    else status='upcoming';
-
-    // Find phone from registry
-    const reg=registry.find(p=>p.name.toLowerCase()===name.toLowerCase());
-    const phone=reg?.phone||'';
-
-    results.push({name,fuD,fuDate,diffDays,status,phone,diag:state.diag||'',rxDate:rx.state?.pD||''});
-  });
-
-  // Sort: overdue first (most overdue at top), then today, then upcoming
-  results.sort((a,b)=>a.diffDays-b.diffDays);
-  return results;
-}
-
-function renderFuList(tab){
-  const all=getFuPatients();
-  const filtered=tab==='all'?all:all.filter(p=>p.status===tab);
-  const el=document.getElementById('fuReminderList');
-  const subtitle=document.getElementById('fuReminderSubtitle');
-  const counts={all:all.length,overdue:all.filter(p=>p.status==='overdue').length,today:all.filter(p=>p.status==='today').length,upcoming:all.filter(p=>p.status==='upcoming').length};
-  subtitle.textContent=`${counts.all} total · ${counts.overdue} overdue · ${counts.today} today · ${counts.upcoming} upcoming`;
-
-  if(!filtered.length){
-    el.innerHTML=`<div style="text-align:center;color:#b0a8cc;font-size:12px;padding:30px">No patients found for this filter.</div>`;
-    return;
-  }
-
-  el.innerHTML=filtered.map((p,i)=>{
-    const statusColor=p.status==='overdue'?'#c62828':p.status==='today'?'#e65100':'#1565c0';
-    const statusBg=p.status==='overdue'?'#ffebee':p.status==='today'?'#fff3e0':'#e3f2fd';
-    const statusLabel=p.status==='overdue'?`⚠️ Overdue by ${Math.abs(p.diffDays)} day${Math.abs(p.diffDays)!==1?'s':''}`:p.status==='today'?'📌 Due Today':`🔜 In ${p.diffDays} day${p.diffDays!==1?'s':''}`;
-    const fuFormatted=p.fuDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-    const hasPhone=!!p.phone;
-    return`<div style="background:var(--wh);border:1px solid var(--br);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px">
-      <div style="width:38px;height:38px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:var(--tx)">${p.name}</div>
-        <div style="font-size:10.5px;color:var(--mu)">${p.diag?p.diag+' · ':''}<span style="color:${statusColor};font-weight:700;background:${statusBg};padding:1px 6px;border-radius:5px">${statusLabel}</span></div>
-        <div style="font-size:10px;color:#9b8ee0;margin-top:2px">📅 ${fuFormatted}${p.phone?' · 📞 '+p.phone:' · <em style=color:#c62828>No phone saved</em>'}</div>
-      </div>
-      <button onclick="fuSendWhatsApp(${i},'${tab}')" ${!hasPhone?'title="No phone number in registry"':''} style="padding:7px 12px;background:${hasPhone?'#25d366':'#aaa'};color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:${hasPhone?'pointer':'default'};font-family:inherit;white-space:nowrap;flex-shrink:0">💬 ${hasPhone?'Send':'No Phone'}</button>
-    </div>`;
-  }).join('');
-}
-
-function buildFuReminderText(p){
-  const fuFormatted=p.fuDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-  const isOverdue=p.status==='overdue';
-  const isToday=p.status==='today';
-  let msg=`📅 *Follow-Up Reminder*\n🏥 Dr. Lakshaya Mahajan, MBBS | PMC Regd. 65784\n\nDear *${p.name}*,`;
-  if(isOverdue){
-    msg+=`\n\nYour follow-up appointment was scheduled for *${fuFormatted}* (${Math.abs(p.diffDays)} day${Math.abs(p.diffDays)!==1?'s':''} ago). Please visit at your earliest convenience.`;
-  } else if(isToday){
-    msg+=`\n\nYour follow-up appointment is *today — ${fuFormatted}*. Please visit the clinic as scheduled.`;
-  } else {
-    msg+=`\n\nThis is a reminder that your follow-up appointment is scheduled for *${fuFormatted}* (in ${p.diffDays} day${p.diffDays!==1?'s':''}).`;
-  }
-  if(p.diag) msg+=`\n\nCondition: ${p.diag}`;
-  msg+=`\n\nFor any queries, please contact the clinic.\n\n_Dr. Lakshaya Mahajan_`;
-  return msg;
-}
-
-function fuSendWhatsApp(idx,tab){
-  const all=getFuPatients();
-  const filtered=tab==='all'?all:all.filter(p=>p.status===tab);
-  const p=filtered[idx];
-  if(!p||!p.phone){showToast('⚠️ No phone number for this patient',2500);return;}
-  const phone=p.phone.replace(/\D/g,'');
-  const fullNum=phone.length===10?'91'+phone:phone;
-  const text=buildFuReminderText(p);
-  window.open(`https://wa.me/${fullNum}?text=${encodeURIComponent(text)}`,'_blank');
-  showToast('💬 Follow-up reminder sent to '+p.name,2500);
-}
-
-function fuSendAllWhatsApp(){
-  const all=getFuPatients();
-  const filtered=_fuCurrentTab==='all'?all:all.filter(p=>p.status===_fuCurrentTab);
-  const withPhone=filtered.filter(p=>!!p.phone);
-  if(!withPhone.length){showToast('⚠️ No patients with phone numbers in this list',2500);return;}
-  if(!confirm(`Send WhatsApp follow-up reminder to ${withPhone.length} patient${withPhone.length!==1?'s':''}?`))return;
-  withPhone.forEach((p,i)=>{
-    setTimeout(()=>{
-      const phone=p.phone.replace(/\D/g,'');
-      const fullNum=phone.length===10?'91'+phone:phone;
-      const text=buildFuReminderText(p);
-      window.open(`https://wa.me/${fullNum}?text=${encodeURIComponent(text)}`,'_blank');
-    },i*600);
-  });
-  showToast(`💬 Sending to ${withPhone.length} patients...`,3000);
-}
 </script>
 </body>
 </html>
