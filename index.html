@@ -587,7 +587,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     <button class="cert-tab-btn" onclick="setCertType('custom',this)">✏️ Custom</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-    <div class="mf" style="grid-column:1/-1"><label>Certificate No.</label><div style="display:flex;gap:6px;align-items:center"><input id="cCertNo" type="text" placeholder="CERT-2026-001" oninput="renderCert()" style="flex:1"><button onclick="document.getElementById('cCertNo').value=nextCertNo();renderCert()" style="padding:5px 10px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:6px;font-size:11px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">🔄 Auto</button></div></div>
+    <div class="mf" style="grid-column:1/-1"><label>Certificate No.</label><div style="display:flex;gap:6px;align-items:center"><input id="cCertNo" type="text" placeholder="CERT-SL-2026-001" oninput="this.dataset.userEdited='1';renderCert()" style="flex:1"><button onclick="const e=document.getElementById('cCertNo');e.value=nextCertNo(certType);e.dataset.userEdited='0';renderCert()" style="padding:5px 10px;background:#f0ecff;border:1.5px solid var(--pl);border-radius:6px;font-size:11px;color:var(--p);font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">🔄 Auto</button></div></div>
     <div class="mf"><label>Patient Name</label><input id="cPn" type="text" oninput="autofillCertFromRx();renderCert()"></div>
     <div class="mf"><label>Age</label><input id="cAge" type="text" placeholder="34 Yrs" oninput="renderCert()"></div>
     <div class="mf"><label>Gender</label>
@@ -600,7 +600,7 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
     </div>
     <div class="mf certf-diagnosis"><label>Diagnosis</label><input id="cDx" type="text" oninput="renderCert()"></div>
     <div class="mf" style="grid-column:1/-1"><label>Address (optional)</label><input id="cAddr" type="text" placeholder="e.g. Village / City, District" oninput="renderCert()"></div>
-    <div class="mf" style="grid-column:1/-1"><label>Aadhar Card No. (optional)</label><input id="cAadhar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="this.value=this.value.replace(/[^0-9 ]/g,'');renderCert()"></div>
+    <div class="mf" style="grid-column:1/-1"><label>Aadhar Card No. (optional)</label><input id="cAadhar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="this.value=formatAadhar(this.value);renderCert()"></div>
     <div class="mf certf-days"><label>Rest Days</label><input id="cDays" type="number" value="3" min="1" oninput="renderCert()"></div>
     <div class="mf certf-from"><label>From Date</label><input id="cFrom" type="date" oninput="renderCert()"></div>
     <div class="mf certf-to"><label>To Date</label><input id="cTo" type="date" oninput="renderCert()"></div>
@@ -941,6 +941,24 @@ body.bw-mode .rxp .rxinv-item::before{color:#000 !important;}
             </div>
             <div id="tokenPreview" style="font-size:10px;font-weight:700;color:var(--p);background:#fff;border-radius:6px;padding:4px 8px;border:1px solid var(--pl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Certificate Settings -->
+      <div class="set-block">
+        <div class="set-bh"><span class="set-bh-icon">📄</span><span class="set-bh-lbl">Certificate Settings</span></div>
+        <div class="set-bb">
+          <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:5px">AADHAR NUMBER SEPARATOR</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600;color:var(--tx)"><input type="radio" name="aadharSep" value="space" checked onchange="savePrefs();reformatAadharField()" style="accent-color:var(--p)"> Space (1234 5678 9012)</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;cursor:pointer;padding:3px 8px;border:1px solid var(--br);border-radius:6px;background:#fff;flex:1;justify-content:center;font-weight:600;color:var(--tx)"><input type="radio" name="aadharSep" value="dash" onchange="savePrefs();reformatAadharField()" style="accent-color:var(--p)"> Dash (1234-5678-9012)</label>
+          </div>
+          <div style="font-size:9px;color:var(--mu);font-weight:700;margin-bottom:5px">CERTIFICATE NUMBER COUNTER</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+            <input id="certCounterInput" type="number" min="1" value="1" oninput="setCertCounterVal(this.value)" style="flex:1;min-width:0;border:1px solid var(--p);border-radius:6px;padding:3px 5px;font-size:12px;font-weight:700;font-family:inherit;outline:none;text-align:center;color:var(--p)">
+            <button onclick="resetCertCounter()" style="padding:4px 7px;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0">Reset</button>
+          </div>
+          <div style="font-size:9px;color:var(--mu);line-height:1.5">Format: <code style="background:#fff;padding:1px 5px;border-radius:3px;color:var(--p)">CERT-[Type]-Year-No</code><br>Type codes: SL Sick Leave · FW Fit Work · FT Fit Travel · FS Fit Studies · RC Recovery · CT Caretaker · CU Custom</div>
         </div>
       </div>
 
@@ -2850,6 +2868,7 @@ function savePrefs(){
     tokenPrefix:document.getElementById('tokenPrefix')?.value||'OPD',
     tokenPrefixTel:document.getElementById('tokenPrefixTel')?.value||'TEL',
     tokenCounter:parseInt(document.getElementById('tokenCounter')?.value)||1,
+    aadharSep:document.querySelector('input[name="aadharSep"]:checked')?.value??'space',
   };
   localStorage.setItem('rxPrefs',JSON.stringify(prefs));
   localStorage.setItem('tokenCounterVal',String(prefs.tokenCounter));
@@ -2881,6 +2900,32 @@ function loadPrefs(){
   // BW mode
   const bw=document.getElementById('setPrefBW');if(bw)bw.checked=prefs.bw??false;
   applyBWMode();
+  // Aadhar separator
+  setRadio('aadharSep',prefs.aadharSep??'space');
+  // Certificate counter
+  const ccIn=document.getElementById('certCounterInput');
+  if(ccIn)ccIn.value=parseInt(localStorage.getItem('certCounterVal')||'1');
+}
+function formatAadhar(v){
+  const digits=v.replace(/[^0-9]/g,'').slice(0,12);
+  const prefs=JSON.parse(localStorage.getItem('rxPrefs')||'{}');
+  const sepChar=(prefs.aadharSep==='dash')?'-':' ';
+  return digits.replace(/(\d{4})(?=\d)/g,'$1'+sepChar);
+}
+function reformatAadharField(){
+  const el=document.getElementById('cAadhar');
+  if(el){el.value=formatAadhar(el.value);renderCert();}
+}
+function setCertCounterVal(v){
+  const n=Math.max(1,parseInt(v)||1);
+  localStorage.setItem('certCounterVal',String(n));
+}
+function resetCertCounter(){
+  localStorage.setItem('certCounterVal','1');
+  const ccIn=document.getElementById('certCounterInput');if(ccIn)ccIn.value=1;
+  showToast('✅ Certificate counter reset to 1',2500);
+  const certNoEl=document.getElementById('cCertNo');
+  if(certNoEl&&certNoEl.dataset.userEdited!=='1'){certNoEl.value=nextCertNo(certType);renderCert();}
 }
 function adjToken(delta){
   const tc=document.getElementById('tokenCounter');
@@ -4409,14 +4454,17 @@ document.head.appendChild(certStyle);
 
 // ─── MEDICAL CERTIFICATES ───
 let certType='sick';
-function nextCertNo(){
+const CERT_TYPE_CODES={sick:'SL',fitness_work:'FW',fitness_travel:'FT',fitness_studies:'FS',recovery:'RC',caretaker:'CT',custom:'CU'};
+function nextCertNo(type){
   const year=new Date().getFullYear();
   const counter=parseInt(localStorage.getItem('certCounterVal')||'1');
-  return `CERT-${year}-${String(counter).padStart(3,'0')}`;
+  const code=CERT_TYPE_CODES[type]||'GN';
+  return `CERT-${code}-${year}-${String(counter).padStart(3,'0')}`;
 }
 function openMedCert(){
   if(!isAuth()){showToast('🔒 Password required',2000);return;}
-  document.getElementById('cCertNo').value=nextCertNo();
+  const certNoEl=document.getElementById('cCertNo');
+  certNoEl.value='';certNoEl.dataset.userEdited='0';
   document.getElementById('cPn').value=g('pN')||'';
   document.getElementById('cAge').value=g('pA')||'';
   document.getElementById('cGender').value=document.getElementById('pG').value||'';
@@ -4437,6 +4485,8 @@ function setCertType(t,btn){
   certType=t;
   document.querySelectorAll('.cert-tab-btn').forEach(b=>b.classList.remove('act'));
   if(btn)btn.classList.add('act');
+  const certNoEl=document.getElementById('cCertNo');
+  if(certNoEl&&certNoEl.dataset.userEdited!=='1'){certNoEl.value=nextCertNo(t);}
   const show=(cls,v)=>document.querySelectorAll('.'+cls).forEach(e=>e.style.display=v?'':'none');
   show('certf-days',t==='sick');
   show('certf-from',t!=='custom');
